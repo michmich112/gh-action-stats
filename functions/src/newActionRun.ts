@@ -1,21 +1,22 @@
 import * as functions from "firebase-functions";
-import { admin } from "./config/firebase.config";
+import {firestore} from "./config/firebase.config";
+import {ActionRun} from "./types";
 
 export const newActionRun = functions.https
   .onRequest(async (req: functions.Request, res: functions.Response) => {
-    const { method, body, ip } = req;
+    const {method, body, ip} = req;
     if (method !== "POST") {
       res.status(405);
       res.end();
       return;
     }
-    const data = {
+    const data: ActionRun = {
       ip,
       ...body,
       timestamp: new Date().toISOString(),
     };
     try {
-      await admin.firestore().collection("runs").add(data);
+      await firestore.collection("runs").add(data);
       res.status(200);
     } catch (e) {
       console.error("Error saving run to firestore.", e);
