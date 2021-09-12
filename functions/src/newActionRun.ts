@@ -1,8 +1,5 @@
 import * as functions from "firebase-functions";
-import * as admin from "firebase-admin";
-
-
-admin.initializeApp();
+import { admin } from "./config/firebase.config";
 
 export const newActionRun = functions.https
   .onRequest(async (req: functions.Request, res: functions.Response) => {
