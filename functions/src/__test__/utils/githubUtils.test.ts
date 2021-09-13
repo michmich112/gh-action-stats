@@ -51,6 +51,7 @@ describe("isGithubActionsAddress", () => {
     // IPv4
     expect(await isGithubActionsAddress("1.2.4.5")).toBe(false);
     expect(await isGithubActionsAddress("5.7.8.9")).toBe(false);
+    expect(await isGithubActionsAddress("0.0.0.0")).toBe(false);
     // IPv6
     expect(await isGithubActionsAddress("1:2:3:4:5:7:8:9")).toBe(false);
     expect(await isGithubActionsAddress("9:10:12:23:34::")).toBe(false);
