@@ -13,6 +13,13 @@ function ip4ToInt(ip: string): number {
   return ip.split('.').reduce((int: number, oct: string) => (int << 8) + parseInt(oct, 10), 0) >>> 0;
 }
 
+export function(ipv6):
+
+  function ip6ToInt(ip: string): BigInt {
+
+  return ip.split(':').reduce((int: BigInt, oct: string) => (int << 8) + parseInt(oct, 16), 0n);
+}
+
 /**
  * Made with the help of code from Edd Mann
  * https://github.com/eddmann
@@ -29,11 +36,22 @@ export function isIpInCIDR(ip: string, cidr: string): boolean {
       || IPv6CIDRMatch === null || IPv6CIDRMatch[0] !== cidr)) {
     return false;
   }
+  if (IPv4Match !== null && IPv4Match[0] === ip) { // IPv4
+    const [range, sbits = '32'] = cidr.split('/');
+    const bits = parseInt(sbits, 10);
+    const mask = ~(2 ** (32 - bits) - 1);
+    return (ip4ToInt(ip) & mask) === (ip4ToInt(range) & mask);
+  } else { // IPv6
+    const [range, sbits = '128'] = cidr.split('/');
+    range.match('::');
+    if (range.match('::') !== null) {
 
-  const [range, sbits = '32'] = cidr.split('/');
-  const bits = parseInt(sbits, 10);
-  const mask = ~(2 ** (32 - bits) - 1);
-  return (ip4ToInt(ip) & mask) === (ip4ToInt(range) & mask);
+    }
+    const bits = parseInt(sbits, 10);
+    const mask = ~(2 ** (128 - bits) - 1);
+    return
+  }
+
 
 }
 

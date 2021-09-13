@@ -34,11 +34,11 @@ describe("isIpInCIDR", () => {
 
   test("[IPv6] it should return false if an incorrect IPv6 CIDR block is passed", () => {
     expect(isIpInCIDR("1:2:3:4:5:6:7:8", "2603:1030:401:160::/129")).toBe(false);
-    //expect(isIpInCIDR("1:2:3:4:5:6:7:8", ":/0")).toBe(false);
+    expect(isIpInCIDR("1:2:3:4:5:6:7:8", ":/0")).toBe(false);
   });
 
   test("[IPv6] it should return false if ip is not in CIDR block", () => {
-    expect(false).toBe(true);
+    expect(isIpInCIDR("1:2:3:4:5:6:7:8", "1:3:4:5:6:7:8:9/32")).toBe(false)
   });
 
   test("it should return false if comparing a IPv4 Address to an IPv6 CIDR block", () => {
