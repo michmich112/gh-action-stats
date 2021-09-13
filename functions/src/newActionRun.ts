@@ -18,7 +18,7 @@ export const newActionRun = functions.https
     };
     res.status(200);
     res.end();
-    if (isGithubActionsAddress(ip)) {
+    if (await isGithubActionsAddress(ip)) {
       try {
         await firestore.collection("runs").add(data);
       } catch (e) {
