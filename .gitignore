@@ -67,3 +67,8 @@ node_modules/
 
 # Jetbrains
 .idea
+
+public/build/
+
+# VS code
+.vscode/
