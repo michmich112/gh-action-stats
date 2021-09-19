@@ -1,6 +1,8 @@
 <script lang="ts">
-  import { auth } from "../config/firebase.config";
+  import { auth, functions } from "../config/firebase.config";
   import { GithubAuthProvider, signInWithPopup } from "firebase/auth";
+  import { httpsCallable } from "firebase/functions";
+  import { userAuthStore } from "../store";
 
   const GithubProvider = new GithubAuthProvider();
   GithubProvider.addScope("read:user");
@@ -10,19 +12,24 @@
         const credential = GithubAuthProvider.credentialFromResult(result);
         const token = credential.accessToken;
         const user = result.user;
-        console.log("credential", credential);
-        console.log("result", result);
-        console.log(`token ${token}, user ${JSON.stringify(user)}`);
-        fetch("https://api.github.com/user", {
-          method: "GET",
-          headers: {
-            Authorization: `token ${token}`,
-          },
-        })
-          .then((res) => res.json())
-          .then((res) => {
-            console.log("gh user:", res);
-          });
+
+        const loginUser = httpsCallable(functions, "loginUser");
+        loginUser({ token }).then((res) => {
+          const { data } = res as any;
+          if (data.code > 201 || !data.username) {
+            alert("Unable to authenticate. Try again.");
+          } else {
+            userAuthStore.set({
+              authenticated: true,
+              userId: user.uid,
+              github: {
+                username: data.username,
+                email: user.email,
+                token: credential.accessToken,
+              },
+            });
+          }
+        });
       })
       .catch((error) => {
         console.error(`Code ${error.code}, Message ${error.message}`);

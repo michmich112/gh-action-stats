@@ -1,5 +1,5 @@
 import { Request, Response } from "firebase-functions";
-import { newActionRun } from "../newActionRun";
+import { newActionRun } from "..";
 
 jest.mock("../config/firebase.config");
 jest.mock("../utils/githubUtils");
@@ -172,10 +172,10 @@ describe("newActionRun tests", () => {
     expect(returnedStatus).toBe(200);
     expect(addMock.mock.calls.length).toBe(1);
     expect(collectionName).toBe("attempted-runs");
-    expect(addedData.data.timestamp).toMatch(/[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3}Z/gm);
-    const timestamp = addedData.data.timestamp;
+    expect(addedData.run.timestamp).toMatch(/[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3}Z/gm);
+    const timestamp = addedData.run.timestamp;
     expect(addedData).toEqual({
-      data: {
+      run: {
         ip: "0.0.0.69",
         ...req.body,
         timestamp

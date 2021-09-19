@@ -1,1 +1,1 @@
-export * from './newActionRun';
+export * from './entrypoints/newActionRun';
