@@ -12,7 +12,7 @@ class UserRepository implements IFirestoreRepository {
   public async create(user: User): Promise<void> {
     await firestore.collection(this.collection)
       .doc(user.uid)
-      .create(user);
+      .set(user);
   }
 
   public async update(user: User): Promise<{ success: boolean, data?: User }> {

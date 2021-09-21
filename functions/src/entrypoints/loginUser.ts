@@ -1,7 +1,7 @@
 import * as functions from "firebase-functions";
 import { CallableContext } from "firebase-functions/v1/https";
-import { firestore } from "../config/firebase.config";
 import LoginUserWithGithubOperation from "../operations/LoginUserWithGitHubOperation";
+import UnauthorizedGitHubApiError from "../domain/errors/UnauthorizedGitHubApiError";
 
 type LoginUserData = {
   GithubToken: string
@@ -11,9 +11,10 @@ type LoginUserDataReturn = {
   code: 200 | 201 | 400 | 401 | 500,
   message: string,
   username?: string,
+  name?: string,
 }
 
-export const loginUser = functions.https.onCall(async (data: LoginUserData, context: CallableContext): Promise<LoginUserDataReturn> => {
+export async function loginUserEntrypoint(data: LoginUserData, context: CallableContext): Promise<LoginUserDataReturn> {
   if (!context.auth) {
     return {
       code: 401,
@@ -34,14 +35,23 @@ export const loginUser = functions.https.onCall(async (data: LoginUserData, cont
     return {
       code: 200,
       message: 'LoggedIn',
-      username: user.username
+      username: user.username,
+      name: user.name
     };
   } catch (e) {
     console.error(`[ERROR][loginUserFunction]: error authenticating: ${e.message}`);
+    if (e instanceof UnauthorizedGitHubApiError) {
+      return {
+        code: 401,
+        message: 'Unauthorized'
+      };
+    }
     return {
       code: 500,
       message: 'Internal Server Error: Unable to authenticate'
     }
   }
-});
+}
+
+export const loginUser = functions.https.onCall(loginUserEntrypoint);
 

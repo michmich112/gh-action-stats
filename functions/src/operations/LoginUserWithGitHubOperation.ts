@@ -12,11 +12,12 @@ export async function LoginUserWithGithubOperation(params: {
     if (user.success) return user.data as User;
     // if we were unable to get the user from the repository we create it
   }
-  const { email, username } = await getUserData(token);
+  const { email, login, name } = await getUserData(token);
   const user = {
     uid,
     email,
-    username
+    username: login,
+    name,
   }
   await UserRepository.create(user);
   return user;

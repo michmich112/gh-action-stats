@@ -1,2 +1,2 @@
 export * from './newActionRun';
-export * from './loginUser';
+export { loginUser } from './loginUser';
