@@ -1,12 +1,12 @@
-import {loginUserEntrypoint} from "../entrypoints/loginUser";
-import {CallableContext} from "firebase-functions/v1/https";
+import { loginUserEntrypoint } from "../entrypoints/loginUser";
+import { CallableContext } from "firebase-functions/v1/https";
 
 jest.mock("axios");
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const axios = require("axios");
 jest.mock("../config/firebase.config");
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const {firestore} = require("../config/firebase.config");
+const { firestore } = require("../config/firebase.config");
 
 describe("loginUser", () => {
   let setValue: any;
@@ -80,9 +80,9 @@ describe("loginUser", () => {
                 exists: true,
                 data: () => (usersDb[id]),
               } : {
-                exist: false,
-                data: () => undefined,
-              }),
+                  exist: false,
+                  data: () => undefined,
+                }),
             set: (data: any, options: any) => {
               setValue = data;
               if (options?.merge) {
@@ -101,9 +101,9 @@ describe("loginUser", () => {
 
   test("it should return the username if the user already exists", async () => {
     try {
-      const user = await loginUserEntrypoint({GithubToken: "token1234"}, {auth: {uid: "123"}} as CallableContext);
+      const user = await loginUserEntrypoint({ GithubToken: "token1234" }, { auth: { uid: "123" } } as CallableContext);
       expect(user.username).toBe("UserCheck1");
-      expect(user.name).toBe("monalisa octocat");
+      expect(user.name).toBe("checked user");
     } catch (e) {
       console.error((e as Error).message);
       expect(false).toBe(true);
@@ -112,7 +112,7 @@ describe("loginUser", () => {
 
   test("it should create a new db entry if the user does not already exist", async () => {
     try {
-      const user = await loginUserEntrypoint({GithubToken: "token123"}, {auth: {uid: "67866"}} as CallableContext);
+      const user = await loginUserEntrypoint({ GithubToken: "token123" }, { auth: { uid: "67866" } } as CallableContext);
       const expected = {
         username: "testUser123",
         email: "testUser@gmail.com",
@@ -121,7 +121,12 @@ describe("loginUser", () => {
       };
       expect(setValue).toEqual(expected);
       console.warn(user);
-      expect(user).toEqual({username: expected.username, code: 200, message: "LoggedIn"});
+      expect(user).toEqual({
+        username: expected.username,
+        name: expected.name,
+        code: 200,
+        message: "LoggedIn"
+      });
     } catch (e) {
       console.error((e as Error).message);
       expect(false).toBe(true);
@@ -130,7 +135,7 @@ describe("loginUser", () => {
 
   test("it should be unable to login if the github token is not correct", async () => {
     try {
-      const user = await loginUserEntrypoint({GithubToken: "NotValidToken"}, {auth: {uid: "1234"}} as CallableContext);
+      const user = await loginUserEntrypoint({ GithubToken: "NotValidToken" }, { auth: { uid: "1234" } } as CallableContext);
       expect(user).toEqual({
         code: 401,
         message: "Unauthorized",
@@ -143,7 +148,7 @@ describe("loginUser", () => {
 
   test("it should throw a 400 if the github token is missing from the call", async () => {
     try {
-      const user = await loginUserEntrypoint({} as { GithubToken: string }, {auth: {uid: "1234"}} as CallableContext);
+      const user = await loginUserEntrypoint({} as { GithubToken: string }, { auth: { uid: "1234" } } as CallableContext);
       expect(user).toEqual({
         code: 400,
         message: "Bad Request: GithubToken is required",
@@ -156,7 +161,7 @@ describe("loginUser", () => {
 
   test("it should throw a 401 if the call comes from an unauthorize source", async () => {
     try {
-      const user = await loginUserEntrypoint({GithubToken: "anyToken"}, {} as CallableContext);
+      const user = await loginUserEntrypoint({ GithubToken: "anyToken" }, {} as CallableContext);
       expect(user).toEqual({
         code: 401,
         message: "Unauthorized",

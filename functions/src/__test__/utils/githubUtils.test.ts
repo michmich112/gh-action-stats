@@ -1,4 +1,4 @@
-import {GithubMeta, isGithubActionsAddress} from "../../utils/githubUtils";
+import { GithubMeta, isGithubActionsAddress } from "../../utils/githubUtils";
 
 jest.mock("axios");
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -30,7 +30,7 @@ describe("isGithubActionsAddress", () => {
   axios.get.mockImplementation(async (url: string) => {
     if (url === "https://api.github.com/meta") {
       return {
-        data: JSON.stringify(githubMeta),
+        data: githubMeta,
       };
     }
     return "";
