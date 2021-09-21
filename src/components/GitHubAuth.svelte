@@ -14,7 +14,7 @@
         const user = result.user;
 
         const loginUser = httpsCallable(functions, "loginUser");
-        loginUser({ token }).then((res) => {
+        loginUser({ GithubToken: token }).then((res) => {
           const { data } = res as any;
           if (data.code > 201 || !data.username) {
             alert("Unable to authenticate. Try again.");

@@ -1,5 +1,5 @@
 import * as functions from "firebase-functions";
-import {CallableContext} from "firebase-functions/v1/https";
+import { CallableContext } from "firebase-functions/v1/https";
 import LoginUserWithGithubOperation from "../operations/LoginUserWithGitHubOperation";
 import UnauthorizedGitHubApiError from "../domain/errors/UnauthorizedGitHubApiError";
 
