@@ -1,12 +1,15 @@
-import { firestore } from "../../config/firebase.config";
+import {firestore} from "../../config/firebase.config";
 import AttemptedActionRun from "../../domain/AttemptedActionRun.type";
 import IFirestoreRepository from "../../domain/IRepository";
 
+/**
+ * Repository for the Attempted Action Runs that do not pass security validation
+ */
 class AttemptedActionRunRepository implements IFirestoreRepository {
-  collection: string
+  collection: string;
 
   constructor() {
-    this.collection = 'attempted-runs';
+    this.collection = "attempted-runs";
   }
 
   public async create(run: AttemptedActionRun): Promise<void> {

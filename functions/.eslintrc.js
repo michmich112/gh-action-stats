@@ -29,5 +29,10 @@ module.exports = {
     "import/no-unresolved": 0,
     "max-len": ["warn", {"code": 120, "tabWidth": 2}],
     "indent": ["error", 2],
+    "camelcase": "off",
+    "@typescript-eslint/naming-convention": "off",
+    "require-jsdoc": "off",
+    "new-cap": "off",
+    "object-curly-spacing": "off",
   },
 };

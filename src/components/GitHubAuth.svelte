@@ -24,7 +24,7 @@
               userId: user.uid,
               github: {
                 username: data.username,
-                email: user.email,
+                email: data.email,
                 token: credential.accessToken,
               },
             });

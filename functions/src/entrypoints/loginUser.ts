@@ -1,5 +1,5 @@
 import * as functions from "firebase-functions";
-import { CallableContext } from "firebase-functions/v1/https";
+import {CallableContext} from "firebase-functions/v1/https";
 import LoginUserWithGithubOperation from "../operations/LoginUserWithGitHubOperation";
 import UnauthorizedGitHubApiError from "../domain/errors/UnauthorizedGitHubApiError";
 
@@ -18,14 +18,14 @@ export async function loginUserEntrypoint(data: LoginUserData, context: Callable
   if (!context.auth) {
     return {
       code: 401,
-      message: 'Unauthorized'
-    }
+      message: "Unauthorized",
+    };
   }
   if (!data.GithubToken) {
     return {
       code: 400,
-      message: 'Bad Request: GithubToken is required'
-    }
+      message: "Bad Request: GithubToken is required",
+    };
   }
   try {
     const user = await LoginUserWithGithubOperation({
@@ -34,22 +34,22 @@ export async function loginUserEntrypoint(data: LoginUserData, context: Callable
     });
     return {
       code: 200,
-      message: 'LoggedIn',
+      message: "LoggedIn",
       username: user.username,
-      name: user.name
+      name: user.name,
     };
   } catch (e) {
     console.error(`[ERROR][loginUserFunction]: error authenticating: ${e.message}`);
     if (e instanceof UnauthorizedGitHubApiError) {
       return {
         code: 401,
-        message: 'Unauthorized'
+        message: "Unauthorized",
       };
     }
     return {
       code: 500,
-      message: 'Internal Server Error: Unable to authenticate'
-    }
+      message: "Internal Server Error: Unable to authenticate",
+    };
   }
 }
 

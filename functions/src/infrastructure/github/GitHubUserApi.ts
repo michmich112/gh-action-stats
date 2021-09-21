@@ -1,5 +1,5 @@
 import UnauthorizedGitHubApiError from "../../domain/errors/UnauthorizedGitHubApiError";
-import axios from 'axios';
+import axios from "axios";
 
 type PublicGitHubUserInfo = {
   login: string,
@@ -36,19 +36,24 @@ type PublicGitHubUserInfo = {
   updated_at: Date
 }
 
+/**
+ * Get User Data From Github's User Api
+ * @param {string} token
+ * @return {Promise<PublicGitHubUserInfo>}
+ */
 export async function getUserData(token: string): Promise<PublicGitHubUserInfo> {
   try {
-    const res = await axios.get('https://api.github.com/user', {
+    const res = await axios.get("https://api.github.com/user", {
       headers: {
-        Authorization: `token ${token}`
-      }
+        Authorization: `token ${token}`,
+      },
     });
     if ([401, 403].includes(res.status)) {
-      throw new UnauthorizedGitHubApiError('Unauthorized to get User information');
+      throw new UnauthorizedGitHubApiError("Unauthorized to get User information");
     }
     return res.data;
   } catch (e) {
-    console.error(`[ERROR][GitHubUserApi] - ${e.message}`);
-    throw new UnauthorizedGitHubApiError('Unable to get User information');
+    console.error(`[ERROR][GitHubUserApi] - ${(e as Error).message}`);
+    throw new UnauthorizedGitHubApiError("Unable to get User information");
   }
 }

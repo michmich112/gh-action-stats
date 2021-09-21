@@ -1,10 +1,10 @@
-import { GithubMeta, isGithubActionsAddress } from "../../utils/githubUtils";
+import {GithubMeta, isGithubActionsAddress} from "../../utils/githubUtils";
 
-jest.mock('axios');
-const axios = require('axios');
+jest.mock("axios");
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const axios = require("axios");
 
 describe("isGithubActionsAddress", () => {
-
   const githubMeta: GithubMeta = {
     verifiable_password_authentication: false,
     ssh_key_fingerprints: {
@@ -22,19 +22,19 @@ describe("isGithubActionsAddress", () => {
       "1.2.3.4/32",
       "5.6.7.0/24",
       "1:2:3:4:5:6:7:8/128",
-      "9:10:11:12:13::/80"
+      "9:10:11:12:13::/80",
     ],
     dependabot: [],
-  }
+  };
 
   axios.get.mockImplementation(async (url: string) => {
-    if (url === 'https://api.github.com/meta') {
+    if (url === "https://api.github.com/meta") {
       return {
-        data: JSON.stringify(githubMeta)
+        data: JSON.stringify(githubMeta),
       };
     }
     return "";
-  })
+  });
 
   test("it should return true if it is in one of the github actions cidr block", async () => {
     // IPv4
@@ -66,5 +66,5 @@ describe("isGithubActionsAddress", () => {
     expect(await isGithubActionsAddress("1:2:3:4:5:6:7:8:9")).toBe(false);
     expect(await isGithubActionsAddress("9:g:8::")).toBe(false);
   });
-})
+});
 

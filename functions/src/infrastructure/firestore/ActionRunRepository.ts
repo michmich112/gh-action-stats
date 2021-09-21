@@ -1,12 +1,12 @@
-import { firestore } from "../../config/firebase.config";
+import {firestore} from "../../config/firebase.config";
 import ActionRun from "../../domain/ActionRun.type";
 import IFirestoreRepository from "../../domain/IRepository";
 
 class ActionRunRepository implements IFirestoreRepository {
-  collection: string
+  collection: string;
 
   constructor() {
-    this.collection = 'runs';
+    this.collection = "runs";
   }
 
   public async create(run: ActionRun): Promise<void> {

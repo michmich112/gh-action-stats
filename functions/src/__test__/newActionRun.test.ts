@@ -1,17 +1,17 @@
-import { Request, Response } from "firebase-functions";
-import { newActionRun } from "..";
+import {Request, Response} from "firebase-functions";
+import {newActionRun} from "..";
 
 jest.mock("../config/firebase.config");
 jest.mock("../utils/githubUtils");
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const { firestore } = require("../config/firebase.config");
-const { isGithubActionsAddress } = require("../utils/githubUtils");
+const {firestore} = require("../config/firebase.config");
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const {isGithubActionsAddress} = require("../utils/githubUtils");
 describe("newActionRun tests", () => {
-
   isGithubActionsAddress.mockImplementation(async (ip: string) => {
     const authorizedIps = ["1.2.3.4", "1:2:3:4:5:6:7:8"];
     return authorizedIps.includes(ip);
-  })
+  });
 
   test("It should insert the right data with timestamp from an authorized IP", async () => {
     let collectionName = "";
@@ -53,6 +53,7 @@ describe("newActionRun tests", () => {
       status: jest.fn((status: any) => {
         returnedStatus = status;
       }),
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
       end: jest.fn(() => { }),
     };
     await newActionRun(req as Request, res as Response);
@@ -109,6 +110,7 @@ describe("newActionRun tests", () => {
       status: jest.fn((status: any) => {
         returnedStatus = status;
       }),
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
       end: jest.fn(() => { }),
     };
     await newActionRun(req as Request, res as Response);
@@ -165,6 +167,7 @@ describe("newActionRun tests", () => {
       status: jest.fn((status: any) => {
         returnedStatus = status;
       }),
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
       end: jest.fn(() => { }),
     };
     await newActionRun(req as Request, res as Response);
@@ -178,7 +181,7 @@ describe("newActionRun tests", () => {
       run: {
         ip: "0.0.0.69",
         ...req.body,
-        timestamp
+        timestamp,
       },
       reason: "Attempted insertion from Non-Github IP: 0.0.0.69",
     });
@@ -220,12 +223,13 @@ describe("newActionRun tests", () => {
       status: jest.fn((status: any) => {
         returnedStatus = status;
       }),
-      end: jest.fn(() => { }),
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
+      end: jest.fn(() => {}),
     };
     await newActionRun(req as Request, res as Response);
 
     expect(returnedStatus).toBe(405);
     expect(addMock.mock.calls.length).toBe(0);
   });
-})
+});
 
