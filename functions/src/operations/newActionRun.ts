@@ -18,7 +18,7 @@ async function NewActionRunOperation(runData: ActionRun): Promise<void> {
       await ActionRepository.add({
         creator,
         name,
-        last_update: new Date()
+        last_update: new Date(),
       });
     } catch (e) {
       console.error("Error saving run to firestore.", e);
@@ -34,7 +34,7 @@ async function NewActionRunOperation(runData: ActionRun): Promise<void> {
       await ActionRepository.add({
         creator,
         name,
-        last_update: new Date()
+        last_update: new Date(),
       });
     } catch (e) {
       console.error("Error saving attempted-run to firestore", e);

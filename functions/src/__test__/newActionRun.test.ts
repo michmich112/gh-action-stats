@@ -14,7 +14,7 @@ describe("newActionRun tests", () => {
   });
 
   test("It should insert the right data with timestamp from an authorized IP", async () => {
-    let collectionNames: string[] = [];
+    const collectionNames: string[] = [];
     let addedData: any = {};
     let returnedStatus = 0;
 
@@ -28,9 +28,9 @@ describe("newActionRun tests", () => {
       return {
         add: addMock,
         doc: jest.fn(() => ({
-          set: () => { },
-          get: () => { },
-        }))
+          set: () => {/* pass */ },
+          get: () => {/* pass */ },
+        })),
       };
     });
 
@@ -76,7 +76,7 @@ describe("newActionRun tests", () => {
   });
 
   test("It should return null data if data sent is null but with timestamp and IP", async () => {
-    let collectionNames: string[] = [];
+    const collectionNames: string[] = [];
     let addedData: any = {};
     let returnedStatus = 0;
 
@@ -90,9 +90,9 @@ describe("newActionRun tests", () => {
       return {
         add: addMock,
         doc: jest.fn(() => ({
-          set: () => { },
-          get: () => { },
-        }))
+          set: () => {/* pass */ },
+          get: () => {/* pass */ },
+        })),
       };
     });
 
@@ -138,7 +138,7 @@ describe("newActionRun tests", () => {
   });
 
   test("it should save attempted runs from non-Github IPs", async () => {
-    let collectionNames: string[] = [];
+    const collectionNames: string[] = [];
     let addedData: any = {};
     let returnedStatus = 0;
 
@@ -152,9 +152,9 @@ describe("newActionRun tests", () => {
       return {
         add: addMock,
         doc: jest.fn(() => ({
-          set: () => { },
-          get: () => { },
-        }))
+          set: () => {/* pass */ },
+          get: () => {/* pass */ },
+        })),
       };
     });
 
