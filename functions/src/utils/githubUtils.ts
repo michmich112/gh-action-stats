@@ -1,5 +1,5 @@
-import axios from 'axios';
-import { isInSubnet } from 'is-in-subnet';
+import axios from "axios";
+import { isInSubnet } from "is-in-subnet";
 
 export type GithubMeta = {
   verifiable_password_authentication: boolean,
@@ -18,13 +18,18 @@ export type GithubMeta = {
   dependabot: string[],
 }
 
+/**
+ * Verifies if an ip is part of the GitHub Actions IPs
+ * @param {string} ip
+ * @return {Promise<boolean>}
+ */
 export async function isGithubActionsAddress(ip: string): Promise<boolean> {
-  const githubMeta: GithubMeta = JSON.parse((await axios.get('https://api.github.com/meta')).data);
+  const githubMeta: GithubMeta = (await axios.get("https://api.github.com/meta")).data;
   try {
     return isInSubnet(ip, githubMeta.actions);
   } catch (e) {
-    console.error(`[isGithubActionAddress][ERROR]:\n\tParameters:\n\t\tip: ${ip}\n\tError: ${e.message}`);
-    return false
+    console.error(`[isGithubActionAddress][ERROR]:\n\tParameters:\n\t\tip: ${ip}\n\tError: ${(e as Error).message}`);
+    return false;
   }
 }
 
