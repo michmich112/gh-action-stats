@@ -1,6 +1,7 @@
-import {ActionRun} from "../domain/ActionRun.type";
-import {isGithubActionsAddress} from "../utils/githubUtils";
+import { ActionRun } from "../domain/ActionRun.type";
+import { isGithubActionsAddress } from "../utils/githubUtils";
 import ActionRunRepository from "../infrastructure/firestore/ActionRunRepository";
+import ActionRepository from "../infrastructure/firestore/ActionsRepository";
 import AttemptedActionRunRepository from "../infrastructure/firestore/AttemptedActionRunRepository";
 
 /**
@@ -10,10 +11,15 @@ import AttemptedActionRunRepository from "../infrastructure/firestore/AttemptedA
  * @constructor
  */
 async function NewActionRunOperation(runData: ActionRun): Promise<void> {
-  const {ip} = runData;
+  const { creator, name, ip } = runData;
   if (await isGithubActionsAddress(ip)) {
     try {
       await ActionRunRepository.create(runData);
+      await ActionRepository.add({
+        creator,
+        name,
+        last_update: new Date()
+      });
     } catch (e) {
       console.error("Error saving run to firestore.", e);
     }
@@ -24,6 +30,11 @@ async function NewActionRunOperation(runData: ActionRun): Promise<void> {
       await AttemptedActionRunRepository.create({
         run: runData,
         reason: message,
+      });
+      await ActionRepository.add({
+        creator,
+        name,
+        last_update: new Date()
       });
     } catch (e) {
       console.error("Error saving attempted-run to firestore", e);
