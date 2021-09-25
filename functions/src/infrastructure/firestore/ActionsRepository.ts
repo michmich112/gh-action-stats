@@ -10,7 +10,7 @@ class ActionRepository implements IFirestoreRepository {
 
   public async add(action: Action): Promise<void> {
     await firestore.collection(this.collection)
-      .doc(`${action.creator}/${action.name}`)
+      .doc(`${action.creator}:${action.name}`)
       .set(action, { merge: true });
   }
 
@@ -19,7 +19,7 @@ class ActionRepository implements IFirestoreRepository {
       .where("creator", "==", username)
       .get();
     const actions: Action[] = [];
-    snapshot.forEach((doc) => actions.push(doc.data() as Action));
+    if (!snapshot.empty) snapshot.forEach((doc) => actions.push(doc.data() as Action));
     return actions;
   }
 }
