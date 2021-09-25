@@ -8,7 +8,7 @@ async function GetActionsForUserOperation(uid: string): Promise<Action[]> {
     return ActionsRepository.getActionsByCreator(user.username);
   } else {
     console.warn(`[GetActionForUserOperation] - User not found for uid ${uid}`);
-    return []
+    return [];
   }
 }
 

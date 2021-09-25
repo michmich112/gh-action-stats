@@ -30,7 +30,7 @@ class UserRepository implements IFirestoreRepository {
     const snapshot = await firestore.collection(this.collection).doc(uid).get();
     const userData = snapshot.data();
     if (userData) return userData as User;
-    else return null
+    else return null;
   }
 
   public async existsByUid(uid: string): Promise<boolean> {

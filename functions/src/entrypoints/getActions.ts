@@ -4,7 +4,7 @@ import GetActionForUserOperation from "../operations/GetActionsForUser";
 import Action from "../domain/Action.type";
 
 export async function getActionsEntrypoint(_: any, context: CallableContext): Promise<Action[]> {
-  if (!context.auth) throw new functions.https.HttpsError('unauthenticated', 'Unauthorized');
+  if (!context.auth) throw new functions.https.HttpsError("unauthenticated", "Unauthorized");
 
   return await GetActionForUserOperation(context.auth.uid);
 }
