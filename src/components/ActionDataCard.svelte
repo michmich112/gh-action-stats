@@ -1,0 +1,48 @@
+<script lang="ts">
+  export let ActionRepoName: string;
+  export let LastUsedDate: Date;
+</script>
+
+<card>
+  <span class="info-text">{ActionRepoName}</span>
+  <span class="info-text">Last Used: {new Date(LastUsedDate)}</span>
+</card>
+
+<style>
+  card {
+    box-sizing: border-box;
+    margin: 5px 15px;
+    height: 60px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 17px;
+    overflow: visible;
+    border-radius: 10px;
+    border: 3px solid #222;
+  }
+
+  card:hover {
+    background-color: #252a2d;
+  }
+
+  .info-text {
+    width: auto;
+    height: auto;
+    flex-shrink: 0;
+    overflow: visible;
+    white-space: pre;
+    font-weight: 600;
+    font-style: normal;
+    font-family: "Roboto Mono", monospace;
+    color: #000000;
+    font-size: 20px;
+    letter-spacing: 0px;
+    line-height: 1.2;
+  }
+
+  card:hover > .info-text {
+    color: #ffffff;
+  }
+</style>
