@@ -2,11 +2,12 @@
   import { auth, functions } from "../config/firebase.config";
   import { GithubAuthProvider, signInWithPopup } from "firebase/auth";
   import { httpsCallable } from "firebase/functions";
-  import { userAuthStore } from "../store";
+  import { appStore, userAuthStore } from "../store";
 
   const GithubProvider = new GithubAuthProvider();
   GithubProvider.addScope("read:user");
   function signIn() {
+    appStore.update((s) => ({ ...s, isLoading: true }));
     signInWithPopup(auth, GithubProvider)
       .then((result) => {
         const credential = GithubAuthProvider.credentialFromResult(result);
@@ -29,6 +30,7 @@
               },
             });
           }
+          appStore.update((s) => ({ ...s, isLoading: false }));
         });
       })
       .catch((error) => {
@@ -39,9 +41,4 @@
   }
 </script>
 
-<main>
-  <button on:click={signIn}>Sign In With GitHub</button>
-</main>
-
-<style>
-</style>
+<button on:click={signIn}>Sign In With GitHub</button>

@@ -3,22 +3,30 @@
   import { functions } from "../config/firebase.config";
   import { httpsCallable } from "firebase/functions";
   import ActionDataCard from "./ActionDataCard.svelte";
+  import Loader from "./Loader.svelte";
 
   type Action = {
     creator: string;
     name: string;
-    last_update: Date;
+    last_update: { _seconds: number; _nanoseconds: number };
   };
 
   let actions: Action[] = [];
+  let loading: boolean = true;
   // let selected: number = 0;
 
   onMount(async () => {
     const getActions = httpsCallable<{}, Action[]>(functions, "getAction");
     actions = (await getActions()).data;
+    loading = false;
   });
 </script>
 
+{#if loading}
+  <div class="full">
+    <Loader />
+  </div>
+{/if}
 {#each actions as action}
   <ActionDataCard
     ActionRepoName={action.creator + "/" + action.name}
@@ -27,15 +35,8 @@
 {/each}
 
 <style>
-  container {
-    height: 100%;
+  .full {
     width: 100%;
-    display: flex;
-  }
-
-  container-content {
-    flex: 1;
-    display: flex;
-    overflow-y: scroll;
+    height: 100%;
   }
 </style>

@@ -1,11 +1,17 @@
 <script lang="ts">
+  import { Timestamp } from "firebase/firestore";
   export let ActionRepoName: string;
-  export let LastUsedDate: Date;
+  export let LastUsedDate: { _seconds: number; _nanoseconds: number };
+
+  $: lastDate = new Timestamp(
+    LastUsedDate._seconds,
+    LastUsedDate._nanoseconds
+  ).toDate();
 </script>
 
 <card>
   <span class="info-text">{ActionRepoName}</span>
-  <span class="info-text">Last Used: {new Date(LastUsedDate)}</span>
+  <span class="info-text">Last Used: {lastDate.toLocaleString()}</span>
 </card>
 
 <style>
