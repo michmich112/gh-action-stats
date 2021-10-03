@@ -1,5 +1,7 @@
 <script lang="ts">
   import { UserAuthStore, userAuthStore } from "../store";
+  import ActionsList from "../components/ActionsList.svelte";
+
   let name: string;
   userAuthStore.subscribe((userAuth: UserAuthStore) => {
     if (userAuth.authenticated) {
@@ -11,6 +13,7 @@
 <main>
   Welcome to GitHub Actions Stats @{name}
 </main>
+<ActionsList />
 
 <style>
   main {

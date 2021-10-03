@@ -1,12 +1,12 @@
-import {Request, Response} from "firebase-functions";
-import {newActionRun} from "..";
+import { Request, Response } from "firebase-functions";
+import { newActionRun } from "..";
 
 jest.mock("../config/firebase.config");
 jest.mock("../utils/githubUtils");
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const {firestore} = require("../config/firebase.config");
+const { firestore } = require("../config/firebase.config");
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const {isGithubActionsAddress} = require("../utils/githubUtils");
+const { isGithubActionsAddress } = require("../utils/githubUtils");
 describe("newActionRun tests", () => {
   isGithubActionsAddress.mockImplementation(async (ip: string) => {
     const authorizedIps = ["1.2.3.4", "1:2:3:4:5:6:7:8"];
@@ -14,7 +14,7 @@ describe("newActionRun tests", () => {
   });
 
   test("It should insert the right data with timestamp from an authorized IP", async () => {
-    let collectionName = "";
+    const collectionNames: string[] = [];
     let addedData: any = {};
     let returnedStatus = 0;
 
@@ -24,9 +24,13 @@ describe("newActionRun tests", () => {
     });
 
     const collection = jest.fn((cn: string) => {
-      collectionName = cn;
+      collectionNames.push(cn);
       return {
         add: addMock,
+        doc: jest.fn(() => ({
+          set: () => {/* pass */ },
+          get: () => {/* pass */ },
+        })),
       };
     });
 
@@ -60,7 +64,8 @@ describe("newActionRun tests", () => {
 
     expect(returnedStatus).toBe(200);
     expect(addMock.mock.calls.length).toBe(1);
-    expect(collectionName).toBe("runs");
+    expect(collectionNames).toContain("runs");
+    expect(collectionNames).toContain("actions");
     expect(addedData.timestamp).toMatch(/[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3}Z/gm);
     const timestamp = addedData.timestamp;
     expect(addedData).toEqual({
@@ -71,7 +76,7 @@ describe("newActionRun tests", () => {
   });
 
   test("It should return null data if data sent is null but with timestamp and IP", async () => {
-    let collectionName = "";
+    const collectionNames: string[] = [];
     let addedData: any = {};
     let returnedStatus = 0;
 
@@ -81,9 +86,13 @@ describe("newActionRun tests", () => {
     });
 
     const collection = jest.fn((cn: string) => {
-      collectionName = cn;
+      collectionNames.push(cn);
       return {
         add: addMock,
+        doc: jest.fn(() => ({
+          set: () => {/* pass */ },
+          get: () => {/* pass */ },
+        })),
       };
     });
 
@@ -117,7 +126,8 @@ describe("newActionRun tests", () => {
 
     expect(returnedStatus).toBe(200);
     expect(addMock.mock.calls.length).toBe(1);
-    expect(collectionName).toBe("runs");
+    expect(collectionNames).toContain("runs");
+    expect(collectionNames).toContain("actions");
     expect(addedData.timestamp).toMatch(/[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3}Z/gm);
     const timestamp = addedData.timestamp;
     expect(addedData).toEqual({
@@ -128,7 +138,7 @@ describe("newActionRun tests", () => {
   });
 
   test("it should save attempted runs from non-Github IPs", async () => {
-    let collectionName = "";
+    const collectionNames: string[] = [];
     let addedData: any = {};
     let returnedStatus = 0;
 
@@ -138,9 +148,13 @@ describe("newActionRun tests", () => {
     });
 
     const collection = jest.fn((cn: string) => {
-      collectionName = cn;
+      collectionNames.push(cn);
       return {
         add: addMock,
+        doc: jest.fn(() => ({
+          set: () => {/* pass */ },
+          get: () => {/* pass */ },
+        })),
       };
     });
 
@@ -174,7 +188,8 @@ describe("newActionRun tests", () => {
 
     expect(returnedStatus).toBe(200);
     expect(addMock.mock.calls.length).toBe(1);
-    expect(collectionName).toBe("attempted-runs");
+    expect(collectionNames).toContain("attempted-runs");
+    expect(collectionNames).toContain("actions");
     expect(addedData.run.timestamp).toMatch(/[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3}Z/gm);
     const timestamp = addedData.run.timestamp;
     expect(addedData).toEqual({
@@ -224,7 +239,7 @@ describe("newActionRun tests", () => {
         returnedStatus = status;
       }),
       // eslint-disable-next-line @typescript-eslint/no-empty-function
-      end: jest.fn(() => {}),
+      end: jest.fn(() => { }),
     };
     await newActionRun(req as Request, res as Response);
 

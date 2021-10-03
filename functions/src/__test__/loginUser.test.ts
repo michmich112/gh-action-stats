@@ -80,9 +80,9 @@ describe("loginUser", () => {
                 exists: true,
                 data: () => (usersDb[id]),
               } : {
-                  exist: false,
-                  data: () => undefined,
-                }),
+                exist: false,
+                data: () => undefined,
+              }),
             set: (data: any, options: any) => {
               setValue = data;
               if (options?.merge) {
@@ -125,7 +125,7 @@ describe("loginUser", () => {
         username: expected.username,
         name: expected.name,
         code: 200,
-        message: "LoggedIn"
+        message: "LoggedIn",
       });
     } catch (e) {
       console.error((e as Error).message);

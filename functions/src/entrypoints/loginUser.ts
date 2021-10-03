@@ -39,7 +39,7 @@ export async function loginUserEntrypoint(data: LoginUserData, context: Callable
       name: user.name,
     };
   } catch (e) {
-    console.error(`[ERROR][loginUserFunction]: error authenticating: ${e.message}`);
+    console.error(`[ERROR][loginUserFunction]: error authenticating: ${(e as Error).message}`);
     if (e instanceof UnauthorizedGitHubApiError) {
       return {
         code: 401,
