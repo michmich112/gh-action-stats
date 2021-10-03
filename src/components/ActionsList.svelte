@@ -4,6 +4,7 @@
   import { httpsCallable } from "firebase/functions";
   import ActionDataCard from "./ActionDataCard.svelte";
   import Loader from "./Loader.svelte";
+  import { appStore } from "../store";
 
   type Action = {
     creator: string;
@@ -12,13 +13,14 @@
   };
 
   let actions: Action[] = [];
-  let loading: boolean = true;
+  let loading: boolean = false;
   // let selected: number = 0;
 
   onMount(async () => {
+    appStore.update((s) => ({ ...s, isLoading: true }));
     const getActions = httpsCallable<{}, Action[]>(functions, "getAction");
     actions = (await getActions()).data;
-    loading = false;
+    appStore.update((s) => ({ ...s, isLoading: false }));
   });
 </script>
 

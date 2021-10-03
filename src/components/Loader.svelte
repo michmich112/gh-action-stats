@@ -1,5 +1,12 @@
+<script lang="ts">
+  import { appStore } from "../store";
+  let display: boolean = false;
+
+  appStore.subscribe((store) => (display = store.isLoading));
+</script>
+
 <!-- Spinner made by @tobiasahlin (http://twitter.com/tobiasahlin) found on https://tobiasahlin.com/spinkit/-->
-<div class="centered">
+<div class={display ? "centered" : "hidden"}>
   <div class="sk-chase">
     <div class="sk-chase-dot" />
     <div class="sk-chase-dot" />
@@ -11,14 +18,23 @@
 </div>
 
 <style>
+  .hidden {
+    display: none;
+  }
+
   .centered {
-    background-color: rgba(0, 0, 0, 0.4);
-    width: 100%;
-    height: 100%;
     display: -webkit-flexbox;
     display: -ms-flexbox;
     display: -webkit-flex;
     display: flex;
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+
+    background-color: rgba(0, 0, 0, 0.4);
     -webkit-flex-align: center;
     -ms-flex-align: center;
     -webkit-align-items: center;
