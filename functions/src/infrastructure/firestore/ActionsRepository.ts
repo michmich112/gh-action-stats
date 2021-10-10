@@ -22,6 +22,16 @@ class ActionRepository implements IFirestoreRepository {
     if (!snapshot.empty) snapshot.forEach((doc) => actions.push(doc.data() as Action));
     return actions;
   }
+
+  public async getActionByCreatorAndName(username: string, actionName: string): Promise<Action | null> {
+    const snapshot = await firestore.collection(this.collection)
+      .where("creator", "==", username)
+      .where("name", "==", actionName)
+      .get();
+    if (snapshot.empty) return null;
+    console.log('snapshot', snapshot.docs);
+    return snapshot.docs[0].data() as Action;
+  }
 }
 
 const instance = new ActionRepository();
