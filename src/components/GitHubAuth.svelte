@@ -3,6 +3,7 @@
   import { GithubAuthProvider, signInWithPopup } from "firebase/auth";
   import { httpsCallable } from "firebase/functions";
   import { appStore, userAuthStore } from "../store";
+  import { navigate } from "svelte-routing";
 
   const GithubProvider = new GithubAuthProvider();
   GithubProvider.addScope("read:user");
@@ -29,6 +30,7 @@
                 token: credential.accessToken,
               },
             });
+            navigate(`/dash/${data.username}`);
           }
           appStore.update((s) => ({ ...s, isLoading: false }));
         });

@@ -31,7 +31,8 @@
 {/if}
 {#each actions as action}
   <ActionDataCard
-    ActionRepoName={action.creator + "/" + action.name}
+    ActionCreator={action.creator}
+    ActionRepoName={action.name}
     LastUsedDate={action.last_update}
   />
 {/each}

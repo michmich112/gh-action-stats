@@ -1,5 +1,8 @@
 <script lang="ts">
   import { Timestamp } from "firebase/firestore";
+  import { navigate } from "svelte-routing";
+
+  export let ActionCreator: string;
   export let ActionRepoName: string;
   export let LastUsedDate: { _seconds: number; _nanoseconds: number };
 
@@ -7,10 +10,16 @@
     LastUsedDate._seconds,
     LastUsedDate._nanoseconds
   ).toDate();
+
+  $: repoName = ActionCreator + "/" + ActionRepoName;
+
+  function goToAction() {
+    navigate(`/action/${ActionCreator}/${ActionRepoName}`);
+  }
 </script>
 
-<card>
-  <span class="info-text">{ActionRepoName}</span>
+<card on:click={goToAction}>
+  <span class="info-text">{repoName}</span>
   <span class="info-text">Last Used: {lastDate.toLocaleString()}</span>
 </card>
 
