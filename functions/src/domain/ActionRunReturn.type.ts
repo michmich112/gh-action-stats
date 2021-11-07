@@ -1,4 +1,4 @@
-export type ActionRunReturn = {
+type ActionRunReturn = {
   actor: string,
   ip: string,
   os: string | null,

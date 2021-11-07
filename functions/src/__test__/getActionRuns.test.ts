@@ -15,8 +15,8 @@ describe("getActionRuns test", () => {
       username: "TestUser1",
       email: "test.user.1@mail.com",
       name: "TheFirstTestUser",
-    }
-  }
+    },
+  };
 
   const runTimestamp: string = new Date().toISOString();
 
@@ -50,13 +50,13 @@ describe("getActionRuns test", () => {
       runner_os: "Linux",
       timestamp: runTimestamp,
       version: "master",
-    }
-  }
+    },
+  };
 
   const collections: { [key: string]: any } = {
     "users": usersDbData,
     "runs": actionRunsDbData,
-  }
+  };
 
   firestore.collection.mockImplementation((cn: string) => {
     let collection: any = collections[cn] || {};
@@ -72,16 +72,16 @@ describe("getActionRuns test", () => {
         where,
         get: async () => {
           const docs = collection.map((d: any) => ({
-            data: () => d
+            data: () => d,
           }));
           return {
             empty: docs.length === 0,
             forEach: (predicate: (e: any, i: number, a: any[]) => void) => docs.forEach(predicate),
             docs,
-          }
-        }
+          };
+        },
       };
-    };
+    }
 
     return {
       where,
@@ -92,14 +92,14 @@ describe("getActionRuns test", () => {
         }),
       }),
     };
-  })
+  });
 
   test("it should return the queried data if it exists", async () => {
     const runs = await getActionRunsEntrypoint({
       creator: "TestUser1",
       action: "Action1",
-    }, { auth: { uid: "1234" } } as CallableContext)
-    expect(runs.length).toEqual(2)
+    }, { auth: { uid: "1234" } } as CallableContext);
+    expect(runs.length).toEqual(2);
     expect(runs).toEqual([{
       actor: "Actor1",
       ip: "123.123.123.123",
@@ -115,7 +115,7 @@ describe("getActionRuns test", () => {
       repository: "repository2",
       is_private: false,
     }]);
-  })
+  });
 
   test("it should return an empty array if no data exists", async () => {
     const runs = await getActionRunsEntrypoint({
@@ -124,7 +124,7 @@ describe("getActionRuns test", () => {
     }, { auth: { uid: "1234" } } as CallableContext);
     expect(runs.length).toEqual(0);
     expect(runs).toEqual([]);
-  })
+  });
 
   test("it should return an unauthorized error if the user is not authenticated", async () => {
     try {
@@ -134,10 +134,10 @@ describe("getActionRuns test", () => {
       }, { auth: { uid: "" } } as CallableContext);
       expect(false).toBe(true);
     } catch (e) {
-      expect(e).toHaveProperty('code');
-      expect((e as functions.https.HttpsError).code).toBe('unauthenticated');
+      expect(e).toHaveProperty("code");
+      expect((e as functions.https.HttpsError).code).toBe("unauthenticated");
     }
-  })
+  });
 
   test("it should return an forbidden error if the user is not authorized", async () => {
     try {
@@ -146,12 +146,11 @@ describe("getActionRuns test", () => {
         action: "Action1",
       }, { auth: { uid: "1234" } } as CallableContext);
     } catch (e) {
-      expect(e).toHaveProperty('code');
-      expect((e as functions.https.HttpsError).code).toBe('permission-denied');
-      return
+      expect(e).toHaveProperty("code");
+      expect((e as functions.https.HttpsError).code).toBe("permission-denied");
+      return;
     }
     expect(false).toBe(true);
-  })
-
-})
+  });
+});
 

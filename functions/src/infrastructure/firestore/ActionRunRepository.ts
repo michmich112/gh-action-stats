@@ -15,14 +15,13 @@ class ActionRunRepository implements IFirestoreRepository {
 
   public async getByCreatorAndName(creator: string, name: string): Promise<ActionRun[]> {
     const snapshot = await firestore.collection(this.collection)
-      .where('creator', '==', creator)
-      .where('name', '==', name)
-      .get()
+      .where("creator", "==", creator)
+      .where("name", "==", name)
+      .get();
 
-    if (snapshot.empty) return []
-    return snapshot.docs.map(s => s.data() as ActionRun);
+    if (snapshot.empty) return [];
+    return snapshot.docs.map((s) => s.data() as ActionRun);
   }
-
 }
 
 const instance = new ActionRunRepository();

@@ -14,8 +14,8 @@ describe("getAction test", () => {
       creator: "TestUser1",
       name: "TestAction1",
       last_update: new Date(),
-    }
-  }
+    },
+  };
 
   const usersDbData: { [key: string]: User } = {
     "1234": {
@@ -23,14 +23,13 @@ describe("getAction test", () => {
       username: "TestUser1",
       email: "test.user.1@mail.com",
       name: "TheFirstTestUser",
-    }
-  }
+    },
+  };
 
   const collections: { [key: string]: any } = {
     "users": usersDbData,
     "actions": actionsDbData,
-  }
-
+  };
 
 
   firestore.collection.mockImplementation((cn: string) => {
@@ -47,16 +46,16 @@ describe("getAction test", () => {
         where,
         get: async () => {
           const docs = collection.map((d: any) => ({
-            data: () => d
+            data: () => d,
           }));
           return {
             empty: docs.length === 0,
             forEach: (predicate: (e: any, i: number, a: any[]) => void) => docs.forEach(predicate),
             docs,
-          }
-        }
+          };
+        },
       };
-    };
+    }
 
     return {
       where,
@@ -82,12 +81,12 @@ describe("getAction test", () => {
     try {
       await getActionEntrypoint({
         creator: "TestUser1",
-        action: "TestAction2"
+        action: "TestAction2",
       }, { auth: { uid: "1234" } } as CallableContext);
       expect(false).toBe(true);
     } catch (e) {
-      expect(e).toHaveProperty('code');
-      expect((e as functions.https.HttpsError).code).toBe('not-found');
+      expect(e).toHaveProperty("code");
+      expect((e as functions.https.HttpsError).code).toBe("not-found");
     }
   });
 
@@ -95,12 +94,12 @@ describe("getAction test", () => {
     try {
       await getActionEntrypoint({
         creator: "TestUser2",
-        action: "TestAction1"
+        action: "TestAction1",
       }, { auth: { uid: "1234" } } as CallableContext);
       expect(false).toBe(true);
     } catch (e) {
-      expect(e).toHaveProperty('code');
-      expect((e as functions.https.HttpsError).code).toBe('permission-denied');
+      expect(e).toHaveProperty("code");
+      expect((e as functions.https.HttpsError).code).toBe("permission-denied");
     }
   });
 
@@ -108,14 +107,13 @@ describe("getAction test", () => {
     try {
       await getActionEntrypoint({
         creator: "TestUser1",
-        action: "TestAction2"
+        action: "TestAction2",
       }, { auth: { uid: "" } } as CallableContext);
       expect(false).toBe(true);
     } catch (e) {
-      expect(e).toHaveProperty('code');
-      expect((e as functions.https.HttpsError).code).toBe('unauthenticated');
+      expect(e).toHaveProperty("code");
+      expect((e as functions.https.HttpsError).code).toBe("unauthenticated");
     }
   });
-
 });
 

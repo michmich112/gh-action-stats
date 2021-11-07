@@ -5,14 +5,13 @@ import GetActionOperation from "../operations/GetActionOperation";
 
 
 export async function getActionEntrypoint({ creator, action }: { creator: string, action: string }, context: CallableContext): Promise<Action> {
-  if (!context?.auth?.uid) throw new functions.https.HttpsError('unauthenticated', 'Authentication Required');
+  if (!context?.auth?.uid) throw new functions.https.HttpsError("unauthenticated", "Authentication Required");
 
   return await GetActionOperation({
     uid: context.auth!.uid,
     creator,
-    action
+    action,
   });
-
 }
 
 export const getAction = functions.https.onCall(getActionEntrypoint);

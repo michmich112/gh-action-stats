@@ -29,7 +29,7 @@ class ActionRepository implements IFirestoreRepository {
       .where("name", "==", actionName)
       .get();
     if (snapshot.empty) return null;
-    console.debug('snapshot', snapshot.docs);
+    console.debug("snapshot", snapshot.docs);
     return snapshot.docs[0].data() as Action;
   }
 }
