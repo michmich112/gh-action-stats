@@ -9,5 +9,5 @@ export async function getActionsEntrypoint(_: any, context: CallableContext): Pr
   return await GetActionForUserOperation(context.auth.uid);
 }
 
-export const getAction = functions.https.onCall(getActionsEntrypoint);
+export const getActions = functions.https.onCall(getActionsEntrypoint);
 

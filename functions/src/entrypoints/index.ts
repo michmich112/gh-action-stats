@@ -1,4 +1,6 @@
 export * from "./newActionRun";
 export { loginUser } from "./loginUser";
-export { getAction } from "./getActions";
+export { getActions } from "./getActions";
+export { getAction } from "./getAction";
+export { getActionRuns } from "./getActionRuns";
 

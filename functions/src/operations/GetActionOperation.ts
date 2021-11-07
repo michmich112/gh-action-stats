@@ -14,7 +14,7 @@ type GetActionOperationParams = {
 
 async function GetActionOperation({ uid, creator, action }: GetActionOperationParams): Promise<Action> {
   const user = await UserRepository.getByUid(uid);
-  if (user !== null && user.username !== creator) throw new functions.https.HttpsError('permission-denied', 'Ressource Forbidden.');
+  if (user !== null && user.username !== creator) throw new functions.https.HttpsError('permission-denied', 'Resource Forbidden.');
   const actionData = await ActionsRepository.getActionByCreatorAndName(creator, action);
   if (actionData === null) throw new functions.https.HttpsError('not-found', 'Action not found');
   return actionData;
