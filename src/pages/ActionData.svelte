@@ -73,10 +73,17 @@
   });
 </script>
 
-<AgGrid bind:data {columnDefs} />
+<div class="grid-container">
+  <AgGrid bind:data {columnDefs} />
+</div>
 
 <style>
   :global(:root) {
-    --grid-height: 500px;
+    --grid-height: 100%;
+  }
+
+  .grid-container {
+    width: 100%;
+    height: 100%;
   }
 </style>
