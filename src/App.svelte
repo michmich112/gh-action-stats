@@ -30,7 +30,7 @@
     <Route path="/action/:userId/:actionName" let:params>
       <ActionData
         actionCreator={params.userId}
-        actionId={params.actionName}
+        actionName={params.actionName}
       /></Route
     >
     <Route path="dash/{username}" component={Dashboard} />

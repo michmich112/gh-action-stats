@@ -1,10 +1,19 @@
-import { writable } from 'svelte/store';
+import { writable, Writable } from 'svelte/store';
+
+function persistentStore<T>(name: string, initial: T): Writable<T> {
+  const previous = localStorage.getItem(name);
+  if (previous !== null) console.debug(`Persistent store with key ${name} found on system. Hydrating.`);
+  const store = writable<T>(previous ? JSON.parse(previous) : initial);
+  store.subscribe(val => localStorage.setItem(name, JSON.stringify(val)));
+  return store
+
+}
 
 export type AppStore = {
   isLoading: boolean
 }
 
-export const appStore = writable<AppStore>({
+export const appStore = persistentStore<AppStore>("appStore", {
   isLoading: false
 });
 
@@ -19,7 +28,7 @@ export type UserAuthStore = {
   }
 };
 
-export const userAuthStore = writable<UserAuthStore>({
+export const userAuthStore = persistentStore<UserAuthStore>("userAuthStore", {
   authenticated: false,
 })
 

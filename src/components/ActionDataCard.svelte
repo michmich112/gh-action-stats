@@ -36,6 +36,7 @@
     overflow: visible;
     border-radius: 10px;
     border: 3px solid #222;
+    cursor: pointer;
   }
 
   card:hover {
@@ -55,6 +56,7 @@
     font-size: 20px;
     letter-spacing: 0px;
     line-height: 1.2;
+    cursor: pointer;
   }
 
   card:hover > .info-text {
