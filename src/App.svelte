@@ -7,7 +7,7 @@
   import ActionData from "./pages/ActionData.svelte";
   import Error from "./pages/Error.svelte";
 
-  import { Router, Route } from "svelte-routing";
+  import { Router, Route, navigate } from "svelte-routing";
 
   let authenticated: boolean = false;
   let username: string = "";
@@ -33,6 +33,7 @@
         actionName={params.actionName}
       /></Route
     >
-    <Route path="dash/{username}" component={Dashboard} />
+    <Route path="/dash/{username}" component={Dashboard} />
+    <Route component={Dashboard} />
   {/if}
 </Router>

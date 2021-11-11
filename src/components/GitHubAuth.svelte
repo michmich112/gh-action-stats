@@ -31,6 +31,7 @@
         userAuthStore.set({
           authenticated: true,
           userId: user.uid,
+          expiry: new Date().getTime() + 360000, // 1h expiry
           github: {
             username: data.username,
             email: data.email,
