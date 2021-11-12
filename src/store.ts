@@ -46,6 +46,7 @@ export type UserAuthStore = {
   userId?: string,
   expiry: number,
   github?: {
+    avatarUrl: string,
     username: string,
     email: string,
     token: string,

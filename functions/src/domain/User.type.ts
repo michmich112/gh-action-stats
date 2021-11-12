@@ -3,6 +3,7 @@ export type User = {
   username: string,
   email: string,
   name: string,
+  avatar_url: string,
 }
 
 export default User;

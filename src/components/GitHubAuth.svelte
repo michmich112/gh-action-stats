@@ -12,6 +12,7 @@
 
   const GithubProvider = new GithubAuthProvider();
   GithubProvider.addScope("read:user");
+  GithubProvider.addScope("user:email");
 
   async function signIn() {
     appStore.update((s) => ({ ...s, isLoading: true }));
@@ -33,6 +34,7 @@
           userId: user.uid,
           expiry: new Date().getTime() + 360000, // 1h expiry
           github: {
+            avatarUrl: data.avatar_url,
             username: data.username,
             email: data.email,
             token: credential.accessToken,
