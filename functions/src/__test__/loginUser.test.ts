@@ -81,9 +81,9 @@ describe("loginUser", () => {
                 exists: true,
                 data: () => (usersDb[id]),
               } : {
-                  exist: false,
-                  data: () => undefined,
-                }),
+                exist: false,
+                data: () => undefined,
+              }),
             set: (data: any, options: any) => {
               setValue = data;
               if (options?.merge) {
