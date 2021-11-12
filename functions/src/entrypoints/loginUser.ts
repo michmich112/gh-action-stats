@@ -12,6 +12,7 @@ type LoginUserDataReturn = {
   message: string,
   username?: string,
   name?: string,
+  avatar_url?: string,
 }
 
 export async function loginUserEntrypoint(data: LoginUserData, context: CallableContext): Promise<LoginUserDataReturn> {
@@ -37,6 +38,7 @@ export async function loginUserEntrypoint(data: LoginUserData, context: Callable
       message: "LoggedIn",
       username: user.username,
       name: user.name,
+      avatar_url: user.avatar_url,
     };
   } catch (e) {
     console.error(`[ERROR][loginUserFunction]: error authenticating: ${(e as Error).message}`);

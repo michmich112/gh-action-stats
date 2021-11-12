@@ -19,6 +19,7 @@ describe("loginUser", () => {
         username: "UserCheck1",
         email: "usercheck1@gmail.com",
         name: "checked user",
+        avatar_url: "http://avatarurl.com/usercheck1",
         uid: "123",
       },
     };
@@ -33,7 +34,7 @@ describe("loginUser", () => {
             login: "testUser123",
             id: 1,
             node_id: "MDQ6VXNlcjE=",
-            avatar_url: "https://github.com/images/error/octocat_happy.gif",
+            avatar_url: "http://avatarurl.com/usercheck1",
             gravatar_id: "",
             url: "https://api.github.com/users/octocat",
             html_url: "https://github.com/octocat",
@@ -80,9 +81,9 @@ describe("loginUser", () => {
                 exists: true,
                 data: () => (usersDb[id]),
               } : {
-                exist: false,
-                data: () => undefined,
-              }),
+                  exist: false,
+                  data: () => undefined,
+                }),
             set: (data: any, options: any) => {
               setValue = data;
               if (options?.merge) {
@@ -104,6 +105,7 @@ describe("loginUser", () => {
       const user = await loginUserEntrypoint({ GithubToken: "token1234" }, { auth: { uid: "123" } } as CallableContext);
       expect(user.username).toBe("UserCheck1");
       expect(user.name).toBe("checked user");
+      expect(user.avatar_url).toBe("http://avatarurl.com/usercheck1");
     } catch (e) {
       console.error((e as Error).message);
       expect(false).toBe(true);
@@ -117,6 +119,7 @@ describe("loginUser", () => {
         username: "testUser123",
         email: "testUser@gmail.com",
         name: "monalisa octocat",
+        avatar_url: "http://avatarurl.com/usercheck1",
         uid: "67866",
       };
       expect(setValue).toEqual(expected);
@@ -124,6 +127,7 @@ describe("loginUser", () => {
       expect(user).toEqual({
         username: expected.username,
         name: expected.name,
+        avatar_url: expected.avatar_url,
         code: 200,
         message: "LoggedIn",
       });

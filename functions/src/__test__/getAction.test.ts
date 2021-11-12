@@ -22,6 +22,7 @@ describe("getAction test", () => {
       uid: "1234",
       username: "TestUser1",
       email: "test.user.1@mail.com",
+      avatar_url: "http://avatarurl.com/testuser1",
       name: "TheFirstTestUser",
     },
   };
