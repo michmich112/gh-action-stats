@@ -126,7 +126,7 @@
 
 <div class="grid-container">
   <div class="data-item">
-    <Line data={dataLine} options={{ responsive: true }} type="line" />
+    <Line data={dataLine} options={{ responsive: true }} />
   </div>
   <div class="data-item">
     <AgGrid {data} {columnDefs} />

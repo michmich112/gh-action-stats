@@ -27,7 +27,7 @@
   },
   "dependencies": {
     "@michmich112/svelte-ag-grid": "^1.1.1",
-    "@michmich112/svelte-chartjs": "^1.1.1-test1",
+    "@michmich112/svelte-chartjs": "^1.1.1",
     "@types/axios": "^0.14.0",
     "axios": "^0.24.0",
     "firebase": "^9.0.2",
