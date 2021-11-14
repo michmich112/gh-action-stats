@@ -31,10 +31,14 @@
   let data: ActionRun[] = [];
   let username: string = "";
 
+  $: sortedData = data.sort(
+    (a, b) => Date.parse(b.timestamp) - Date.parse(a.timestamp)
+  );
+
   $: runs = data.length;
   $: actors = data.reduce((acc, cur) => acc.add(cur.actor), new Set()).size;
   $: repos = data.reduce((acc, cur) => acc.add(cur.repository), new Set()).size;
-  $: graphData = getActionRunGraphData(data);
+  $: graphData = getActionRunGraphData(sortedData);
 
   $: dataLine = {
     labels: graphData?.labels ?? [],
@@ -51,11 +55,11 @@
         borderJoinStyle: "miter",
         pointBorderColor: "rgb(205, 130,1 58)",
         pointBackgroundColor: "rgb(255, 255, 255)",
-        pointBorderWidth: 10,
-        pointHoverRadius: 5,
+        pointBorderWidth: 2,
+        pointHoverRadius: 1,
         pointHoverBackgroundColor: "rgb(0, 0, 0)",
         pointHoverBorderColor: "rgba(220, 220, 220,1)",
-        pointHoverBorderWidth: 2,
+        pointHoverBorderWidth: 1,
         pointRadius: 1,
         pointHitRadius: 10,
         data: graphData?.data ?? [],
@@ -121,8 +125,12 @@
 </div>
 
 <div class="grid-container">
-  <Line data={dataLine} options={{ responsive: true }} type="line" />
-  <!-- <AgGrid bind:data {columnDefs} /> -->
+  <div class="data-item">
+    <Line data={dataLine} options={{ responsive: true }} type="line" />
+  </div>
+  <div class="data-item">
+    <AgGrid {data} {columnDefs} />
+  </div>
 </div>
 
 <style>
@@ -145,28 +153,20 @@
     margin: 10px 1px;
   }
 
-  .metric-card {
+  .grid-container {
+    box-sizing: border-box;
+    width: 100%;
+    height: 45%;
+    max-height: 500px;
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-around;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: flex-start;
+    margin: 10px 10px;
   }
 
-  .label {
-    width: auto;
-    height: auto;
-    flex-shrink: 0;
-    font-family: "Roboto Mono", monospace;
-    font-style: normal;
-    font-weight: 600;
-  }
-
-  .value {
-    width: auto;
-    height: auto;
-    flex-shrink: 0;
-    font-family: "Roboto Mono", monospace;
-    font-style: normal;
-    font-weight: 600;
+  .data-item {
+    width: 45%;
+    height: 100%;
   }
 </style>
