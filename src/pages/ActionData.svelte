@@ -7,20 +7,12 @@
   import { navigate } from "svelte-routing";
   import { appStore } from "../store";
   import MetricCard from "../components/MetricCard.svelte";
-  import { Line } from "@michmich112/svelte-chartjs";
-  import getActionRunGraphData from "../domain/functions/GetActionRunGraphData";
+  import RunGraph from "../components/RunGraph.svelte";
+  import ReposGraph from "../components/ReposGraph.svelte";
+  import type ActionRun from "../domain/types/ActionRun";
 
   export let actionCreator: string;
   export let actionName: string;
-
-  type ActionRun = {
-    actor: string;
-    ip: string;
-    os: string | null;
-    timestamp: string;
-    repository: string | null;
-    is_private: boolean;
-  };
 
   type Action = {
     creator: string;
@@ -38,34 +30,6 @@
   $: runs = data.length;
   $: actors = data.reduce((acc, cur) => acc.add(cur.actor), new Set()).size;
   $: repos = data.reduce((acc, cur) => acc.add(cur.repository), new Set()).size;
-  $: graphData = getActionRunGraphData(sortedData);
-
-  $: dataLine = {
-    labels: graphData?.labels ?? [],
-    datasets: [
-      {
-        label: "Run data",
-        fill: true,
-        lineTension: 0,
-        backgroundColor: "rgba(225, 204,230, .3)",
-        borderColor: "rgb(205, 130, 158)",
-        borderCapStyle: "butt",
-        borderDash: [],
-        borderDashOffset: 0.0,
-        borderJoinStyle: "miter",
-        pointBorderColor: "rgb(205, 130,1 58)",
-        pointBackgroundColor: "rgb(255, 255, 255)",
-        pointBorderWidth: 2,
-        pointHoverRadius: 1,
-        pointHoverBackgroundColor: "rgb(0, 0, 0)",
-        pointHoverBorderColor: "rgba(220, 220, 220,1)",
-        pointHoverBorderWidth: 1,
-        pointRadius: 1,
-        pointHitRadius: 10,
-        data: graphData?.data ?? [],
-      },
-    ],
-  };
 
   const columnDefs = [
     { headerName: "actor", field: "actor", sortable: true },
@@ -126,9 +90,14 @@
 
 <div class="grid-container">
   <div class="data-item">
-    <Line data={dataLine} options={{ responsive: true }} />
+    <div class="graph">
+      <RunGraph data={sortedData} />
+    </div>
+    <div class="graph">
+      <ReposGraph data={sortedData} />
+    </div>
   </div>
-  <div class="data-item">
+  <div class="data-item data-table">
     <AgGrid {data} {columnDefs} />
   </div>
 </div>
@@ -136,6 +105,11 @@
 <style>
   :global(:root) {
     --grid-height: 100%;
+  }
+
+  .graph {
+    width: 45vw;
+    min-width: 300px;
   }
 
   .grid-container {
@@ -156,17 +130,28 @@
   .grid-container {
     box-sizing: border-box;
     width: 100%;
-    height: 45%;
-    max-height: 500px;
+    height: 100%;
     display: flex;
-    flex-direction: row;
-    justify-content: space-evenly;
-    align-items: flex-start;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    align-content: center;
     margin: 10px 10px;
   }
 
   .data-item {
-    width: 45%;
-    height: 100%;
+    width: 95%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-content: space-around;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    margin: 10px;
+  }
+
+  .data-table {
+    height: 45vh;
+    min-height: 300px;
   }
 </style>
