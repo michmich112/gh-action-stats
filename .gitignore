@@ -72,3 +72,6 @@ public/build/
 
 # VS code
 .vscode/
+
+.DS_Store/
+public/.DS_Store

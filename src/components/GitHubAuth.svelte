@@ -11,7 +11,7 @@
   import { navigate } from "svelte-routing";
 
   const GithubProvider = new GithubAuthProvider();
-  GithubProvider.addScope("user"); //c.f. docs: https://docs.github.com/en/developers/apps/building-oauth-apps/scopes-for-oauth-apps
+  GithubProvider.addScope("read:user"); //c.f. docs: https://docs.github.com/en/developers/apps/building-oauth-apps/scopes-for-oauth-apps
 
   async function signIn() {
     appStore.update((s) => ({ ...s, isLoading: true }));
@@ -40,12 +40,13 @@
           },
         });
         navigate(`/dash/${data.username}`);
-        appStore.update((s) => ({ ...s, isLoading: false }));
       }
+      appStore.update((s) => ({ ...s, isLoading: false }));
     } catch (error) {
       console.error(`Code ${error.code}, Message ${error.message}`);
       const credential = GithubAuthProvider.credentialFromError(error);
       console.error("credential err", credential);
+      appStore.update((s) => ({ ...s, isLoading: false }));
     }
   }
 </script>
