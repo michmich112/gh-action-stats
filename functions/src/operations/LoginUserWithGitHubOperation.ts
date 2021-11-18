@@ -20,12 +20,13 @@ export async function LoginUserWithGithubOperation(params: {
     if (user !== null) return user as User;
     // if we were unable to get the user from the repository we create it
   }
-  const { email, login, name } = await getUserData(token);
-  const user = {
+  const { email, login, name, avatar_url } = await getUserData(token);
+  const user: User = {
     uid,
     email,
     username: login,
     name,
+    avatar_url,
   };
   await UserRepository.create(user);
   return user;

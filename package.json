@@ -26,7 +26,12 @@
     "typescript": "^4.0.0"
   },
   "dependencies": {
+    "@michmich112/svelte-ag-grid": "^1.1.1",
+    "@michmich112/svelte-chartjs": "^1.1.1",
+    "@types/axios": "^0.14.0",
+    "axios": "^0.24.0",
     "firebase": "^9.0.2",
-    "sirv-cli": "^1.0.0"
+    "sirv-cli": "^1.0.0",
+    "svelte-routing": "^1.6.0"
   }
 }

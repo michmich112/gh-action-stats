@@ -18,7 +18,7 @@
 
   onMount(async () => {
     appStore.update((s) => ({ ...s, isLoading: true }));
-    const getActions = httpsCallable<{}, Action[]>(functions, "getAction");
+    const getActions = httpsCallable<{}, Action[]>(functions, "getActions");
     actions = (await getActions()).data;
     appStore.update((s) => ({ ...s, isLoading: false }));
   });
@@ -31,7 +31,8 @@
 {/if}
 {#each actions as action}
   <ActionDataCard
-    ActionRepoName={action.creator + "/" + action.name}
+    ActionCreator={action.creator}
+    ActionRepoName={action.name}
     LastUsedDate={action.last_update}
   />
 {/each}

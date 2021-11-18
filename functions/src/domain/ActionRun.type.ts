@@ -5,6 +5,7 @@ export type ActionRun = {
   github_base_ref: string | null,
   github_head_ref: string | null,
   github_ref: string | null,
+  github_repository: string | null,
   github_run_id: string | null,
   ip: string,
   name: string,
