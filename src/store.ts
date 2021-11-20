@@ -1,5 +1,15 @@
 import { writable, Writable } from 'svelte/store';
 
+//function getParams(paramsString: string): string[] {
+//  return paramsString.split('.')
+//}
+
+
+//function mm(obj: object, params: string[]): object {
+//  const ret = {};
+//  params.forEach((str) => str.split('.').reduce(()));
+//}
+
 function persistentStore<T>(name: string, initial: T): Writable<T> {
   const previous = localStorage.getItem(name);
   if (previous !== null) console.debug(`Persistent store with key ${name} found on system. Hydrating.`);

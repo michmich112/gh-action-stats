@@ -6,8 +6,9 @@ import type ActionRun from "../types/ActionRun";
 export default function getActionRunGraphData(data: ActionRun[]): { labels: string[], data: number[] } {
   if (data.length < 1) return { labels: [], data: [] }
   const sortedData = data.sort((a, b) => Date.parse(a.timestamp) - Date.parse(b.timestamp));
-  const labels = getDateRangeWithSeperation(new Date(Date.parse(sortedData[0].timestamp)),
-    new Date(Date.parse(sortedData[sortedData.length - 1].timestamp)));
+  const labels = getDaysBetweenDates(new Date(Date.parse(sortedData[0].timestamp)),
+    new Date(Date.parse(sortedData[sortedData.length - 1].timestamp)))
+    .map((d: Date) => d.toLocaleDateString());
   const retData = [... new Array(labels.length)].map(_ => 0);
   sortedData.forEach(e => {
     const index = labels.indexOf(new Date(Date.parse(e.timestamp)).toLocaleDateString());
@@ -25,8 +26,9 @@ export default function getActionRunGraphData(data: ActionRun[]): { labels: stri
 export function getActionReposGraphData(data: ActionRun[]): { labels: string[], data: number[] } {
   if (data.length < 1) return { labels: [], data: [] };
   const sortedData = data.sort((a, b) => Date.parse(a.timestamp) - Date.parse(b.timestamp));
-  const labels = getDateRangeWithSeperation(new Date(Date.parse(sortedData[0].timestamp)),
-    new Date(Date.parse(sortedData[sortedData.length - 1].timestamp)));
+  const labels = getDaysBetweenDates(new Date(Date.parse(sortedData[0].timestamp)),
+    new Date(Date.parse(sortedData[sortedData.length - 1].timestamp)))
+    .map((d: Date) => d.toLocaleDateString());
   const retData: Set<string>[] = [... new Array(labels.length)].map(_ => new Set());
   sortedData.forEach(e => {
     const index = labels.indexOf(new Date(Date.parse(e.timestamp)).toLocaleDateString());
@@ -44,8 +46,9 @@ export function getActionReposGraphData(data: ActionRun[]): { labels: string[], 
 export function getActionActorsGraphData(data: ActionRun[]): { labels: string[], data: number[] } {
   if (data.length < 1) return { labels: [], data: [] };
   const sortedData = data.sort((a, b) => Date.parse(a.timestamp) - Date.parse(b.timestamp));
-  const labels = getDateRangeWithSeperation(new Date(Date.parse(sortedData[0].timestamp)),
-    new Date(Date.parse(sortedData[sortedData.length - 1].timestamp)));
+  const labels = getDaysBetweenDates(new Date(Date.parse(sortedData[0].timestamp)),
+    new Date(Date.parse(sortedData[sortedData.length - 1].timestamp)))
+    .map((d: Date) => d.toLocaleDateString());
   const retData: Set<string>[] = [... new Array(labels.length)].map(_ => new Set());
   sortedData.forEach(e => {
     const index = labels.indexOf(new Date(Date.parse(e.timestamp)).toLocaleDateString());
@@ -57,15 +60,36 @@ export function getActionActorsGraphData(data: ActionRun[]): { labels: string[],
   }
 }
 
-function getDateRangeWithSeperation(start: Date, end: Date, deltaMs: number = 86400000, toStringFn: string = "toLocaleDateString") {
-  const days: string[] = [];
-  let date = start;
-  while (date <= end) {
-    days.push(date[toStringFn]());
-    date = new Date(date.getTime() + deltaMs);
+/**
+ * Memoization functioen to offload possibly expensive computaion
+ */
+const memoize = (func: (...args: any[]) => any) => {
+  const results = {};
+  return (...args: any[]) => {
+    const argsKey = JSON.stringify(args);
+    if (!results[argsKey]) {
+      results[argsKey] = func(...args);
+    }
+    return results[argsKey];
   }
-
-  days.push(end[toStringFn]());
-  return days;
 }
 
+/**
+ * This computation can be expensive depending on the size of the dataset so we memoize it
+ * Get the days between two dates
+ */
+export const getDaysBetweenDates = memoize((start: Date, end: Date): Date[] => {
+  if (start.getTime() > end.getTime()) return [];
+  const days = [];
+  const dayInMs = 24 * 60 * 60 * 1000;
+  const endDate = new Date(end.getTime() + dayInMs).toLocaleDateString();
+  let day = start;
+  while (day.toLocaleDateString() !== endDate) {
+    days.push(new Date(day.toLocaleDateString()));
+    day.setTime(day.getTime() + dayInMs);
+  }
+  return days.map(d => {
+    d.setTime(d.getTime() - (d.getTime() % dayInMs) + dayInMs)
+    return d;
+  });
+});
