@@ -1,4 +1,4 @@
-import { getDaysBetweenDates } from '../GetActionRunGraphData';
+import getActionRunGraphData, { getActionActorsGraphData, getActionReposGraphData, getDaysBetweenDates } from '../GetActionRunGraphData';
 
 describe('getDaysBetweenDates', () => {
   test('it should give the right dates for range within a month', () => {
@@ -43,4 +43,72 @@ describe('getDaysBetweenDates', () => {
   });
 
 })
+
+const data = [
+  {
+    actor: "actor1",
+    ip: "192.168.0.1",
+    os: "Linux",
+    timestamp: '2021-11-01T00:00:00.000Z',
+    repository: 'actor1/repository1',
+    is_private: false,
+  },
+  {
+    actor: "actor2",
+    ip: "192.168.0.1",
+    os: "Linux",
+    timestamp: '2021-11-01T01:00:00.000Z',
+    repository: 'actor1/repository1',
+    is_private: false,
+  },
+  {
+    actor: "actor1",
+    ip: "192.168.0.1",
+    os: "Linux",
+    timestamp: '2021-11-01T02:20:00.000Z',
+    repository: 'actor1/repository1',
+    is_private: false,
+  },
+  {
+    actor: "actor2",
+    ip: "192.168.0.1",
+    os: "Linux",
+    timestamp: '2021-11-03T00:00:00.000Z',
+    repository: 'actor1/repository2',
+    is_private: false,
+  }
+];
+
+describe('getActionRunGraphData', () => {
+  test('it should return the correct count and labels', () => {
+    const expected = {
+      labels: ['2021-10-31', '2021-11-01', '2021-11-02'],
+      data: [3, 0, 1]
+    };
+    const ret = getActionRunGraphData(data);
+    expect(ret).toEqual(expected);
+  });
+});
+
+describe('getActionReposGraphData', () => {
+  test('it should return the correct count and labels', () => {
+    const expected = {
+      labels: ['2021-10-31', '2021-11-01', '2021-11-02'],
+      data: [1, 0, 1]
+    };
+    const ret = getActionReposGraphData(data);
+    expect(ret).toEqual(expected);
+  });
+});
+
+describe('getActionActorsGraphData', () => {
+  test('it should return the correct count and labels', () => {
+    const expected = {
+      labels: ['2021-10-31', '2021-11-01', '2021-11-02'],
+      data: [2, 0, 1]
+    };
+    const ret = getActionActorsGraphData(data);
+    expect(ret).toEqual(expected);
+  });
+});
 
