@@ -1,14 +1,7 @@
 import { writable, Writable } from 'svelte/store';
+import deepMerge from './domain/functions/DeepMerge';
+import SelectiveObjectValues from './domain/functions/SelectiveObjectValues';
 
-//function getParams(paramsString: string): string[] {
-//  return paramsString.split('.')
-//}
-
-
-//function mm(obj: object, params: string[]): object {
-//  const ret = {};
-//  params.forEach((str) => str.split('.').reduce(()));
-//}
 
 function persistentStore<T>(name: string, initial: T): Writable<T> {
   const previous = localStorage.getItem(name);
@@ -16,6 +9,18 @@ function persistentStore<T>(name: string, initial: T): Writable<T> {
   const store = writable<T>(previous ? JSON.parse(previous) : initial);
   store.subscribe(val => localStorage.setItem(name, JSON.stringify(val)));
   return store
+}
+
+/**
+ * Store that persist selective values only
+ */
+function selectivePersistentStore<T>(name: string, initial: T, keys: string[]): Writable<T> {
+  const previous = localStorage.getItem(name);
+  if (previous !== null) console.debug(`Selective persistent store with key ${name} found on system. Hydrating`)
+  const value = previous ? deepMerge(initial, SelectiveObjectValues(JSON.parse(previous), keys)) : initial;
+  const store = writable<T>(value);
+  store.subscribe(val => localStorage.setItem(name, JSON.stringify(SelectiveObjectValues(val, keys))));
+  return store;
 }
 
 interface ExpiryStore {
@@ -46,9 +51,9 @@ export type AppStore = {
   isLoading: boolean
 }
 
-export const appStore = persistentStore<AppStore>("appStore", {
+export const appStore = selectivePersistentStore<AppStore>("appStore", {
   isLoading: false
-});
+}, []);
 
 // User Auth Store Types
 export type UserAuthStore = {
