@@ -1,0 +1,48 @@
+name: Deploy Prod Functions
+on:
+  push:
+    paths:
+      - functions/**
+    branches:
+      - staging
+  workflow_dispatch:
+
+jobs:
+  test-functions:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Node
+        uses: actions/setup-node@v1
+        with:
+          node-version: '14'
+      - name: test functions
+        working-directory: ./functions
+        run: | 
+          npm install
+          npm run test
+  
+  deploy-functions:
+    runs-on: ubuntu-latest
+    needs: test-functions
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Node
+        uses: actions/setup-node@v1
+        with:
+          node-version: '14'
+      - name: Deploy
+        working-directory: ./functions
+        run: |
+          npm install -g firbase-tools
+           
+          # Install dependencies
+          npm install
+
+          # Build project
+          npm run build
+
+          firebase deploy --project gh-action-stats --only functions --token $FIREBASE_TOKEN
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+          
