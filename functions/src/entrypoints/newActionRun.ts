@@ -4,7 +4,7 @@ import NewActionRunOperation from "../operations/newActionRun";
 
 export const newActionRun = functions.https
   .onRequest(async (req: functions.Request, res: functions.Response) => {
-    const {method, body, ip} = req;
+    const { method, body, ip } = req;
     if (method !== "POST") {
       res.status(405);
       res.end();
@@ -16,8 +16,8 @@ export const newActionRun = functions.https
       timestamp: new Date().toISOString(),
     };
     res.status(200);
-    res.end();
     // eslint-disable-next-line new-cap
     await NewActionRunOperation(data);
+    res.end();
   });
 
