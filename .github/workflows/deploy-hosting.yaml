@@ -43,6 +43,5 @@ jobs:
 
           firebase deploy --project gh-action-stats --only hosting --token $FIREBASE_TOKEN
         env:
-          ROLLUP_WATCH: false
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
  
