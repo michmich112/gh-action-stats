@@ -34,7 +34,7 @@ jobs:
       - name: Deploy
         working-directory: ./functions
         run: |
-          npm install -g firbase-tools
+          npm install -g firebase-tools
            
           # Install dependencies
           npm install
