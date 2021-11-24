@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  test-functions:
+  test-client:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -22,16 +22,16 @@ jobs:
           npm install
           npm run test
   
-  deploy-functions:
+  deploy-client:
     runs-on: ubuntu-latest
-    needs: test-functions
+    needs: test-client
     steps:
       - uses: actions/checkout@v2
       - name: Setup Node
         uses: actions/setup-node@v1
         with:
           node-version: '14'
-      - name: Deploy
+      - name: Deploy Client
         run: |
           npm install -g firebase-tools
            
@@ -43,5 +43,6 @@ jobs:
 
           firebase deploy --project gh-action-stats --only hosting --token $FIREBASE_TOKEN
         env:
+          ROLLUP_WATCH: false
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
  
