@@ -1,5 +1,6 @@
 name: Test Application
 on: 
+  push:
   pull_request:
   workflow_dispatch:
 
@@ -8,9 +9,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - name: Setup Node
+        uses: actions/setup-node@v1
+        with:
+          node-version: '14'
       - name: test server
         working-directory: ./functions
         run: | 
+          npm install
           npm run test
 
 
@@ -24,6 +30,7 @@ jobs:
           node-version: '14'
       - name: test client
         run: |
+          npm install
           npm run test
 
         

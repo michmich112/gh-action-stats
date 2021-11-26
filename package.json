@@ -12,7 +12,7 @@
   "devDependencies": {
     "@rollup/plugin-commonjs": "^17.0.0",
     "@rollup/plugin-node-resolve": "^11.0.0",
-    "@rollup/plugin-typescript": "^8.0.0",
+    "@rollup/plugin-typescript": "^8.3.0",
     "@tsconfig/svelte": "^2.0.0",
     "@types/firebase": "^3.2.1",
     "@types/jest": "^27.0.3",
@@ -28,7 +28,7 @@
     "svelte-preprocess": "^4.0.0",
     "ts-jest": "^27.0.7",
     "tslib": "^2.0.0",
-    "typescript": "^4.0.0"
+    "typescript": "^4.5.2"
   },
   "dependencies": {
     "@michmich112/svelte-ag-grid": "^1.1.1",

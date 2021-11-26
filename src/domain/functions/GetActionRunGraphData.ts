@@ -6,12 +6,12 @@ import type ActionRun from "../types/ActionRun";
 export default function getActionRunGraphData(data: ActionRun[]): { labels: string[], data: number[] } {
   if (data.length < 1) return { labels: [], data: [] }
   const sortedData = data.sort((a, b) => Date.parse(a.timestamp) - Date.parse(b.timestamp));
-  const labels = getDaysBetweenDates(new Date(Date.parse(sortedData[0].timestamp)),
-    new Date(Date.parse(sortedData[sortedData.length - 1].timestamp)))
-    .map((d: Date) => d.toLocaleDateString());
+  const labels = getDaysBetweenDates(dateFromTimestamp(sortedData[0].timestamp),
+    dateFromTimestamp(sortedData[sortedData.length - 1].timestamp))
+    .map(fmtDate);
   const retData = [... new Array(labels.length)].map(_ => 0);
   sortedData.forEach(e => {
-    const index = labels.indexOf(new Date(Date.parse(e.timestamp)).toLocaleDateString());
+    const index = labels.indexOf(fmtDate(dateFromTimestamp(e.timestamp)));
     retData[index] += 1;
   });
   return {
@@ -26,12 +26,12 @@ export default function getActionRunGraphData(data: ActionRun[]): { labels: stri
 export function getActionReposGraphData(data: ActionRun[]): { labels: string[], data: number[] } {
   if (data.length < 1) return { labels: [], data: [] };
   const sortedData = data.sort((a, b) => Date.parse(a.timestamp) - Date.parse(b.timestamp));
-  const labels = getDaysBetweenDates(new Date(Date.parse(sortedData[0].timestamp)),
-    new Date(Date.parse(sortedData[sortedData.length - 1].timestamp)))
-    .map((d: Date) => d.toLocaleDateString());
+  const labels = getDaysBetweenDates(dateFromTimestamp(sortedData[0].timestamp),
+    dateFromTimestamp(sortedData[sortedData.length - 1].timestamp))
+    .map(fmtDate);
   const retData: Set<string>[] = [... new Array(labels.length)].map(_ => new Set());
   sortedData.forEach(e => {
-    const index = labels.indexOf(new Date(Date.parse(e.timestamp)).toLocaleDateString());
+    const index = labels.indexOf(fmtDate(dateFromTimestamp(e.timestamp)));
     retData[index].add(e.repository);
   });
   return {
@@ -46,12 +46,12 @@ export function getActionReposGraphData(data: ActionRun[]): { labels: string[], 
 export function getActionActorsGraphData(data: ActionRun[]): { labels: string[], data: number[] } {
   if (data.length < 1) return { labels: [], data: [] };
   const sortedData = data.sort((a, b) => Date.parse(a.timestamp) - Date.parse(b.timestamp));
-  const labels = getDaysBetweenDates(new Date(Date.parse(sortedData[0].timestamp)),
-    new Date(Date.parse(sortedData[sortedData.length - 1].timestamp)))
-    .map((d: Date) => d.toLocaleDateString());
+  const labels = getDaysBetweenDates(dateFromTimestamp(sortedData[0].timestamp),
+    dateFromTimestamp(sortedData[sortedData.length - 1].timestamp))
+    .map(fmtDate);
   const retData: Set<string>[] = [... new Array(labels.length)].map(_ => new Set());
   sortedData.forEach(e => {
-    const index = labels.indexOf(new Date(Date.parse(e.timestamp)).toLocaleDateString());
+    const index = labels.indexOf(fmtDate(dateFromTimestamp(e.timestamp)));
     retData[index].add(e.actor);
   });
   return {
@@ -93,3 +93,10 @@ export const getDaysBetweenDates = memoize((start: Date, end: Date): Date[] => {
     return d;
   });
 });
+
+function dateFromTimestamp(timestamp: string): Date {
+  return new Date(Date.parse(timestamp));
+}
+function fmtDate(date: Date): string {
+  return new Intl.DateTimeFormat('en-CA').format(date);
+}
