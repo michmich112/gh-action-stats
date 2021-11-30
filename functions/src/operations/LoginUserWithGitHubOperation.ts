@@ -14,13 +14,23 @@ export async function LoginUserWithGithubOperation(params: {
   token: string,
   uid: string
 }): Promise<User> {
+  console.debug("[LoginUserWithGitHubOperation][Start]");
   const { token, uid } = params;
   if (await UserRepository.existsByUid(uid)) {
+    console.debug("[LoginUserWithGitHubOperation] - User exists, fetching by Uid");
     const user = await UserRepository.getByUid(uid);
-    if (user !== null) return user as User;
+    console.debug("[LoginUserWithGitHubOperation] - User fetched by Uid");
+    if (user !== null) {
+      console.debug("[LoginUserWithGitHubOperation] - User found on  user repository");
+      console.debug("[LoginUserWithGitHubOperation][End]");
+      return user as User;
+    }
+    console.debug("[LoginUserWithGitHubOperation] - User not found on user repository");
     // if we were unable to get the user from the repository we create it
   }
+  console.debug("[LoginUserWithGitHubOperation] - Creating new User, getting user data from Github.");
   const { email, login, name, avatar_url } = await getUserData(token);
+  console.debug("[LoginUserWithGitHubOperation] - Received User data from github, creating User");
   const user: User = {
     uid,
     email,
@@ -29,6 +39,8 @@ export async function LoginUserWithGithubOperation(params: {
     avatar_url,
   };
   await UserRepository.create(user);
+  console.debug("[LoginUserWithGitHubOperation] - User Created");
+  console.debug("[LoginUserWithGitHubOperation][End]");
   return user;
 }
 
