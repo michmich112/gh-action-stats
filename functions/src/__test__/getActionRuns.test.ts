@@ -43,7 +43,7 @@ describe("getActionRuns test", () => {
       github_event_name: "push",
       execution_time: [1, 10000],
       runner_name: "GithubActions",
-      error: null
+      error: null,
     },
 
     "0002": {
@@ -63,7 +63,7 @@ describe("getActionRuns test", () => {
       github_event_name: "pull_request",
       execution_time: [2, 200],
       runner_name: "GithubActions",
-      error: null
+      error: null,
     },
 
     "0003": {
@@ -83,7 +83,7 @@ describe("getActionRuns test", () => {
       github_event_name: "pull_request",
       execution_time: [2, 200],
       runner_name: "GithubActions",
-      error: null
+      error: null,
     },
   };
 
@@ -130,13 +130,13 @@ describe("getActionRuns test", () => {
 
   isRepoAccessible.mockImplementation(async (token: string, owner: string, repo: string): Promise<boolean> => {
     return !(token === "1234" && owner === "PrivateUser" && repo === "private1");
-  })
+  });
 
   test("it should return the queried data if it exists", async () => {
     const runs = await getActionRunsEntrypoint({
       creator: "TestUser1",
       action: "Action1",
-      token: "1234"
+      token: "1234",
     }, { auth: { uid: "1234" } } as CallableContext);
     expect(runs.length).toEqual(3);
     expect(runs).toEqual([{

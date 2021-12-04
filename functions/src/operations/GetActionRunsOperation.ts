@@ -14,9 +14,11 @@ type GetActionRunsOperationParams = {
 
 
 function HashRepo(repo: string): string {
-  const owner = repo.split('/')[0];
-  const repoName = repo.split('/').slice(1).join('/');
-  let hash = 0, i, chr;
+  const owner = repo.split("/")[0];
+  const repoName = repo.split("/").slice(1).join("/");
+  let hash = 0;
+  let i;
+  let chr;
   for (i = 0; i < repoName.length; i++) {
     chr = repoName.charCodeAt(i);
     hash = ((hash << 5) - hash) + chr;
@@ -35,12 +37,10 @@ async function GetActionRunsOperation({ uid, creator, name, token }: GetActionRu
   const repos = [...actionRuns.reduce((acc: Set<string>, cur: ActionRun) =>
     cur.github_repository ? acc.add(cur.github_repository) : acc, new Set())];
   const reposRename = (await Promise.all(repos.map(async (r) => {
-    const ira = await isRepoAccessible(token, r.split('/')[0], r.split('/').slice(1).join('/'));
+    const ira = await isRepoAccessible(token, r.split("/")[0], r.split("/").slice(1).join("/"));
     return ira ? undefined : r;
   })))
     .reduce((acc: { [k: string]: string }, cur?: string) => (cur !== undefined ? { ...acc, [cur]: HashRepo(cur) } : acc), {});
-
-
 
   return actionRuns.map((ar) => {
     const repoName = ar.github_repository ? reposRename[ar.github_repository] : undefined;
@@ -54,7 +54,7 @@ async function GetActionRunsOperation({ uid, creator, name, token }: GetActionRu
       execution_time: ar.execution_time || null,
       error: ar.error || null,
       is_private: repoName !== undefined, // if we have to rename it then its private
-    } as ActionRunReturn
+    } as ActionRunReturn;
   });
 }
 

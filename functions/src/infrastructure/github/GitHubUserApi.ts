@@ -72,7 +72,7 @@ export async function isRepoAccessible(token: string, owner: string, repo: strin
       return true;
     } else {
       console.debug("[GitHubRepoApi][isRepoAccessible] - Unexpected response status", JSON.stringify(res));
-      return false
+      return false;
     }
   } catch (e) {
     console.error(`[ERROR][GitHubRepoApi][isRepoAccessible] - ${(e as Error).message}`);
