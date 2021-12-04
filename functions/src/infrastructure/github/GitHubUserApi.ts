@@ -53,7 +53,29 @@ export async function getUserData(token: string): Promise<PublicGitHubUserInfo> 
     }
     return res.data;
   } catch (e) {
-    console.error(`[ERROR][GitHubUserApi] - ${(e as Error).message}`);
+    console.error(`[ERROR][GitHubUserApi][getUserData] - ${(e as Error).message}`);
     throw new UnauthorizedGitHubApiError("Unable to get User information");
+  }
+}
+
+
+export async function isRepoAccessible(token: string, owner: string, repo: string): Promise<boolean> {
+  try {
+    const res = await axios.get(`https://api.github.com/repos/${owner}/${repo}`, {
+      headers: {
+        Authorization: `token ${token}`,
+      },
+    });
+    if ([403, 404].includes(res.status)) {
+      return false;
+    } else if ([200, 301].includes(res.status)) {
+      return true;
+    } else {
+      console.debug("[GitHubRepoApi][isRepoAccessible] - Unexpected response status", JSON.stringify(res));
+      return false
+    }
+  } catch (e) {
+    console.error(`[ERROR][GitHubRepoApi][isRepoAccessible] - ${(e as Error).message}`);
+    return false;
   }
 }

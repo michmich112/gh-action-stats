@@ -14,7 +14,7 @@ export type ActionRun = {
   runner_name: string | null,
   timestamp: string,
   version: string,
-  execution_time: [number, number] | null,
+  execution_time: [number, number] | null, // uses process.hrtime
   error: {
     name: string,
     message: string,
