@@ -3,9 +3,8 @@
   import { functions } from "../config/firebase.config";
   import { httpsCallable } from "firebase/functions";
   import AgGrid from "@michmich112/svelte-ag-grid";
-  import { UserAuthStore, userAuthStore } from "../store";
+  import { appStore, UserAuthStore, userAuthStore } from "../store";
   import { navigate } from "svelte-routing";
-  import { appStore } from "../store";
   import MetricCard from "../components/MetricCard.svelte";
   import RunGraph from "../components/RunGraph.svelte";
   import ReposGraph from "../components/ReposGraph.svelte";
@@ -22,6 +21,7 @@
 
   let data: ActionRun[] = [];
   let username: string = "";
+  let token: string = "";
 
   $: sortedData = data.sort(
     (a, b) => Date.parse(b.timestamp) - Date.parse(a.timestamp)
@@ -31,16 +31,54 @@
   $: actors = data.reduce((acc, cur) => acc.add(cur.actor), new Set()).size;
   $: repos = data.reduce((acc, cur) => acc.add(cur.repository), new Set()).size;
 
+  const options = {
+    defaultColDef: {
+      resizable: true,
+      sortable: true,
+      filter: "agTextColumnFilter",
+    },
+  };
+
   const columnDefs = [
-    { headerName: "actor", field: "actor", sortable: true },
-    { headerName: "timestamp", field: "timestamp", sortable: true },
-    { headerName: "ip", field: "ip" },
-    { headerName: "repository", field: "repository", sortable: true },
-    { headerName: "os", field: "os", sortable: true },
+    {
+      headerName: "Actor",
+      field: "actor",
+    },
+    {
+      headerName: "Timestamp",
+      field: "timestamp",
+      sortable: true,
+      filter: "agDateColumnFilter",
+      filterParams: {
+        comparator: (filterDate: Date, cellValue: string) => {
+          const d = new Date(Date.parse(cellValue));
+          if (d < filterDate) {
+            return -1;
+          } else if (d > filterDate) {
+            return 1;
+          }
+          return 0;
+        },
+      },
+    },
+    { headerName: "IP", field: "ip" },
+    {
+      headerName: "Repo",
+      field: "repository",
+    },
+    {
+      headerName: "OS",
+      field: "os",
+    },
+    {
+      headerName: "Repo Private",
+      field: "is_private",
+    },
   ];
 
   userAuthStore.subscribe((userAuth: UserAuthStore) => {
     username = userAuth.github.username;
+    token = userAuth.github.token;
   });
 
   onMount(async () => {
@@ -70,7 +108,11 @@
     // fetch the run data
     try {
       data = (
-        await getActionRuns({ creator: actionCreator, action: actionName })
+        await getActionRuns({
+          creator: actionCreator,
+          action: actionName,
+          token,
+        })
       ).data;
     } catch (e) {
       alert(
@@ -98,7 +140,7 @@
     </div>
   </div>
   <div class="data-item data-table">
-    <AgGrid {data} {columnDefs} />
+    <AgGrid {data} {columnDefs} {options} />
   </div>
 </div>
 
