@@ -1,4 +1,5 @@
 <script lang="ts">
+  import GithubButton from "./GithubButton.svelte";
   import { auth, functions } from "../config/firebase.config";
   import {
     browserLocalPersistence,
@@ -51,4 +52,4 @@
   }
 </script>
 
-<button on:click={signIn}>Sign In With GitHub</button>
+<GithubButton onClick={signIn} />
