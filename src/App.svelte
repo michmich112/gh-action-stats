@@ -6,6 +6,7 @@
   import Dashboard from "./pages/Dashboard.svelte";
   import ActionData from "./pages/ActionData.svelte";
   import Error from "./pages/Error.svelte";
+  import GetStarted from "./pages/GetStarted.svelte";
 
   import { Router, Route, navigate } from "svelte-routing";
 
@@ -20,20 +21,31 @@
 </script>
 
 <Loader />
-<Router {url}>
-  <Header />
-  {#if !authenticated}
-    <Route path="/error/:id" let:params><Error code={params.id} /></Route>
-    <Route component={Authentication} />
-  {:else}
-    <Route path="/error/:id" let:params><Error code={params.id} /></Route>
-    <Route path="/action/:userId/:actionName" let:params>
-      <ActionData
-        actionCreator={params.userId}
-        actionName={params.actionName}
-      /></Route
-    >
-    <Route path="/dash/{username}" component={Dashboard} />
-    <Route component={Dashboard} />
-  {/if}
-</Router>
+<Header />
+<main>
+  <Router {url}>
+    <Route path="/get-started" component={GetStarted} />
+    {#if !authenticated}
+      <Route path="/error/:id" let:params><Error code={params.id} /></Route>
+      <Route component={Authentication} />
+    {:else}
+      <Route path="/error/:id" let:params><Error code={params.id} /></Route>
+      <Route path="/action/:userId/:actionName" let:params>
+        <ActionData
+          actionCreator={params.userId}
+          actionName={params.actionName}
+        /></Route
+      >
+      <Route path="/dash/{username}" component={Dashboard} />
+      <Route component={Dashboard} />
+    {/if}
+  </Router>
+</main>
+
+<style>
+  main {
+    width: 100%;
+    top: 50px;
+    position: absolute;
+  }
+</style>

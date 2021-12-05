@@ -28,14 +28,17 @@
   <div class="full">
     <Loader />
   </div>
+{:else if actions.length > 0}
+  {#each actions as action}
+    <ActionDataCard
+      ActionCreator={action.creator}
+      ActionRepoName={action.name}
+      LastUsedDate={action.last_update}
+    />
+  {/each}
+{:else}
+  No Action Data Yet.
 {/if}
-{#each actions as action}
-  <ActionDataCard
-    ActionCreator={action.creator}
-    ActionRepoName={action.name}
-    LastUsedDate={action.last_update}
-  />
-{/each}
 
 <style>
   .full {
