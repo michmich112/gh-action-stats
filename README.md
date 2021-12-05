@@ -1,15 +1,10 @@
-*Psst — looking for a more complete solution? Check out [SvelteKit](https://kit.svelte.dev), the official framework for building web applications of all sizes, with a beautiful development experience and flexible filesystem-based routing.*
-
-*Looking for a shareable component template instead? Go here --> [sveltejs/component-template](https://github.com/sveltejs/component-template)*
-
----
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/20456444/144739095-a3cca282-b5a1-413c-b517-10b8c965b06b.png" width="150px" height="150px" />
+</p>
 
 # gh-action-stats
 
-Platform to visualize the statistics of you github actions
-
-*Note that you will need to have [Node.js](https://nodejs.org) installed.*
-
+Analytics platform for Github actions
 
 ## Get started
 
@@ -25,36 +20,18 @@ npm install
 npm run dev
 ```
 
-Navigate to [localhost:5000](http://localhost:5000). You should see your app running. Edit a component file in `src`, save it, and reload the page to see your changes.
+Navigate to [localhost:5000](http://localhost:5000). You should see the app running. By default it is connected to the production back end so you are able to access your data on your local host.
 
-By default, the server will only respond to requests from localhost. To allow connections from other computers, edit the `sirv` commands in package.json to include the option `--host 0.0.0.0`.
+## Start Collecting Analytics
 
-If you're using [Visual Studio Code](https://code.visualstudio.com/) we recommend installing the official extension [Svelte for VS Code](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode). If you are using other editors you may need to install a plugin in order to get syntax highlighting and intellisense.
+To start collecting analytics, visit the [get started page](https://actions.boringday.co/get-started) and visit the [`gh-action-stats` npm pacakge](https://github.com/michmich112/gh-action-stats-js).
 
-## Building and running in production mode
+## Future implementation
+- [ ] Download data in csv format
+- [ ] Time range picker
+- [ ] Notifications for new Actor & new Repo
+- [ ] Error displays & notifications
+- [ ] Improved analytics with performance graphing and P90,P95 run duration
+- [ ] Repo badges/shields 
 
-To create an optimised version of the app:
-
-```bash
-npm run build
-```
-
-You can run the newly built app with `npm run start`. This uses [sirv](https://github.com/lukeed/sirv), which is included in your package.json's `dependencies` so that the app will work when you deploy to platforms like [Heroku](https://heroku.com).
-
-
-## Single-page app mode
-
-By default, sirv will only respond to requests that match files in `public`. This is to maximise compatibility with static fileservers, allowing you to deploy your app anywhere.
-
-If you're building a single-page app (SPA) with multiple routes, sirv needs to be able to respond to requests for *any* path. You can make it so by editing the `"start"` command in package.json:
-
-```js
-"start": "sirv public --single"
-```
-
-## Deploying to the web
-
-Login into the firebase CLI and run `firebase deploy --only hosting` to deploy the web interface and
-`firebase deploy --only functions` to deploy only the functions.
-> CI/CD pipeline to auto-deploy the code when merged to master coming soon
-
+# Contributions are welcome! Feel free to open an issue with what you would like us to add on here! :)
