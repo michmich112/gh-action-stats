@@ -48,4 +48,10 @@
     top: 50px;
     position: absolute;
   }
+
+  @media only screen and (max-width: 500px) {
+    main {
+      top: 140px;
+    }
+  }
 </style>
