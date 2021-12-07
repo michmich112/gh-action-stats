@@ -41,3 +41,4 @@ jobs:
               "reset": "build",
               "tag": true
             }]
+          github-token: ${{ secrets.GITHUB_TOKEN }}
