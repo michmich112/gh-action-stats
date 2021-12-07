@@ -1,0 +1,43 @@
+name: Manager Versions
+
+on:
+  push:
+    branches:
+      - staging
+      - main
+  workflow_dispatch:
+jobs:
+  Bump-Version:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup Node
+        uses: actions/setup-node@v1
+        with:
+          node-version: '12'
+      - name: Bump & Tag
+        uses: michmich112/version-bumper@master
+        with:
+          scheme: org_semantic
+          version-file: ./package.json
+          files: >
+            [
+              ./package-lock.json,
+              ./functions/package.json,
+              ./functions/package-lock.json,
+            ]
+          rules: >
+            [{
+              "trigger": "commit",
+              "bump": "build",
+              "branch": "staging",
+              "suffix": "-beta",
+              "tag": true
+            }, {
+              "trigger": "commit",
+              "bump": "minor",
+              "branch": "main",
+              "reset": "build",
+              "tag": true
+            }]
