@@ -23,9 +23,9 @@ jobs:
           version-file: ./package.json
           files: >
             [
-              ./package-lock.json,
-              ./functions/package.json,
-              ./functions/package-lock.json,
+              "./package-lock.json",
+              "./functions/package.json",
+              "./functions/package-lock.json",
             ]
           rules: >
             [{
