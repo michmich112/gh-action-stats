@@ -23,7 +23,9 @@
     {#if authenticated}
       <li class="right">{name}</li>
     {:else}
-      <div class="right"><GitHubAuth /></div>
+      <li class="full-width right no-padding">
+        <div class="center"><GitHubAuth /></div>
+      </li>
     {/if}
   </ul>
 </nav>
@@ -53,11 +55,40 @@
     text-decoration: none;
   }
 
+  .no-padding {
+    padding: 2px;
+  }
+
   .clickable {
     cursor: pointer;
   }
 
   .right {
     float: right;
+  }
+
+  @media screen and (max-width: 500px) {
+    nav {
+      height: 140px;
+    }
+
+    li {
+      float: none;
+    }
+
+    .center {
+      display: flex;
+      width: 100%;
+      justify-content: center;
+      align-content: center;
+      margin: 2px;
+    }
+    .full-width {
+      width: 100%;
+    }
+
+    .right {
+      float: none;
+    }
   }
 </style>

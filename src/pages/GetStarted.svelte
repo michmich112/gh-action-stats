@@ -98,7 +98,7 @@ collectStats(main);</code></pre>
       </blockquote>
       <figure id="6ce1a885-7f96-4aed-9c38-2b09d39c0d5d" class="image">
         <a
-          href="Get%20Started%20dcebca3efd7847a38e1e9096c3ea5ff0/Screen_Shot_2021-12-04_at_11.32.08_PM.png"
+          href="/"
           ><img
             style="width:1470px"
             src="assets/images/Screen_Shot_2021-12-04_at_11.32.08_PM.png"

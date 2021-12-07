@@ -27,13 +27,12 @@
   card {
     box-sizing: border-box;
     margin: 5px 15px;
-    height: 60px;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    padding: 17px;
-    overflow: visible;
+    padding: 1em;
+    overflow: hidden;
     border-radius: 10px;
     border: 3px solid #222;
     cursor: pointer;
@@ -53,7 +52,7 @@
     font-style: normal;
     font-family: "Roboto Mono", monospace;
     color: #000000;
-    font-size: 20px;
+    font-size: 15px;
     letter-spacing: 0px;
     line-height: 1.2;
     cursor: pointer;
@@ -61,5 +60,24 @@
 
   card:hover > .info-text {
     color: #ffffff;
+  }
+
+  @media only screen and (max-width: 800px) {
+    card {
+      box-sizing: border-box;
+      margin: 5px 15px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1em;
+      overflow: hidden;
+      border-radius: 10px;
+      border: 3px solid #222;
+      cursor: pointer;
+    }
+    .info-text {
+      font-size: max(3.2vw, 12px);
+    }
   }
 </style>

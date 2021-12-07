@@ -1,6 +1,12 @@
 {
-  "name": "svelte-app",
-  "version": "1.0.0",
+  "name": "gh-action-stats",
+  "version": "0.1.0",
+  "description": "Platform to get analytics from your GitHub Actions",
+  "homepage": "https://actions.boringday.co/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/michmich112/gh-action-stats.git"
+  },
   "private": true,
   "scripts": {
     "build": "rollup -c",
