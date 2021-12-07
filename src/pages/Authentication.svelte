@@ -11,7 +11,7 @@
     if (authenticated) username = userAuth.github.username;
   });
 
-  if (authenticated) navigate(`/dash/${username}`);
+  if (authenticated) window.location.replace(`/dash/${username}`);
 </script>
 
 <div class="main">
