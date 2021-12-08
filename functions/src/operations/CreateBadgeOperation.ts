@@ -1,5 +1,5 @@
 import BadgeMetrics from "../domain/BadgeMetrics.type";
-import { makeBadge, Format } from "badge-maker";
+import { makeBadge } from "badge-maker";
 import ActionRunRepository from "../infrastructure/firestore/ActionRunRepository";
 import ActionRun from "../domain/ActionRun.type";
 import CountRuns from "../utils/CountRuns";
@@ -12,23 +12,26 @@ type CreateBadgeOperationParams = {
   metric: BadgeMetrics
 }
 
-export default async function CreateBadgeOperation({ owner, repo, metric }: CreateBadgeOperationParams): Promise<string> {
+export default async function CreateBadgeOperation({ owner, repo, metric }: CreateBadgeOperationParams)
+: Promise<string> {
   const actionRuns: ActionRun[] = await ActionRunRepository.getByCreatorAndName(owner, repo);
   let value = 0;
   switch (metric) {
-    case "runs":
-      value = CountRuns(actionRuns);
-    case "runs/month":
-      value = CountRunsPerMonth(actionRuns);
-    case "repos":
-      value = CountRepos(actionRuns);
+  case "runs":
+    value = CountRuns(actionRuns);
+    break;
+  case "runs/month":
+    value = CountRunsPerMonth(actionRuns);
+    break;
+  case "repos":
+    value = CountRepos(actionRuns);
   }
 
   const format = {
     label: metric,
     color: "green",
-    message: value.toString()
-  }
+    message: value.toString(),
+  };
 
   return makeBadge(format);
 }
