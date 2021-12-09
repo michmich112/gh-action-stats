@@ -3,15 +3,15 @@ import BadgeMetrics, { BadgeMetricsTypeValue } from "../domain/BadgeMetrics.type
 import CreateBadgeOperation from "../operations/CreateBadgeOperation";
 
 async function getBadge(req: functions.Request, res: functions.Response) {
-  const { owner, repo, metric } = req.params;
+  const { owner, repo, metric } = req.query;
   if (owner === undefined || repo === undefined ||
-    (metric !== undefined && !BadgeMetricsTypeValue.includes(metric))) {
+    (metric !== undefined && !BadgeMetricsTypeValue.includes(metric.toString()))) {
     res.status(400);
     res.end();
     return;
   }
 
-  const badge = CreateBadgeOperation({ owner, repo, metric: (metric as BadgeMetrics) });
+  const badge = await CreateBadgeOperation({ owner: owner.toString(), repo: repo.toString(), metric: (metric as BadgeMetrics) });
 
   res.status(200);
   res.send(badge);
