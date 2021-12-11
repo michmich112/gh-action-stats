@@ -1,7 +1,7 @@
+import { PubSub } from "@google-cloud/pubsub";
 import BadgeMetrics from "../domain/BadgeMetrics.type";
 import BadgeRequestLogRepository from "../infrastructure/firestore/BadgeRequestLogRepository";
 import BadgeStorage from "../infrastructure/storage/BadgeStorage";
-import axios from "axios";
 
 type CreateBadgeOperationParams = {
   owner: string,
@@ -12,7 +12,10 @@ type CreateBadgeOperationParams = {
 export default async function CreateBadgeOperation({ owner, repo, metric }: CreateBadgeOperationParams)
   : Promise<string> {
   // send request to server to updated the badges
-  axios.get("https://actions.boringday.co/api/badge/refresh", { params: { owner, repo } });
+  const pubsub = new PubSub();
+  const messageBuffer = Buffer.from(JSON.stringify({ owner, repo }), "utf8");
+  await pubsub.topic("badges").publish(messageBuffer);
+
   const path = `${owner}/${repo}/${metric}`;
   const badge = await BadgeStorage.get(path);
   await BadgeRequestLogRepository.create({
