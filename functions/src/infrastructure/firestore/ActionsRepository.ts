@@ -24,19 +24,12 @@ class ActionRepository implements IFirestoreRepository {
   }
 
   public async getActionByCreatorAndName(username: string, actionName: string): Promise<Action | null> {
-    // const snapshot = await firestore.collection(this.collection)
-    //  .doc(`${username}:${actionName}`)
-    //  .get();
-
-    // TODO: remove comments after test
     const snapshot = await firestore.collection(this.collection)
       .where("creator", "==", username)
       .where("name", "==", actionName)
       .get();
     if (snapshot.empty) return null;
     return hydrate(snapshot.docs[0].data());
-    // if (!snapshot.exists) return null;
-    // return hydrate(snapshot.data());
   }
 
   public async setBadgesIsUpdating(username: string, actionName: string, value: boolean): Promise<void> {
