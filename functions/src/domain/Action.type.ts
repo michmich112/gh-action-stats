@@ -24,8 +24,8 @@ export function hydrate(action: any): Action {
     name: action.name,
     last_update: action.last_update,
     badges: {
-      last_update: new Date(Date.parse(action.badges.last_update)),
-      is_updating: action.badges.is_updating,
+      last_update: action?.badges?.last_update ? new Date(Date.parse(action.badges.last_update)) : new Date(0),
+      is_updating: action?.badges?.is_updating ?? false,
     },
   };
 }
@@ -36,8 +36,8 @@ export function deHydrate(action: Action): DbAction {
     name: action.name,
     last_update: action.last_update,
     badges: {
-      last_update: action?.badges?.last_update?.toISOString() ?? new Date(0).toISOString(),
-      is_updating: action?.badges?.is_updating ?? false,
+      last_update: action.badges?.last_update?.toISOString() ?? new Date(0).toISOString(),
+      is_updating: action.badges?.is_updating ?? false,
     },
   };
 }
