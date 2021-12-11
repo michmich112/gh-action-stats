@@ -14,10 +14,13 @@
     "public": "public",
     "rewrites": [
       {
+        "source":"/api/badge",
+        "function": "badge"
+      },{
         "source":"/api/newActionRun",
         "function": "newActionRun"
-     },
-     {
+      },
+      {
         "source": "**",
         "destination": "/index.html"
       }

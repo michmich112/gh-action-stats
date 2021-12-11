@@ -4,4 +4,5 @@ export { getActions } from "./getActions";
 export { getAction } from "./getAction";
 export { getActionRuns } from "./getActionRuns";
 export * from "./badge";
+export * from "./refreshBadges";
 

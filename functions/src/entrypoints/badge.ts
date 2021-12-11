@@ -14,6 +14,7 @@ async function getBadge(req: functions.Request, res: functions.Response) {
   const badge = await CreateBadgeOperation({ owner: owner.toString(), repo: repo.toString(), metric: (metric as BadgeMetrics) });
 
   res.status(200);
+  res.set("Content-Type", "image/svg+xml;charset=utf-8");
   res.send(badge);
   return;
 }
