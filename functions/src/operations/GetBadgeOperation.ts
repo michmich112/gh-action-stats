@@ -3,13 +3,13 @@ import BadgeMetrics from "../domain/BadgeMetrics.type";
 import BadgeRequestLogRepository from "../infrastructure/firestore/BadgeRequestLogRepository";
 import BadgeStorage from "../infrastructure/storage/BadgeStorage";
 
-type CreateBadgeOperationParams = {
+type GetBadgeOperationParams = {
   owner: string,
   repo: string,
   metric: BadgeMetrics
 }
 
-export default async function CreateBadgeOperation({ owner, repo, metric }: CreateBadgeOperationParams)
+export default async function GetBadgeOperation({ owner, repo, metric }: GetBadgeOperationParams)
   : Promise<string> {
   // send request to server to updated the badges
   const pubsub = new PubSub();

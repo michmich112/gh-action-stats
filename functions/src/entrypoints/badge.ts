@@ -1,6 +1,6 @@
 import * as functions from "firebase-functions";
 import BadgeMetrics, { BadgeMetricsTypeValue } from "../domain/BadgeMetrics.type";
-import CreateBadgeOperation from "../operations/CreateBadgeOperation";
+import GetBadgeOperation from "../operations/GetBadgeOperation";
 
 async function getBadge(req: functions.Request, res: functions.Response) {
   const { owner, repo, metric } = req.query;
@@ -11,7 +11,7 @@ async function getBadge(req: functions.Request, res: functions.Response) {
     return;
   }
 
-  const badge = await CreateBadgeOperation({ owner: owner.toString(), repo: repo.toString(), metric: (metric as BadgeMetrics) });
+  const badge = await GetBadgeOperation({ owner: owner.toString(), repo: repo.toString(), metric: (metric as BadgeMetrics) });
 
   res.status(200);
   res.set("Content-Type", "image/svg+xml;charset=utf-8");

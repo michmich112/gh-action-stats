@@ -14,9 +14,6 @@
     "public": "public",
     "rewrites": [
       {
-        "source": "/api/badge/refresh",
-        "function": "refreshBadges"
-      },{
         "source":"/api/badge",
         "function": "badge"
       },{
