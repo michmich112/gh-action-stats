@@ -27,7 +27,7 @@
       <code>{url}</code>
       <span style="align:right;width:100%">Markdown</span>
       <code>{`![${title} badge](${url})`}</code>
-      <img src={url} alt={`${title} Badge`} />
+      <div><img src={url} alt={`${title} Badge`} /></div>
     </div>
   {/each}
 </div>
@@ -58,12 +58,9 @@
     gap: 10px;
   }
 
-  .row-flex {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-around;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 5px;
+  @media screen and (max-width: 500px) {
+    .column-flex {
+      align-items: unset;
+    }
   }
 </style>

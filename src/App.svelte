@@ -20,12 +20,13 @@
     authenticated = userAuth.authenticated;
     if (authenticated) username = userAuth.github.username;
   });
+  $: topMargin = authenticated ? "98px" : "145px";
 </script>
 
 <Loader />
 <Modal>
   <Header />
-  <main>
+  <main style="--top-margin:{topMargin}">
     <Router {url}>
       <Route path="/get-started" component={GetStarted} />
       <Route path="/error/:id" let:params><Error code={params.id} /></Route>
@@ -59,7 +60,7 @@
 
   @media only screen and (max-width: 500px) {
     main {
-      top: 140px;
+      top: var(--top-margin);
     }
   }
 </style>
