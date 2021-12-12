@@ -9,6 +9,7 @@
   import Error from "./pages/Error.svelte";
   import GetStarted from "./pages/GetStarted.svelte";
 
+  import Modal from "svelte-simple-modal";
   import { Router, Route, navigate } from "svelte-routing";
 
   let authenticated: boolean = false;
@@ -22,30 +23,32 @@
 </script>
 
 <Loader />
-<Header />
-<main>
-  <Router {url}>
-    <Route path="/get-started" component={GetStarted} />
-    <Route path="/error/:id" let:params><Error code={params.id} /></Route>
-    <Route path="/auth" component={Authentication} />
-    <Route path="/error/:id" let:params><Error code={params.id} /></Route>
-    {#if authenticated}
-      <Route path="/action/:userId/:actionName" let:params>
-        <ActionData
-          actionCreator={params.userId}
-          actionName={params.actionName}
-        />
-      </Route>
-      <Route path="/dash/{username}" component={Dashboard} />
-      <Route path="/" component={Landing} />
-      <Route path="*"><Error code="404" /></Route>
-    {/if}
-    {#if !authenticated}
-      <Route path="/" component={Landing} />
-      <Route path="*" component={Authentication} />
-    {/if}
-  </Router>
-</main>
+<Modal>
+  <Header />
+  <main>
+    <Router {url}>
+      <Route path="/get-started" component={GetStarted} />
+      <Route path="/error/:id" let:params><Error code={params.id} /></Route>
+      <Route path="/auth" component={Authentication} />
+      <Route path="/error/:id" let:params><Error code={params.id} /></Route>
+      {#if authenticated}
+        <Route path="/action/:userId/:actionName" let:params>
+          <ActionData
+            actionCreator={params.userId}
+            actionName={params.actionName}
+          />
+        </Route>
+        <Route path="/dash/{username}" component={Dashboard} />
+        <Route path="/" component={Landing} />
+        <Route path="*"><Error code="404" /></Route>
+      {/if}
+      {#if !authenticated}
+        <Route path="/" component={Landing} />
+        <Route path="*" component={Authentication} />
+      {/if}
+    </Router>
+  </main>
+</Modal>
 
 <style>
   main {

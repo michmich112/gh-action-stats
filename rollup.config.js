@@ -39,6 +39,7 @@ export default {
     file: 'public/build/bundle.js'
   },
   plugins: [
+
     svelte({
       preprocess: sveltePreprocess({ sourceMap: !production }),
       compilerOptions: {
@@ -57,7 +58,7 @@ export default {
     // https://github.com/rollup/plugins/tree/master/packages/commonjs
     resolve({
       browser: true,
-      dedupe: ['svelte']
+      dedupe: ['svelte', 'svelte/transition', 'svelte/internal']
     }),
     commonjs(),
     typescript({

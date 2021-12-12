@@ -1,21 +1,45 @@
 <script lang="ts">
   import { Timestamp } from "firebase/firestore";
+  import { onMount } from "svelte";
   import { navigate } from "svelte-routing";
+  import axios from "axios";
+  import type Action from "../domain/types/Action";
 
-  export let ActionCreator: string;
-  export let ActionRepoName: string;
-  export let LastUsedDate: { _seconds: number; _nanoseconds: number };
+  export let ActionData: Action;
 
   $: lastDate = new Timestamp(
-    LastUsedDate._seconds,
-    LastUsedDate._nanoseconds
+    ActionData.last_update._seconds,
+    ActionData.last_update._nanoseconds
   ).toDate();
 
-  $: repoName = ActionCreator + "/" + ActionRepoName;
+  $: repoName = ActionData.creator + "/" + ActionData.name;
 
   function goToAction() {
-    navigate(`/action/${ActionCreator}/${ActionRepoName}`);
+    navigate(`/action/${ActionData.creator}/${ActionData.name}`);
   }
+
+  onMount(() => {
+    if (new Date(Date.parse(ActionData.badges.last_update)).getTime() === 0) {
+      axios
+        .get("https://actions.boringday.co/api/badge", {
+          params: {
+            owner: ActionData.creator,
+            repo: ActionData.name,
+            metric: "runs",
+          },
+        })
+        .then(() => {
+          console.log(
+            `Initialized Action Badges ${ActionData.creator}/${ActionData.name}`
+          );
+        })
+        .catch(() => {
+          console.log(
+            `Initialized Action Badges ${ActionData.creator}/${ActionData.name}`
+          );
+        });
+    }
+  });
 </script>
 
 <card on:click={goToAction}>
