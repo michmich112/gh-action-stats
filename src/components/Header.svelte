@@ -16,7 +16,7 @@
 <nav style="--top-margin:{topMargin}">
   <ul>
     <li class="clickable no-padding" on:click={(_) => navigate("/")}>
-      <img src="/favicon.png" width="45px" height="45px" alt="Logo" />
+      <img src="/favicon.png" width="40px" height="40px" alt="Logo" />
     </li>
     <li class="clickable hide-on-mobile" on:click={(_) => navigate("/")}>
       GitHub Actions Stats
