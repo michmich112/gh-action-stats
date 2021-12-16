@@ -10,18 +10,22 @@
     authenticated = userAuth.authenticated;
     name = userAuth?.github?.username;
   });
+  $: topMargin = authenticated ? "98px" : "145px";
 </script>
 
-<nav>
+<nav style="--top-margin:{topMargin}">
   <ul>
-    <li class="clickable" on:click={(_) => navigate("/")}>
+    <li class="clickable no-padding" on:click={(_) => navigate("/")}>
+      <img src="/favicon.png" width="40px" height="40px" alt="Logo" />
+    </li>
+    <li class="clickable hide-on-mobile" on:click={(_) => navigate("/")}>
       GitHub Actions Stats
     </li>
     <li class="clickable" on:click={(_) => navigate("/get-started")}>
       Get Started
     </li>
     {#if authenticated}
-      <li class="right">{name}</li>
+      <li class="right hide-on-mobile">{name}</li>
     {:else}
       <li class="full-width right no-padding">
         <div class="center"><GitHubAuth /></div>
@@ -69,11 +73,15 @@
 
   @media screen and (max-width: 500px) {
     nav {
-      height: 140px;
+      height: var(--top-margin);
     }
 
     li {
       float: none;
+    }
+
+    .hide-on-mobile {
+      display: none;
     }
 
     .center {

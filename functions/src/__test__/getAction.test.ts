@@ -1,4 +1,3 @@
-import Action from "../domain/Action.type";
 import User from "../domain/User.type";
 import { CallableContext } from "firebase-functions/v1/https";
 import * as functions from "firebase-functions";
@@ -9,11 +8,16 @@ jest.mock("../config/firebase.config");
 const { firestore } = require("../config/firebase.config");
 
 describe("getAction test", () => {
-  const actionsDbData: { [key: string]: Action } = {
+  const actionLastUpdate = new Date();
+  const actionsDbData: { [key: string]: any } = {
     "TestUser1:TestAction1": {
       creator: "TestUser1",
       name: "TestAction1",
-      last_update: new Date(),
+      last_update: actionLastUpdate,
+      badges: {
+        last_update: new Date(0).toISOString(),
+        is_updating: false,
+      },
     },
   };
 
@@ -75,7 +79,15 @@ describe("getAction test", () => {
       creator: "TestUser1",
       action: "TestAction1",
     }, { auth: { uid: "1234" } } as CallableContext);
-    expect(action).toEqual(actionsDbData["TestUser1:TestAction1"]);
+    expect(action).toEqual({
+      creator: "TestUser1",
+      name: "TestAction1",
+      last_update: actionLastUpdate,
+      badges: {
+        last_update: new Date(0),
+        is_updating: false,
+      },
+    });
   });
 
   test("it should return a 404 Not Found if the action does not exist yet", async () => {

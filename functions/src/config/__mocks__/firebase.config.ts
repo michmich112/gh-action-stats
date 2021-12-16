@@ -14,3 +14,13 @@ export const admin = {
 export const firestore = {
   collection,
 };
+
+export const storage = {
+  bucket: (name?: string) => ({
+    file: (path: string) => ({
+      save: async (file: string, options: any) => ({}),
+      download: async (location?: string) => ["data"],
+      exists: async (path: string) => [true],
+    }),
+  }),
+};

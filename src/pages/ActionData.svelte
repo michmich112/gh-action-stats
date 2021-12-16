@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from "svelte";
+  import { onMount, getContext } from "svelte";
   import { functions } from "../config/firebase.config";
   import { httpsCallable } from "firebase/functions";
   import AgGrid from "@michmich112/svelte-ag-grid";
@@ -8,10 +8,13 @@
   import MetricCard from "../components/MetricCard.svelte";
   import RunGraph from "../components/RunGraph.svelte";
   import ReposGraph from "../components/ReposGraph.svelte";
+  import OptionsModal from "../components/OptionsModal.svelte";
   import type ActionRun from "../domain/types/ActionRun";
 
   export let actionCreator: string;
   export let actionName: string;
+
+  const { open } = getContext("simple-modal");
 
   type Action = {
     creator: string;
@@ -81,6 +84,10 @@
     token = userAuth.github.token;
   });
 
+  function openOptionsModal() {
+    open(OptionsModal, { owner: actionCreator, repo: actionName });
+  }
+
   onMount(async () => {
     appStore.update((s) => ({ ...s, isLoading: true }));
     // return a 404 if not the correct user for safety puposes
@@ -124,6 +131,17 @@
   });
 </script>
 
+<div class="options-bar">
+  <div on:click={openOptionsModal} class="clickable">
+    <img
+      src="/assets/feather/settings.svg"
+      alt="settings"
+      width="24px"
+      height="24px"
+    />
+  </div>
+</div>
+
 <div class="metric-cards">
   <MetricCard label="Runs" value={runs.toString()} />
   <MetricCard label="Actors" value={actors.toString()} />
@@ -147,6 +165,10 @@
 <style>
   :global(:root) {
     --grid-height: 100%;
+  }
+
+  .clickable {
+    cursor: pointer;
   }
 
   .graph {
@@ -195,5 +217,14 @@
   .data-table {
     height: 45vh;
     min-height: 300px;
+  }
+
+  .options-bar {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
   }
 </style>

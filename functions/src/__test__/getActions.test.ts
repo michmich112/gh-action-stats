@@ -1,4 +1,3 @@
-import Action from "../domain/Action.type";
 import User from "../domain/User.type";
 import { CallableContext } from "firebase-functions/v1/https";
 import { getActionsEntrypoint } from "../entrypoints/getActions";
@@ -10,11 +9,16 @@ const { firestore } = require("../config/firebase.config");
 
 
 describe("getActions test", () => {
-  const actionsDbData: { [key: string]: Action } = {
+  const actionLastUpdateDate = new Date();
+  const actionsDbData: { [key: string]: any } = {
     "TestUser1:TestAction1": {
       creator: "TestUser1",
       name: "TestAction1",
-      last_update: new Date(),
+      last_update: actionLastUpdateDate,
+      badges: {
+        last_update: new Date(0).toISOString(),
+        is_updating: false,
+      },
     },
   };
 
@@ -62,7 +66,15 @@ describe("getActions test", () => {
     const actions = await getActionsEntrypoint({}, { auth: { uid: "1234" } } as CallableContext);
     expect(Array.isArray(actions)).toBe(true);
     expect(actions.length).toBe(1);
-    expect(actions[0]).toEqual(actionsDbData["TestUser1:TestAction1"]);
+    expect(actions[0]).toEqual({
+      creator: "TestUser1",
+      name: "TestAction1",
+      last_update: actionLastUpdateDate,
+      badges: {
+        last_update: new Date(0),
+        is_updating: false,
+      },
+    });
   });
 
   test("it should return nothing if the user doesn't exist yet", async () => {

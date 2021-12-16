@@ -5,12 +5,7 @@
   import ActionDataCard from "./ActionDataCard.svelte";
   import Loader from "./Loader.svelte";
   import { appStore } from "../store";
-
-  type Action = {
-    creator: string;
-    name: string;
-    last_update: { _seconds: number; _nanoseconds: number };
-  };
+  import type Action from "../domain/types/Action";
 
   let actions: Action[] = [];
   let loading: boolean = false;
@@ -30,11 +25,7 @@
   </div>
 {:else if actions.length > 0}
   {#each actions as action}
-    <ActionDataCard
-      ActionCreator={action.creator}
-      ActionRepoName={action.name}
-      LastUsedDate={action.last_update}
-    />
+    <ActionDataCard ActionData={action} />
   {/each}
 {:else}
   No Action Data Yet.
