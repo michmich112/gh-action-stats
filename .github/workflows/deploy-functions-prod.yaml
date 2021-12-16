@@ -42,10 +42,7 @@ jobs:
           # Build project
           npm run build
 
-          firebase functions:config:set service_account_secret=$SERVICE_ACCOUNT_SECRET
-
           firebase deploy --project gh-action-stats --only functions --token $FIREBASE_TOKEN
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
-          SERVICE_ACCOUNT_SECRET: ${{ secrets.STORAGE_SERVICE_ACCOUNT_SECRET }}
           
