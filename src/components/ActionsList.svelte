@@ -28,7 +28,7 @@
     <ActionDataCard ActionData={action} />
   {/each}
 {:else}
-  No Action Data Yet.
+  No Action Data Yet. Start collecting analytics by <a href='/get-started'>getting started</a>.
 {/if}
 
 <style>
