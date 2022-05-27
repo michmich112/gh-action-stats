@@ -27,4 +27,3 @@ class ActionRunRepository implements IFirestoreRepository {
 const instance = new ActionRunRepository();
 
 export default instance;
-
