@@ -32,7 +32,7 @@ export default class ActionRunRepository implements IPostgresRepostiory {
       error_name,
       error_message) VALUES (
         $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18
-      );`
+      );`;
 
     const values = [
       run.creator,
@@ -52,7 +52,7 @@ export default class ActionRunRepository implements IPostgresRepostiory {
       run.version,
       run.execution_time,
       run.error?.name,
-      run.error?.message
+      run.error?.message,
     ];
 
     await this.client.query(query, values);
@@ -64,7 +64,7 @@ export default class ActionRunRepository implements IPostgresRepostiory {
 
     const res = await this.client.query<PostgresActionRun>(query, values);
 
-    return res.rows.map<ActionRun>((v: PostgresActionRun):ActionRun => ({
+    return res.rows.map<ActionRun>((v: PostgresActionRun): ActionRun => ({
       creator: v.creator,
       github_action: v.github_action,
       github_actor: v.github_actor,
@@ -85,8 +85,7 @@ export default class ActionRunRepository implements IPostgresRepostiory {
         name: v.error_name,
         message: v.error_message,
       } : null,
-    }))
-
+    }));
   }
 }
 

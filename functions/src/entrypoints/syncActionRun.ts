@@ -6,7 +6,7 @@ import { createClient } from "../infrastructure/postgres/PostgresClient";
 async function SyncActionRun(message: functions.pubsub.Message, context: functions.EventContext) {
   const actionRun: ActionRun = message.json?.actionRun;
   if (actionRun === undefined) {
-    console.error(`[SyncActionRun][BadMessage] - could not access actionRun data.`);
+    console.error("[SyncActionRun][BadMessage] - could not access actionRun data.");
     return;
   }
 
@@ -20,7 +20,7 @@ async function SyncActionRun(message: functions.pubsub.Message, context: functio
 
   } catch (e) {
     console.group();
-    console.error(`[SyncActionRun] - Error connecting & adding an action run to the repository`);
+    console.error("[SyncActionRun] - Error connecting & adding an action run to the repository");
     console.error(e.message);
     console.error(e.stack);
     console.groupEnd();
@@ -30,4 +30,4 @@ async function SyncActionRun(message: functions.pubsub.Message, context: functio
   }
 }
 
-const syncActionRun = functions.pubsub.topic("action-run").onPublish(SyncActionRun)
+export const syncActionRun = functions.pubsub.topic("action-runs").onPublish(SyncActionRun);
