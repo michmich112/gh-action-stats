@@ -2,7 +2,7 @@ import { Client } from "pg";
 import ActionRun from "../../domain/ActionRun.type";
 import { IPostgresRepostiory } from "../../domain/IRepository";
 
-class ActionRunRepository implements IPostgresRepostiory {
+export default class ActionRunRepository implements IPostgresRepostiory {
   tableName: string;
   client: Client;
 
