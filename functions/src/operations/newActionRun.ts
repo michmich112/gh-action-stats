@@ -24,7 +24,7 @@ async function NewActionRunOperation(runData: ActionRun): Promise<void> {
       /* START SYNC */
       const ps = new PubSub();
       try {
-        await ps.topic("action-runs").publishMessage({ json: runData });
+        await ps.topic("action-runs").publishMessage({ json: { actionRun: runData } });
       } catch (e) {
         console.error("Error synching new action run to pubSub Queue.", e);
       }
