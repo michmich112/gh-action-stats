@@ -1,6 +1,6 @@
 {
   "name": "gh-action-stats",
-  "version": "0.1.4-beta",
+  "version": "0.1.5-beta",
   "description": "Platform to get analytics from your GitHub Actions",
   "homepage": "https://actions.boringday.co/",
   "repository": {
