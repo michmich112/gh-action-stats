@@ -5,4 +5,4 @@ export { getAction } from "./getAction";
 export { getActionRuns } from "./getActionRuns";
 export * from "./badge";
 export * from "./refreshBadges";
-
+export { syncActionRun } from "./syncActionRun";
