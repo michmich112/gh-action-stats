@@ -28,6 +28,13 @@ CREATE TABLE IF NOT EXISTS "Runs" (
 );
 `;
 
+// const tableConstraints: string = `
+// ALTER TABLE "Runs" ADD FOREIGN KEY ("action_id") REFERENCES "Actions" ("id");
+// ALTER TABLE "Runs" ADD FOREIGN KEY ("error_id") REFERENCES "RunErrors" ("id");
+// ALTER TABLE "Runs" ADD FOREIGN KEY ("attempt_id") REFERENCES "AttemptedRuns" ("id");
+// ALTER TABLE "Runs" ADD FOREIGN KEY ("pulse_repo_id") REFERENCES "PulseRepos" ("id");
+// `;
+
 export default class MigrationActionRunsRepository
   implements IPostgresRepostiory
 {
@@ -53,6 +60,7 @@ export default class MigrationActionRunsRepository
    */
   protected async mustExec(): Promise<void> {
     await this.client.query(tableSchema);
+    // await this.client.query(tableConstraints);
   }
 
   public async create(run: {

@@ -1,7 +1,10 @@
-CREATE TYPE "PulseRepoAccessLevel" AS ENUM (
-  'public',
-  'private'
+CREATE TABLE "PulseRepoAccessLevel" (
+	access_level text primary key
 );
+
+INSERT INTO "PulseRepoAccessLevel" (access_level) VALUES 
+ ('public'),
+ ('private');
 
 CREATE TABLE "Actions" (
   "id" BIGSERIAL PRIMARY KEY,
@@ -73,7 +76,7 @@ CREATE TABLE "Users" (
 CREATE TABLE "UserPulseRepoAccesses" (
   "user_id" uuid,
   "pulse_repo_id" bigint,
-  "pr_access_level" UserAccessLevels,
+  "pr_access_level" text references "PulseRepoAccessLevel"(access_level) ON UPDATE CASCADE,
   PRIMARY KEY ("user_id", "pulse_repo_id")
 );
 
