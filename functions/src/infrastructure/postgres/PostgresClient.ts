@@ -4,7 +4,9 @@ export function createClient(): Client {
   const { PG_URI } = process.env;
 
   if (PG_URI === undefined || !PG_URI) {
-    console.error("Unable to initialize client due to missing environment variables");
+    console.error(
+      "Unable to initialize client due to missing environment variables"
+    );
     throw new Error("Missing PG_URI environment variable");
   }
 

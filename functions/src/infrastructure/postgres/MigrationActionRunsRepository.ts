@@ -42,7 +42,7 @@ export default class MigrationActionRunsRepository
   client: Client;
 
   private constructor(client: Client) {
-    this.tableName = "runs";
+    this.tableName = "Runs";
     this.client = client;
   }
 
@@ -69,8 +69,8 @@ export default class MigrationActionRunsRepository
     attemptId?: number;
     pulseRepoId: number;
     run: ActionRun;
-  }): Promise<void> {
-    const query = `INSERT INTO ${this.tableName} (
+  }): Promise<number> {
+    const query = `INSERT INTO "${this.tableName}" (
       action_id,
       error_id,
       attempt_id,
@@ -91,7 +91,7 @@ export default class MigrationActionRunsRepository
       t,
       version) VALUES (
         $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19
-      )
+      ) RETURNING id;
     `;
     const r = run.run;
     const values = [
@@ -116,6 +116,10 @@ export default class MigrationActionRunsRepository
       r.version,
     ];
 
-    await this.client.query(query, values);
+    const res = await this.client.query(query, values);
+    if (res.rowCount < 1) {
+      throw new Error("Inserted new run but no ID returned.");
+    }
+    return res.rows[0].id;
   }
 }
