@@ -7,7 +7,8 @@ CREATE TABLE "Actions" (
   "id" BIGSERIAL PRIMARY KEY,
   "creator" text NOT NULL,
   "name" text NOT NUll,
-  "last_update" timestamp NOT NULL
+  "last_update" timestamp NOT NULL,
+  UNIQUE(creator, name)
 );
 
 CREATE TABLE "Runs" (
