@@ -43,7 +43,8 @@ CREATE TABLE "PulseRepos" (
   "name" text NOT NULL,
   "hashed_name" text,
   "full_name" text,
-  "full_hashed_name" text
+  "full_hashed_name" text,
+  UNIQUE (owner, name)
 );
 
 CREATE TABLE "AttemptedRuns" (
