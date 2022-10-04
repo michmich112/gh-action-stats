@@ -3,11 +3,11 @@ import { IPostgresRepostiory } from "../../domain/IRepository";
 import { MigrationDbAction } from "../../domain/Action.type";
 
 const tableSchema: string = `
-CREATE TABLE "Actions" (
+CREATE TABLE IF NOT EXISTS "Actions" (
   "id" BIGSERIAL PRIMARY KEY,
   "creator" text NOT NULL,
   "name" text NOT NUll,
-  "last_update" timestamp NOT NULL,
+  "last_update" timestamptz NOT NULL,
   UNIQUE(creator, name)
 );
 `;
@@ -17,7 +17,7 @@ export default class MigrationActionRepository implements IPostgresRepostiory {
   client: Client;
 
   private constructor(client: Client) {
-    this.tableName = "actions";
+    this.tableName = "Actions";
     this.client = client;
   }
 
@@ -41,7 +41,7 @@ export default class MigrationActionRepository implements IPostgresRepostiory {
     timestamp: string;
   }): Promise<MigrationDbAction> {
     const e = await this.client.query(
-      `SELECT * FROM ${this.tableName} WHERE creator = $1 and name = $2;`,
+      `SELECT * FROM "${this.tableName}" WHERE creator = $1 and name = $2;`,
       [action.creator, action.name]
     );
     let ret: MigrationDbAction;
@@ -49,7 +49,7 @@ export default class MigrationActionRepository implements IPostgresRepostiory {
       // update last_update
       const recId = e.rows[0].id;
       const res = await this.client.query(
-        `UPDATE ${this.tableName} SET last_update = $1 WHERE id = $2 RETURNINIG *`,
+        `UPDATE "${this.tableName}" SET last_update = $1 WHERE id = $2 RETURNING *`,
         [action.timestamp, recId]
       );
       if (res.rowCount < 1) {
@@ -60,11 +60,11 @@ export default class MigrationActionRepository implements IPostgresRepostiory {
       ret = res.rows[0];
     } else {
       // create
-      const query = `INSERT INTO ${this.tableName} (
+      const query = `INSERT INTO "${this.tableName}" (
         creator,
         name,
         last_update
-      ) VALUES ($1,$2,$3) RETURNING *;
+      ) VALUES ($1,$2,$3) RETURNING id, creator, name, last_update;
       `;
 
       const res = await this.client.query(query, [
@@ -79,12 +79,15 @@ export default class MigrationActionRepository implements IPostgresRepostiory {
       }
       ret = res.rows[0];
     }
+    if (typeof ret.id !== "number") {
+      return { ...ret, id: Number(ret.id) };
+    }
     return ret;
   }
 
   public async getById(id: number): Promise<MigrationDbAction> {
     const res = await this.client.query(
-      `SELECT * FROM ${this.tableName} WHERE id = $1;`,
+      `SELECT * FROM "${this.tableName}" WHERE id = $1;`,
       [id]
     );
     if (res.rowCount < 1) {
