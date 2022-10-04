@@ -1,6 +1,4 @@
 import { Client } from "pg";
-import ActionRun from "../../domain/ActionRun.type";
-
 import { IPostgresRepostiory } from "../../domain/IRepository";
 import { MigrationDbAction } from "../../domain/Action.type";
 
