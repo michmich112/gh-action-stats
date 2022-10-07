@@ -102,7 +102,7 @@ describe.only("PulseRepoRepositoryTests", () => {
       expect(res.full_hashed_name).not.toEqual("toto/toto_repo/the/third");
     });
 
-    test("it should fet the PulseRepo that exists even if the name has an extra / at the end", async function () {
+    test("it should get the PulseRepo that exists even if the name has an extra / at the end", async function () {
       if (client === null || repo === null) {
         console.warn("No client connection or repo, skipping test");
         return;
