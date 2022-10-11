@@ -71,6 +71,8 @@ describe.only("ActionRunRepostoryTests", () => {
     github_repository: "user/repository",
     github_run_id: "1234353",
     github_event_name: "push",
+    github_action_repository: "michmich112/versionbumper@main",
+    package_version: "0.1.0",
     ip: "1.2.3.4",
     name: "toto_action",
     runner_os: "Linux",

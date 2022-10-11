@@ -18,6 +18,8 @@ CREATE TABLE IF NOT EXISTS "Runs" (
   "github_event_name" text NOT NULL,
   "github_repository" text,
   "github_run_id" bigint,
+  "github_action_repository" text,
+  "package_version" text,
   "execution_time_s" int,
   "execution_time_ns" bigint,
   "ip" text,
@@ -83,6 +85,8 @@ export default class MigrationActionRunsRepository
       github_event_name,
       github_repository,
       github_run_id,
+      github_action_repository,
+      package_version,
       execution_time_s,
       execution_time_ns,
       ip,
@@ -90,7 +94,7 @@ export default class MigrationActionRunsRepository
       runner_os,
       t,
       version) VALUES (
-        $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19
+        $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21
       ) RETURNING id;
     `;
     const r = run.run;
@@ -107,6 +111,8 @@ export default class MigrationActionRunsRepository
       r.github_event_name,
       r.github_repository,
       r.github_run_id,
+      r.github_action_repository,
+      r.package_version,
       r.execution_time ? r.execution_time[0] : null,
       r.execution_time ? r.execution_time[1] : null,
       r.ip,

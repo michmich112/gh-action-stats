@@ -28,6 +28,8 @@ CREATE TABLE "Runs" (
   "github_event_name" text NOT NULL,
   "github_repository" text,
   "github_run_id" bigint,
+  "github_action_repository" text,
+  "package_version" text,
   "execution_time_s" int NOT NULL,
   "execution_time_ns" bigint NOT NULL,
   "ip" text,
