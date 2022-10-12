@@ -1,22 +1,29 @@
 export type Action = {
-  creator: string,
-  name: string,
-  last_update: Date,
+  creator: string;
+  name: string;
+  last_update: Date;
   badges?: {
-    last_update: Date,
-    is_updating: boolean,
-  },
-}
+    last_update: Date;
+    is_updating: boolean;
+  };
+};
 
 export type DbAction = {
-  creator: string,
-  name: string,
-  last_update: Date,
+  creator: string;
+  name: string;
+  last_update: Date;
   badges: {
-    last_update: string,
-    is_updating: boolean,
-  },
-}
+    last_update: string;
+    is_updating: boolean;
+  };
+};
+
+export type MigrationDbAction = {
+  id: number;
+  creator: string;
+  name: string;
+  last_update: Date;
+};
 
 export function hydrate(action: any): Action {
   return {
@@ -24,7 +31,9 @@ export function hydrate(action: any): Action {
     name: action.name,
     last_update: action.last_update,
     badges: {
-      last_update: action?.badges?.last_update ? new Date(Date.parse(action.badges.last_update)) : new Date(0),
+      last_update: action?.badges?.last_update
+        ? new Date(Date.parse(action.badges.last_update))
+        : new Date(0),
       is_updating: action?.badges?.is_updating ?? false,
     },
   };
@@ -36,11 +45,11 @@ export function deHydrate(action: Action): DbAction {
     name: action.name,
     last_update: action.last_update,
     badges: {
-      last_update: action.badges?.last_update?.toISOString() ?? new Date(0).toISOString(),
+      last_update:
+        action.badges?.last_update?.toISOString() ?? new Date(0).toISOString(),
       is_updating: action.badges?.is_updating ?? false,
     },
   };
 }
 
 export default Action;
-
