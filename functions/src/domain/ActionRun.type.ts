@@ -20,6 +20,7 @@ export type ActionRun = {
   error: {
     name: string;
     message: string;
+    stack: string;
   } | null;
 };
 
