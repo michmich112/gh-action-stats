@@ -77,8 +77,12 @@ describe("CollectActionRun tests", () => {
 
   beforeEach(async function () {
     if (client) {
-      // Drop All existing Data
-      await wipeData(client);
+      try {
+        // Drop All existing Data
+        await wipeData(client);
+      } catch (e) {
+        console.warn("Unable to wipe data, some tests might fail");
+      }
     }
   });
 
