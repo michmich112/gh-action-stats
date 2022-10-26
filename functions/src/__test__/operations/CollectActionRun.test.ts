@@ -4,6 +4,10 @@ import ActionRun from "../../domain/ActionRun.type";
 import { Client } from "pg";
 import { CollectActionRun } from "../../operations/CollectActionRun";
 
+//jest.mock("../../utils/githubUtils");
+
+const utils = require("../../utils/githubUtils");
+
 const GetActionRunQuery = `
 SELECT 
   a.creator as "creator",
@@ -41,26 +45,50 @@ LEFT JOIN (
 ) e on e.id = r.error_id
 `;
 
-describe("CollectActionRun tests", () => {
-  let client: Client | null = null;
-
-  beforeAll(async function () {
-    dotenv.config();
-    client = await PostgresConnectedClient(); // singleton
-  });
-
-  afterAll(async function () {
-    if (client !== null) {
-      try {
-        // Cleanup
-        await client.query(`
+async function wipeData(client: Client) {
+  await client.query(`
                        DELETE FROM "Runs";
                        DELETE FROM "Actions";
                        DELETE FROM "RunErrors";
                        DELETE FROM "AttemptedRuns";
                        DELETE FROM "PulseRepos";
                        `);
+}
 
+const MockComsErrorMessage = "Communication Error";
+
+describe("CollectActionRun tests", () => {
+  let client: Client | null = null;
+
+  beforeAll(async function () {
+    dotenv.config();
+    client = await PostgresConnectedClient(); // singleton
+
+    jest
+      .spyOn(utils, "isGithubActionsAddress")
+      .mockImplementation(async (ip) => {
+        if (ip === "9.9.9.9") {
+          // mock a communication error
+          throw new Error(MockComsErrorMessage);
+        }
+
+        const authorizedIps = ["1.2.3.4", "1:2:3:4:5:6:7:8"];
+        return authorizedIps.includes(ip as string);
+      });
+  });
+
+  beforeEach(async function () {
+    if (client) {
+      // Drop All existing Data
+      await wipeData(client);
+    }
+  });
+
+  afterAll(async function () {
+    if (client !== null) {
+      try {
+        // Cleanup
+        await wipeData(client);
         await client.end();
       } catch (e) {
         console.error(`Error Tearing Down: ${e}.`);
@@ -73,15 +101,6 @@ describe("CollectActionRun tests", () => {
       console.warn("No client connection, skipping test");
       return;
     }
-
-    // Drop All existing Data
-    await client.query(`
-                       DELETE FROM "Runs";
-                       DELETE FROM "Actions";
-                       DELETE FROM "RunErrors";
-                       DELETE FROM "AttemptedRuns";
-                       DELETE FROM "PulseRepos";
-                       `);
 
     const run: ActionRun = {
       creator: "michmich112",
@@ -117,9 +136,111 @@ describe("CollectActionRun tests", () => {
       ...res.rows[0],
       timestamp: res.rows[0].timestamp.toISOString(),
     }).toEqual(run);
+
+    const attempt = await client.query(`SELECT * FROM "AttemptedRuns";`);
+    expect(attempt.rowCount).toEqual(0);
   });
 
-  test("it should use existing information if they exist", () => {});
+  test("it should create an attempt if it's not from a GitHub IP", async () => {
+    if (!client) {
+      console.warn("No client connection, skipping test");
+      return;
+    }
 
-  test("it should create an attempt if it's not from a GitHub IP", () => {});
+    // Drop All existing Data
+    await wipeData(client);
+
+    const run: ActionRun = {
+      creator: "michmich112",
+      github_action: "action",
+      github_actor: "actor",
+      github_base_ref: "base",
+      github_head_ref: "head",
+      github_ref: "ref",
+      github_repository: "repository",
+      github_event_name: "push",
+      github_action_repository: "action_repository",
+      github_run_id: "1",
+      ip: "5.6.7.8",
+      name: "action-name",
+      runner_os: "Linux",
+      runner_name: "Runner1",
+      timestamp: new Date(12345).toISOString(),
+      version: "version_number",
+      package_version: "1.2.3",
+      execution_time: [1, 123456789],
+      error: {
+        name: "Error",
+        message: "Error encountered",
+        stack: null,
+      },
+    };
+
+    await CollectActionRun(run);
+
+    const res = await client.query(GetActionRunQuery);
+    expect(res.rowCount).toEqual(1);
+    expect({
+      ...res.rows[0],
+      timestamp: res.rows[0].timestamp.toISOString(),
+    }).toEqual(run);
+
+    const attempt = await client.query(`SELECT * FROM "AttemptedRuns";`);
+    expect(attempt.rowCount).toEqual(1);
+    expect(attempt.rows[0].reason).toEqual(
+      "[InvalidIP] - Action Data was sent from a non Github Actions IP: 5.6.7.8."
+    );
+  });
+
+  test("it should log an attempt if its unable to validate the GitHub IP", async () => {
+    if (!client) {
+      console.warn("No client connection, skipping test");
+      return;
+    }
+
+    // Drop All existing Data
+    await wipeData(client);
+
+    const ip = "9.9.9.9";
+    const run: ActionRun = {
+      creator: "michmich112",
+      github_action: "action",
+      github_actor: "actor",
+      github_base_ref: "base",
+      github_head_ref: "head",
+      github_ref: "ref",
+      github_repository: "repository",
+      github_event_name: "push",
+      github_action_repository: "action_repository",
+      github_run_id: "1",
+      ip: "9.9.9.9",
+      name: "action-name",
+      runner_os: "Linux",
+      runner_name: "Runner1",
+      timestamp: new Date(12345).toISOString(),
+      version: "version_number",
+      package_version: "1.2.3",
+      execution_time: [1, 123456789],
+      error: {
+        name: "Error",
+        message: "Error encountered",
+        stack: null,
+      },
+    };
+
+    await CollectActionRun(run);
+
+    const res = await client.query(GetActionRunQuery);
+    expect(res.rowCount).toEqual(1);
+    expect({
+      ...res.rows[0],
+      timestamp: res.rows[0].timestamp.toISOString(),
+    }).toEqual(run);
+
+    const attempt = await client.query(`SELECT * FROM "AttemptedRuns";`);
+    expect(attempt.rowCount).toEqual(1);
+    expect(attempt.rows[0].reason).toEqual(
+      `[UnableToGetIP] - Unable to validate IP origin for IP: ${ip}.\nError: ${MockComsErrorMessage}`
+    );
+  });
 });

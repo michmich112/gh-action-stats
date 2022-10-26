@@ -69,7 +69,7 @@ export async function CollectActionRun(runData: ActionRun): Promise<void> {
       if (!fromGh) {
         attempt = new AttemptInfo({
           reason: AttemptReason.InvalidIP,
-          message: `Action was sent from a non Github Actions IP: ${ip}.`,
+          message: `Action Data was sent from a non Github Actions IP: ${ip}.`,
         });
       }
     } catch (e) {
