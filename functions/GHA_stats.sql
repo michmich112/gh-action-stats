@@ -35,7 +35,7 @@ CREATE TABLE "Runs" (
   "ip" text,
   "runner_name" text NOT NULL,
   "runner_os" text NOT NULL,
-  "t" timestamp NOT NULL,
+  "t" timestamptz NOT NULL,
   "version" text
 );
 
