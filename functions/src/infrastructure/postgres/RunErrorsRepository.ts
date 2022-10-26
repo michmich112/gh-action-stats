@@ -49,9 +49,9 @@ export default class MigrationRunErrorsRepository
     name,
     stack,
   }: {
-    message?: string;
-    name?: string;
-    stack?: string;
+    message?: string | null;
+    name?: string | null;
+    stack?: string | null;
   }): Promise<number> {
     if (!message && !name && !stack) {
       throw new Error("No run error information was present.");

@@ -18,9 +18,9 @@ export type ActionRun = {
   version: string;
   execution_time: [number, number] | null; // uses process.hrtime
   error: {
-    name: string;
-    message: string;
-    stack: string;
+    name: string | null;
+    message: string | null;
+    stack: string | null;
   } | null;
 };
 

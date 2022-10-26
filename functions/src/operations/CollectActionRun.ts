@@ -109,7 +109,11 @@ export async function CollectActionRun(runData: ActionRun): Promise<void> {
       PulseRepo.getFromGithubRepositoryString(
         runData.github_repository || "unset/unset"
       ), // Maybe I should make this an attempt
-      ActionsRepo.upsert({ creator, name, timestamp: runData.timestamp }),
+      ActionsRepo.upsert({
+        creator,
+        name,
+        timestamp: runData.timestamp,
+      }),
     ]);
 
     // Order matters if the tables have not been created yet
