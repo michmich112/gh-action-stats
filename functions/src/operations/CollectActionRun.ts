@@ -81,8 +81,8 @@ export async function CollectActionRun(runData: ActionRun): Promise<void> {
       });
     }
 
-    // TODO: Transaction
-
+    // start transaction
+    await client.query("BEGIN");
     // Add attempted run if there is one needed
     let attemptId = undefined;
     if (!!attempt) {
@@ -126,7 +126,7 @@ export async function CollectActionRun(runData: ActionRun): Promise<void> {
       run: runData,
     });
 
-    // TODO: Apply transaction
+    await client.query("COMMIT");
   } catch (e) {
     console.error(
       "Error persiting collected action run: ",
@@ -134,7 +134,7 @@ export async function CollectActionRun(runData: ActionRun): Promise<void> {
       "\nRaw ActionRun:\n",
       runData
     );
-    // TODO: Rollback if error
+    await client.query("ROLLBACK");
   } finally {
     await client.end();
   }

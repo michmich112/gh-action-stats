@@ -4,8 +4,6 @@ import ActionRun from "../../domain/ActionRun.type";
 import { Client } from "pg";
 import { CollectActionRun } from "../../operations/CollectActionRun";
 
-//jest.mock("../../utils/githubUtils");
-
 const utils = require("../../utils/githubUtils");
 
 const GetActionRunQuery = `
