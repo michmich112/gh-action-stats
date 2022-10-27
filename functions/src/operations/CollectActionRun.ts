@@ -62,6 +62,15 @@ export async function CollectActionRun(runData: ActionRun): Promise<void> {
   }
 
   try {
+    // create repos (which are dependent on for db generation)
+    const [AttemptedRunRepo, RunErrorsRepo, PulseRepo, ActionsRepo] =
+      await Promise.all([
+        MigrationAttemptedRunRepository.New(client),
+        MigrationRunErrorsRepository.New(client),
+        MigrationPulseRepoRepository.New(client),
+        MigrationActionRepository.New(client),
+      ]);
+
     const { creator, name, ip } = runData;
     let attempt;
     try {
@@ -86,9 +95,6 @@ export async function CollectActionRun(runData: ActionRun): Promise<void> {
     // Add attempted run if there is one needed
     let attemptId = undefined;
     if (!!attempt) {
-      const AttemptedRunRepo = await MigrationAttemptedRunRepository.New(
-        client
-      );
       attemptId = await AttemptedRunRepo.create({
         reason: attempt.toString(),
       });
@@ -96,14 +102,8 @@ export async function CollectActionRun(runData: ActionRun): Promise<void> {
 
     let errorId = undefined;
     if (!!runData.error) {
-      const RunErrorsRepo = await MigrationRunErrorsRepository.New(client);
       errorId = await RunErrorsRepo.create(runData.error);
     }
-
-    const [PulseRepo, ActionsRepo] = await Promise.all([
-      MigrationPulseRepoRepository.New(client),
-      MigrationActionRepository.New(client),
-    ]);
 
     const [pulseRepo, action] = await Promise.all([
       PulseRepo.getFromGithubRepositoryString(

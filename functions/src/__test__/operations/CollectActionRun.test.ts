@@ -91,10 +91,11 @@ describe("CollectActionRun tests", () => {
       try {
         // Cleanup
         await wipeData(client);
-        await client.end();
       } catch (e) {
         console.error(`Error Tearing Down: ${e}.`);
       }
+
+      await client.end();
     }
   });
 
