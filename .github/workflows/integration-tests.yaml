@@ -33,10 +33,10 @@ jobs:
       run:
         working-directory: ./
 
-        steps:
-          - name: Test Client
-            run: |
-              npm run test
+    steps:
+      - name: Test Client
+        run: |
+          npm run test
 
   test-functions:
     runs-on: ubuntu-latest
@@ -65,6 +65,17 @@ jobs:
           - 5432:5432
 
     steps:
+      # Downloads a copy of the code in your repository before running CI tests
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Node
+        uses: actions/setup-node@v1
+        with:
+          node-version: "16"
+      - name: Install dependencies
+        run: |
+          npm install
+
       - name: Test Functions
         run: |
           npm run test
