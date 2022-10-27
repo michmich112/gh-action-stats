@@ -4,6 +4,10 @@ on:
     paths:
       - src/**
       - functions/**
+  pull_request:
+    paths:
+      - src/**
+      - functions/**
   workflow_dispatch:
 
 jobs:
