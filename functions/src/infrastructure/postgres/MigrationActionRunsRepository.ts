@@ -27,8 +27,7 @@ CREATE TABLE IF NOT EXISTS "Runs" (
   "runner_os" text NOT NULL,
   "t" timestamptz NOT NULL,
   "version" text
-);
-`;
+);`;
 
 export default class MigrationActionRunsRepository
   implements IPostgresRepostiory
