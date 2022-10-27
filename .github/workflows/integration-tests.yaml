@@ -13,7 +13,6 @@ on:
 jobs:
   test-client:
     runs-on: ubuntu-latest
-    needs: prepare
 
     steps:
       - name: Checkout
@@ -31,7 +30,6 @@ jobs:
 
   test-functions:
     runs-on: ubuntu-latest
-    needs: prepare
 
     defaults:
       run:
