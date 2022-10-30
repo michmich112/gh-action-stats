@@ -1,0 +1,39 @@
+org: tendermole
+console: true
+service: async-operations
+frameworkVersion: "3"
+
+provider:
+  name: aws
+  runtime: nodejs16.x
+
+constructs:
+  collect-action-run-worker:
+    type: queue
+    worker:
+      handler: lib/serverless-index.CollectActionRun.worker
+      memorySize: 1024 # lower cost & higher performance https://docs.aws.amazon.com/lambda/latest/operatorguide/computing-power.html
+      timeout: 10
+      runtime: nodejs16.x
+      fifo: true
+      environment:
+        PG_URI: ${env:PG_URI}
+
+functions:
+  collect-action-run-receiver:
+    handler: lib/serverless-index.CollectActionRun.receiver
+    description: Receiver to collect ActionRun statistics from HTTP endpoint. Passes it to another Queue.
+    events:
+      - httpApi:
+          method: post
+          path: /collect
+          cors: true
+          async: true
+    environment:
+      QUEUE_URL: ${construct:collect-action-run-worker.queueUrl}
+    timeout: 6
+    memorySize: 1024 # lower cost & higher performance https://docs.aws.amazon.com/lambda/latest/operatorguide/computing-power.html
+    runtime: nodejs16.x
+
+plugins:
+  - serverless-lift
