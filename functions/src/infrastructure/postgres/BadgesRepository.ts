@@ -7,7 +7,7 @@ import { IPostgresRepostiory } from "../../domain/IRepository";
 const tableSchema: string = `
 CREATE TABLE IF NOT EXISTS "Badges" (
   "id" BIGSERIAL PRIMARY KEY,
-  "action_id" bigint NOT NULL REFERENCES "Actions" ("id"),
+  "action_id" bigint NOT NULL REFERENCES "Actions" ("id") ON DELETE CASCADE,
   "metric" text NOT NULL,
   "last_generated" timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
   "location_path" text NOT NULL,
@@ -62,9 +62,9 @@ export default class MigrationBadgesRepository implements IPostgresRepostiory {
           aa.creator,
           aa.name,
           aa.last_update
-          FROM "Actions"
-      ) a on a.creator = ? and a.name = ?
-      where b.metric = ?;
+          FROM "Actions" aa
+      ) a on a.creator = $1 AND a.name = $2
+      WHERE b.metric = $3;
     `;
     const res = await this.client.query(query, [creator, name, metric]);
     if (res.rowCount < 1) {
@@ -92,18 +92,21 @@ export default class MigrationBadgesRepository implements IPostgresRepostiory {
           !!(params[k as keyof typeof params] as unknown)
       )
       .reduce(
-        (acc, cur) => {
+        (acc, cur, i) => {
           const key = cur.replace(/[A-Z]/g, (l) => `_${l.toLowerCase()}`); // snake case
           return {
-            qu: [acc.qu, `${key} = ?`].join(", "),
+            qu: [...acc.qu, `${key} = $${i + 1}`],
             vars: [...acc.vars, params[cur as keyof typeof params]],
           };
         },
-        { qu: "", vars: <any>[] }
+        { qu: [] as string[], vars: <any>[] }
       );
 
+    if (qu.length < 1) return; // return without error since there is nothing to update
+
     const query = `
-      UPDATE "${this.tableName}" SET ${qu} WHERE actionId = ? AND metric = ?;
+      UPDATE "${this.tableName}" SET ${qu.join(", ")} 
+      WHERE action_id = $${qu.length + 1} AND metric = $${qu.length + 2};
     `;
 
     await this.client.query(query, [...vars, params.actionId, params.metric]);
@@ -117,7 +120,7 @@ export default class MigrationBadgesRepository implements IPostgresRepostiory {
     metric: BadgeMetrics;
   }): Promise<Badge> {
     const query = `
-      SELECT * from "${this.tableName}" WHERE action_id = ? AND metric = ?;
+      SELECT * from "${this.tableName}" WHERE action_id = $1 AND metric = $2;
     `;
     const res = await this.client.query(query, [actionId, metric]);
 
@@ -127,6 +130,42 @@ export default class MigrationBadgesRepository implements IPostgresRepostiory {
       throw new Error(message);
     }
 
-    return res.rows[0];
+    return BadgeMapper(res.rows[0]);
   }
+
+  public async createBadge(badge: Badge): Promise<void> {
+    return;
+  }
+}
+
+// function dbBadgeMapper(b: object): Badge {
+//   return Object.keys(b).reduce(
+//     (acc, cur) => ({
+//       ...acc,
+//       [cur.replace(/_[a-z]/g, (l) => l.toUpperCase()).replace(/_/g, "")]:
+//         b[cur as keyof typeof b], // change to CamelCase
+//     }),
+//     {}
+//   ) as Badge;
+// }
+
+type DbBadge = {
+  id: string;
+  action_id: string;
+  metric: string;
+  last_generated: Date;
+  location_path: string;
+  public_uri: string;
+  value: string;
+};
+
+function BadgeMapper(b: DbBadge): Badge {
+  return {
+    actionId: parseInt(b.action_id, 10),
+    metric: b.metric as BadgeMetrics,
+    lastGenerated: b.last_generated,
+    locationPath: b.location_path,
+    publicUri: b.public_uri,
+    value: b.value,
+  };
 }

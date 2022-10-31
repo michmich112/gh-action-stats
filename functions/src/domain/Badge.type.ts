@@ -6,6 +6,7 @@ type Badge = {
   lastGenerated: Date;
   locationPath: string;
   publicUri: string;
+  value: string;
 };
 
 export default Badge;
