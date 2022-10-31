@@ -37,19 +37,19 @@ describe.only("BadgesRepository tests", () => {
 
       // create placeholder toto action
       await client.query(
-        'INSERT INTO "Actions" (creator, name, last_update) VALUES ($1, $2, $3);',
+        'INSERT INTO "Actions" (id, creator, name, last_update) VALUES (1, $1, $2, $3);',
         ["toto", "toto_action", new Date(100)]
       );
 
       // create placeholder tata action
       await client.query(
-        'INSERT INTO "Actions" (creator, name, last_update) VALUES ($1, $2, $3);',
+        'INSERT INTO "Actions" (id, creator, name, last_update) VALUES (2, $1, $2, $3);',
         ["tata", "tata_action", new Date()]
       );
 
       // create existing action not up to date (runs)
       await client.query(
-        'INSERT INTO "Badges" (id, action_id, metric, last_generated, location_path, public_uri, value) VALUES (1, $1, $2, $3, $4, $5, $6);',
+        'INSERT INTO "Badges" (action_id, metric, last_generated, location_path, public_uri, value) VALUES ($1, $2, $3, $4, $5, $6);',
         [
           1,
           "runs",
@@ -62,7 +62,7 @@ describe.only("BadgesRepository tests", () => {
 
       // create existing action up to date (repos)
       await client.query(
-        'INSERT INTO "Badges" (id, action_id, metric, last_generated, location_path, public_uri, value) VALUES (2, $1, $2, $3, $4, $5, $6);',
+        'INSERT INTO "Badges" (action_id, metric, last_generated, location_path, public_uri, value) VALUES ($1, $2, $3, $4, $5, $6);',
         [
           1,
           "repos",
