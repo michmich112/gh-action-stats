@@ -9,6 +9,7 @@ on:
       - src/**
       - functions/**
   workflow_dispatch:
+  workflow_call:
 
 jobs:
   test-client:
