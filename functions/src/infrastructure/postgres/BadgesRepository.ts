@@ -134,7 +134,51 @@ export default class MigrationBadgesRepository implements IPostgresRepostiory {
   }
 
   public async createBadge(badge: Badge): Promise<void> {
+    const query = `
+      INSERT INTO "${this.tableName}" (
+        action_id, 
+        metric, 
+        last_generated, 
+        location_path, 
+        public_uri, 
+        value) VALUES ($1, $2, $3, $4, $5, $6)
+        RETURNING id;
+    `;
+
+    const res = await this.client.query(query, [
+      badge.actionId,
+      badge.metric,
+      badge.lastGenerated,
+      badge.locationPath,
+      badge.publicUri,
+      badge.value,
+    ]);
+    if (res.rowCount < 1) {
+      console.error(
+        "[BadgesRepository][createBadge] Error - No rows returned when attempting to create a new badge: ",
+        badge
+      );
+      throw new Error("Error Creating Badge");
+    }
     return;
+  }
+
+  public async badgeExists({
+    actionId,
+    metric,
+  }: {
+    actionId: number;
+    metric: BadgeMetrics;
+  }): Promise<boolean> {
+    const query = `
+      SELECT id FROM "${this.tableName}" where action_id = $1 and metric = $2;
+    `;
+    try {
+      const res = await this.client.query(query, [actionId, metric]);
+      return res.rowCount > 0;
+    } catch (e) {
+      return false;
+    }
   }
 }
 

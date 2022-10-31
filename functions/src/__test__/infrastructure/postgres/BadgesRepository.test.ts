@@ -244,4 +244,28 @@ describe.only("BadgesRepository tests", () => {
       fail("Expected error to be thrown");
     });
   });
+
+  describe("badgeExists", () => {
+    test("it should return true if the badge already exists", async function () {
+      if (client === null || repo === null) {
+        console.warn("No client connection or repo, skipping test");
+        return;
+      }
+
+      const res = await repo.badgeExists({ actionId: 1, metric: "repos" });
+      expect(res).toBeTruthy();
+    });
+    test("it should return false if the badge does not exists", async function () {
+      if (client === null || repo === null) {
+        console.warn("No client connection or repo, skipping test");
+        return;
+      }
+
+      const res = await repo.badgeExists({
+        actionId: 2,
+        metric: "runs-per-month",
+      });
+      expect(res).toBeFalsy();
+    });
+  });
 });
