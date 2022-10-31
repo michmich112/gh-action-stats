@@ -1,4 +1,4 @@
-org: ghactionstats
+org: akumetsu
 console: true
 service: async-operations
 frameworkVersion: "3"
