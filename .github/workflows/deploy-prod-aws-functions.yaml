@@ -5,6 +5,7 @@ on:
       - functions/**
     branches:
       - main
+      - MigrationMain
   workflow_dispatch:
 
 jobs:
