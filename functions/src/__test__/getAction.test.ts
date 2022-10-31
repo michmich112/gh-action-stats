@@ -1,7 +1,7 @@
 import User from "../domain/User.type";
 import { CallableContext } from "firebase-functions/v1/https";
 import * as functions from "firebase-functions";
-import { getActionEntrypoint } from "../entrypoints/getAction";
+import { getActionEntrypoint } from "../entrypoints/firebase/getAction";
 
 jest.mock("../config/firebase.config");
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -32,10 +32,9 @@ describe("getAction test", () => {
   };
 
   const collections: { [key: string]: any } = {
-    "users": usersDbData,
-    "actions": actionsDbData,
+    users: usersDbData,
+    actions: actionsDbData,
   };
-
 
   firestore.collection.mockImplementation((cn: string) => {
     let collection: any = collections[cn] || {};
@@ -55,7 +54,8 @@ describe("getAction test", () => {
           }));
           return {
             empty: docs.length === 0,
-            forEach: (predicate: (e: any, i: number, a: any[]) => void) => docs.forEach(predicate),
+            forEach: (predicate: (e: any, i: number, a: any[]) => void) =>
+              docs.forEach(predicate),
             docs,
           };
         },
@@ -75,10 +75,13 @@ describe("getAction test", () => {
 
   /* ------ SETUP END ------- */
   test("it should return the queried data if it exists", async () => {
-    const action = await getActionEntrypoint({
-      creator: "TestUser1",
-      action: "TestAction1",
-    }, { auth: { uid: "1234" } } as CallableContext);
+    const action = await getActionEntrypoint(
+      {
+        creator: "TestUser1",
+        action: "TestAction1",
+      },
+      { auth: { uid: "1234" } } as CallableContext
+    );
     expect(action).toEqual({
       creator: "TestUser1",
       name: "TestAction1",
@@ -92,10 +95,13 @@ describe("getAction test", () => {
 
   test("it should return a 404 Not Found if the action does not exist yet", async () => {
     try {
-      await getActionEntrypoint({
-        creator: "TestUser1",
-        action: "TestAction2",
-      }, { auth: { uid: "1234" } } as CallableContext);
+      await getActionEntrypoint(
+        {
+          creator: "TestUser1",
+          action: "TestAction2",
+        },
+        { auth: { uid: "1234" } } as CallableContext
+      );
       expect(false).toBe(true);
     } catch (e) {
       expect(e).toHaveProperty("code");
@@ -105,10 +111,13 @@ describe("getAction test", () => {
 
   test("it should return a 403 Forbidden if the userId passed in the authentication does not match the username", async () => {
     try {
-      await getActionEntrypoint({
-        creator: "TestUser2",
-        action: "TestAction1",
-      }, { auth: { uid: "1234" } } as CallableContext);
+      await getActionEntrypoint(
+        {
+          creator: "TestUser2",
+          action: "TestAction1",
+        },
+        { auth: { uid: "1234" } } as CallableContext
+      );
       expect(false).toBe(true);
     } catch (e) {
       expect(e).toHaveProperty("code");
@@ -118,10 +127,13 @@ describe("getAction test", () => {
 
   test("it should return a 401 Unauthorized if no authentication is passed in the context", async () => {
     try {
-      await getActionEntrypoint({
-        creator: "TestUser1",
-        action: "TestAction2",
-      }, { auth: { uid: "" } } as CallableContext);
+      await getActionEntrypoint(
+        {
+          creator: "TestUser1",
+          action: "TestAction2",
+        },
+        { auth: { uid: "" } } as CallableContext
+      );
       expect(false).toBe(true);
     } catch (e) {
       expect(e).toHaveProperty("code");
@@ -129,4 +141,3 @@ describe("getAction test", () => {
     }
   });
 });
-

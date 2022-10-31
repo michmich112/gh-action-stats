@@ -1,9 +1,8 @@
 import ActionRun from "../domain/ActionRun.type";
 import User from "../domain/User.type";
 import { CallableContext } from "firebase-functions/v1/https";
-import { getActionRunsEntrypoint } from "../entrypoints/getActionRuns";
+import { getActionRunsEntrypoint } from "../entrypoints/firebase/getActionRuns";
 import * as functions from "firebase-functions";
-
 
 jest.mock("../infrastructure/github/GitHubUserApi");
 jest.mock("../config/firebase.config");
@@ -88,8 +87,8 @@ describe("getActionRuns test", () => {
   };
 
   const collections: { [key: string]: any } = {
-    "users": usersDbData,
-    "runs": actionRunsDbData,
+    users: usersDbData,
+    runs: actionRunsDbData,
   };
 
   firestore.collection.mockImplementation((cn: string) => {
@@ -110,7 +109,8 @@ describe("getActionRuns test", () => {
           }));
           return {
             empty: docs.length === 0,
-            forEach: (predicate: (e: any, i: number, a: any[]) => void) => docs.forEach(predicate),
+            forEach: (predicate: (e: any, i: number, a: any[]) => void) =>
+              docs.forEach(predicate),
             docs,
           };
         },
@@ -128,67 +128,86 @@ describe("getActionRuns test", () => {
     };
   });
 
-  isRepoAccessible.mockImplementation(async (token: string, owner: string, repo: string): Promise<boolean> => {
-    return !(token === "1234" && owner === "PrivateUser" && repo === "private1");
-  });
+  isRepoAccessible.mockImplementation(
+    async (token: string, owner: string, repo: string): Promise<boolean> => {
+      return !(
+        token === "1234" &&
+        owner === "PrivateUser" &&
+        repo === "private1"
+      );
+    }
+  );
 
   test("it should return the queried data if it exists", async () => {
-    const runs = await getActionRunsEntrypoint({
-      creator: "TestUser1",
-      action: "Action1",
-      token: "1234",
-    }, { auth: { uid: "1234" } } as CallableContext);
+    const runs = await getActionRunsEntrypoint(
+      {
+        creator: "TestUser1",
+        action: "Action1",
+        token: "1234",
+      },
+      { auth: { uid: "1234" } } as CallableContext
+    );
     expect(runs.length).toEqual(3);
-    expect(runs).toEqual([{
-      actor: "Actor1",
-      ip: "123.123.123.123",
-      os: "Linux",
-      timestamp: runTimestamp,
-      repository: "TestUser1/repository1",
-      event: "push",
-      execution_time: [1, 10000],
-      error: null,
-      is_private: false,
-    }, {
-      actor: "Actor2",
-      ip: "123.123.123.123",
-      os: "Linux",
-      timestamp: runTimestamp,
-      repository: "TestUser1/repository2",
-      event: "pull_request",
-      execution_time: [2, 200],
-      error: null,
-      is_private: false,
-    }, {
-      actor: "Actor2",
-      repository: "PrivateUser/-1159492850",
-      ip: "123.123.123.123",
-      os: "Linux",
-      timestamp: runTimestamp,
-      event: "pull_request",
-      execution_time: [2, 200],
-      error: null,
-      is_private: true,
-    }]);
+    expect(runs).toEqual([
+      {
+        actor: "Actor1",
+        ip: "123.123.123.123",
+        os: "Linux",
+        timestamp: runTimestamp,
+        repository: "TestUser1/repository1",
+        event: "push",
+        execution_time: [1, 10000],
+        error: null,
+        is_private: false,
+      },
+      {
+        actor: "Actor2",
+        ip: "123.123.123.123",
+        os: "Linux",
+        timestamp: runTimestamp,
+        repository: "TestUser1/repository2",
+        event: "pull_request",
+        execution_time: [2, 200],
+        error: null,
+        is_private: false,
+      },
+      {
+        actor: "Actor2",
+        repository: "PrivateUser/-1159492850",
+        ip: "123.123.123.123",
+        os: "Linux",
+        timestamp: runTimestamp,
+        event: "pull_request",
+        execution_time: [2, 200],
+        error: null,
+        is_private: true,
+      },
+    ]);
   });
 
   test("it should return an empty array if no data exists", async () => {
-    const runs = await getActionRunsEntrypoint({
-      token: "1234",
-      creator: "TestUser1",
-      action: "Action2",
-    }, { auth: { uid: "1234" } } as CallableContext);
+    const runs = await getActionRunsEntrypoint(
+      {
+        token: "1234",
+        creator: "TestUser1",
+        action: "Action2",
+      },
+      { auth: { uid: "1234" } } as CallableContext
+    );
     expect(runs.length).toEqual(0);
     expect(runs).toEqual([]);
   });
 
   test("it should return an unauthorized error if the user is not authenticated", async () => {
     try {
-      await getActionRunsEntrypoint({
-        token: "1234",
-        creator: "TestUser1",
-        action: "Action1",
-      }, { auth: { uid: "" } } as CallableContext);
+      await getActionRunsEntrypoint(
+        {
+          token: "1234",
+          creator: "TestUser1",
+          action: "Action1",
+        },
+        { auth: { uid: "" } } as CallableContext
+      );
       expect(false).toBe(true);
     } catch (e) {
       expect(e).toHaveProperty("code");
@@ -198,11 +217,14 @@ describe("getActionRuns test", () => {
 
   test("it should return an forbidden error if the user is not authorized", async () => {
     try {
-      await getActionRunsEntrypoint({
-        token: "1234",
-        creator: "InvalidUser1",
-        action: "Action1",
-      }, { auth: { uid: "1234" } } as CallableContext);
+      await getActionRunsEntrypoint(
+        {
+          token: "1234",
+          creator: "InvalidUser1",
+          action: "Action1",
+        },
+        { auth: { uid: "1234" } } as CallableContext
+      );
     } catch (e) {
       expect(e).toHaveProperty("code");
       expect((e as functions.https.HttpsError).code).toBe("permission-denied");
@@ -211,4 +233,3 @@ describe("getActionRuns test", () => {
     expect(false).toBe(true);
   });
 });
-

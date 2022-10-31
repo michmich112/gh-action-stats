@@ -9,6 +9,7 @@ on:
       - src/**
       - functions/**
   workflow_dispatch:
+  workflow_call:
 
 jobs:
   test-client:
@@ -58,9 +59,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Setup Node
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
-          node-version: "16"
+          node-version: 16
       - name: Install Dependencies
         run: |
           npm install

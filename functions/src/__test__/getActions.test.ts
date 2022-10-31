@@ -1,12 +1,10 @@
 import User from "../domain/User.type";
 import { CallableContext } from "firebase-functions/v1/https";
-import { getActionsEntrypoint } from "../entrypoints/getActions";
-
+import { getActionsEntrypoint } from "../entrypoints/firebase/getActions";
 
 jest.mock("../config/firebase.config");
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { firestore } = require("../config/firebase.config");
-
 
 describe("getActions test", () => {
   const actionLastUpdateDate = new Date();
@@ -33,8 +31,8 @@ describe("getActions test", () => {
   };
 
   const collections: { [key: string]: any } = {
-    "users": usersDbData,
-    "actions": actionsDbData,
+    users: usersDbData,
+    actions: actionsDbData,
   };
 
   firestore.collection.mockImplementation((cn: string) => {
@@ -48,9 +46,10 @@ describe("getActions test", () => {
 
         return {
           empty: !cdata,
-          get: async () => cdata.map((d) => ({
-            data: () => d,
-          })),
+          get: async () =>
+            cdata.map((d) => ({
+              data: () => d,
+            })),
         };
       },
       doc: (dn: string) => ({
@@ -63,7 +62,9 @@ describe("getActions test", () => {
   });
 
   test("it should return the data that is stored in the actions collection", async () => {
-    const actions = await getActionsEntrypoint({}, { auth: { uid: "1234" } } as CallableContext);
+    const actions = await getActionsEntrypoint({}, {
+      auth: { uid: "1234" },
+    } as CallableContext);
     expect(Array.isArray(actions)).toBe(true);
     expect(actions.length).toBe(1);
     expect(actions[0]).toEqual({
@@ -78,7 +79,9 @@ describe("getActions test", () => {
   });
 
   test("it should return nothing if the user doesn't exist yet", async () => {
-    const actions = await getActionsEntrypoint({}, { auth: { uid: "2222" } } as CallableContext);
+    const actions = await getActionsEntrypoint({}, {
+      auth: { uid: "2222" },
+    } as CallableContext);
     expect(Array.isArray(actions)).toBe(true);
     expect(actions.length).toBe(0);
   });
@@ -92,4 +95,3 @@ describe("getActions test", () => {
     expect(false).toBe(true); // it should throw an error
   });
 });
-
