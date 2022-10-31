@@ -1,4 +1,4 @@
-org: gh-action-stats
+org: ghactionstats
 console: true
 service: async-operations
 frameworkVersion: "3"
