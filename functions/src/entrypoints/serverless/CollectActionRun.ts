@@ -5,8 +5,8 @@ import { CollectActionRun } from "../../operations/CollectActionRun";
 export async function receiver(event: any) {
   const ip = event["requestContext"]["http"]["sourceIp"];
   const body = {
-    ip,
     ...JSON.parse(event.body),
+    ip,
     timestamp: new Date().toISOString(),
   };
 
