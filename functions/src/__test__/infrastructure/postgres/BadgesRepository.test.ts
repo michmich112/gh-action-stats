@@ -37,13 +37,13 @@ describe.only("BadgesRepository tests", () => {
 
       // create placeholder toto action
       await client.query(
-        'INSERT INTO "Actions" (id, creator, name, last_update) VALUES (1, $1, $2, $3);',
+        'INSERT INTO "Actions" (creator, name, last_update) VALUES ($1, $2, $3);',
         ["toto", "toto_action", new Date(100)]
       );
 
       // create placeholder tata action
       await client.query(
-        'INSERT INTO "Actions" (id, creator, name, last_update) VALUES (2, $1, $2, $3);',
+        'INSERT INTO "Actions" (creator, name, last_update) VALUES ($1, $2, $3);',
         ["tata", "tata_action", new Date()]
       );
 
@@ -142,13 +142,13 @@ describe.only("BadgesRepository tests", () => {
         return;
       }
 
-      const b = await repo.getBadge({ actionId: 1, metric: "runs" });
+      const b = await repo.getBadge({ actionId: 1, metric: "repos" });
       await repo.updateBadge({
         actionId: 1,
-        metric: "runs",
+        metric: "repos",
         value: "12345",
       });
-      const a = await repo.getBadge({ actionId: 1, metric: "runs" });
+      const a = await repo.getBadge({ actionId: 1, metric: "repos" });
       expect(b.value).not.toEqual(a.value);
       expect({ ...b, value: "" }).toEqual({ ...b, value: "" });
     });
@@ -159,12 +159,12 @@ describe.only("BadgesRepository tests", () => {
         return;
       }
 
-      const b = await repo.getBadge({ actionId: 1, metric: "runs" });
+      const b = await repo.getBadge({ actionId: 1, metric: "repos" });
       await repo.updateBadge({
         actionId: 1,
-        metric: "runs",
+        metric: "repos",
       });
-      const a = await repo.getBadge({ actionId: 1, metric: "runs" });
+      const a = await repo.getBadge({ actionId: 1, metric: "repos" });
       expect(b.value).toEqual(a.value);
     });
   });
