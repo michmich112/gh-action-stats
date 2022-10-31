@@ -1,19 +1,28 @@
-org: tendermole
+org: gh-action-stats
 console: true
 service: async-operations
 frameworkVersion: "3"
 
+custom:
+  memsize:
+    prod: 1024 # lower cost & higher performance https://docs.aws.amazon.com/lambda/latest/operatorguide/computing-power.html
+    dev: 512
+  timeout:
+    prod: 10
+    dev: 6
+
 provider:
   name: aws
   runtime: nodejs16.x
+  stage: ${opt:stage, 'dev'} #dev by default
 
 constructs:
   collect-action-run-worker:
     type: queue
     worker:
       handler: lib/serverless-index.CollectActionRun.worker
-      memorySize: 1024 # lower cost & higher performance https://docs.aws.amazon.com/lambda/latest/operatorguide/computing-power.html
-      timeout: 10
+      memorySize: ${self:custom.memsize.${self:provider.stage}, 1024}
+      timeout: ${self:custom.timeout.${self:provider.stage}, 10}
       runtime: nodejs16.x
       fifo: true
       environment:
@@ -31,8 +40,8 @@ functions:
           async: true
     environment:
       QUEUE_URL: ${construct:collect-action-run-worker.queueUrl}
-    timeout: 6
-    memorySize: 1024 # lower cost & higher performance https://docs.aws.amazon.com/lambda/latest/operatorguide/computing-power.html
+    memorySize: ${self:custom.memsize.${self:provider.stage}, 1024}
+    timeout: ${self:custom.timeout.${self:provider.stage}, 10}
     runtime: nodejs16.x
 
 plugins:
