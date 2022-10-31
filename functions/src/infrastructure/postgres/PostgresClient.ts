@@ -14,3 +14,19 @@ export function createClient(): Client {
     connectionString: PG_URI,
   });
 }
+
+let ConnectedClient: Client | undefined;
+
+// do not throw an error
+export async function PostgresConnectedClient(): Promise<Client | null> {
+  try {
+    if (!ConnectedClient || ConnectedClient.setMaxListeners) {
+      ConnectedClient = createClient();
+      await ConnectedClient.connect();
+    }
+    return ConnectedClient;
+  } catch (e) {
+    console.debug(`Unable to get Postgres Connected Client.`, e);
+    return null;
+  }
+}

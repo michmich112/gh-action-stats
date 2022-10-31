@@ -43,10 +43,10 @@ describe.only("ActionsRepositoryTests", () => {
     if (client !== null) {
       try {
         await client.query('DELETE FROM "Actions";'); // Drop all values from Actions
-        await client.end();
       } catch (e) {
         console.error(`ERROR Tearing Down: ${e}.`);
       }
+      await client.end();
     }
     return;
   });

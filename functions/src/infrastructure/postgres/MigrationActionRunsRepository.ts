@@ -6,10 +6,10 @@ import { IPostgresRepostiory } from "../../domain/IRepository";
 const tableSchema: string = `
 CREATE TABLE IF NOT EXISTS "Runs" (
   "id" BIGSERIAL PRIMARY KEY,
-  "action_id" bigint NOT NULL,
-  "error_id" bigint,
-  "attempt_id" bigint,
-  "pulse_repo_id" bigint,
+  "action_id" bigint NOT NULL REFERENCES "Actions" ("id"),
+  "error_id" bigint REFERENCES "RunErrors" ("id"),
+  "attempt_id" bigint REFERENCES "AttemptedRuns" ("id"),
+  "pulse_repo_id" bigint REFERENCES "PulseRepos" ("id"),
   "github_action" text,
   "github_actor" text NOT NULL,
   "github_ref" text,
@@ -25,17 +25,9 @@ CREATE TABLE IF NOT EXISTS "Runs" (
   "ip" text,
   "runner_name" text NOT NULL,
   "runner_os" text NOT NULL,
-  "t" timestamp NOT NULL,
+  "t" timestamptz NOT NULL,
   "version" text
-);
-`;
-
-// const tableConstraints: string = `
-// ALTER TABLE "Runs" ADD FOREIGN KEY ("action_id") REFERENCES "Actions" ("id");
-// ALTER TABLE "Runs" ADD FOREIGN KEY ("error_id") REFERENCES "RunErrors" ("id");
-// ALTER TABLE "Runs" ADD FOREIGN KEY ("attempt_id") REFERENCES "AttemptedRuns" ("id");
-// ALTER TABLE "Runs" ADD FOREIGN KEY ("pulse_repo_id") REFERENCES "PulseRepos" ("id");
-// `;
+);`;
 
 export default class MigrationActionRunsRepository
   implements IPostgresRepostiory
