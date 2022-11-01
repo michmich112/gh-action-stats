@@ -4,13 +4,6 @@ import { IPostgresRepostiory } from "../../domain/IRepository";
 import BadgeView, { UtmParameters } from "../../domain/BadgeView.type";
 
 const tableSchema: string = `
-CREATE TABLE IF NOT EXISTS "BadgeViews" (
-  "id" BIGSERIAL PRIMARY KEY,
-  "badge_id" bigint NOT NULL REFERENCES "Badges" ("id") ON DELETE CASCADE,
-  "utm_param_id" bigint NOT NULL REFERENCES "UtmParameters" ("id") ON DELETE SET NULL,
-  "timestamp" timestamptz,
-);
-
 CREATE TABLE IF NOT EXISTS "UtmParameters" (
   "id" BIGSERIAL PRIMARY KEY,
   "source" text,
@@ -18,8 +11,16 @@ CREATE TABLE IF NOT EXISTS "UtmParameters" (
   "campaign" text,
   "term" text,
   "content" text,
-  UNIQUE("source", "medium", "campaign", "term", "content")
+  UNIQUE ("source", "medium", "campaign", "term", "content")
 );
+
+CREATE TABLE IF NOT EXISTS "BadgeViews" (
+  "id" BIGSERIAL PRIMARY KEY,
+  "badge_id" bigint NOT NULL REFERENCES "Badges" ("id") ON DELETE CASCADE,
+  "utm_param_id" bigint NOT NULL REFERENCES "UtmParameters" ("id") ON DELETE SET NULL,
+  "timestamp" timestamptz
+);
+
 `;
 
 export default class MigrationBadgeViewsRepository
@@ -83,7 +84,7 @@ export default class MigrationBadgeViewsRepository
       );
     }
     if (!res || res.rowCount < 1) {
-      return this.createNewUtm(utm);
+      return await this.createNewUtm(utm);
     } else {
       return parseInt(res.rows[0].id);
     }
@@ -121,7 +122,7 @@ export default class MigrationBadgeViewsRepository
   public async saveBadgeView(bv: BadgeView): Promise<void> {
     let utmId;
     try {
-      utmId = this.getUtmId(bv.utmParameters);
+      utmId = await this.getUtmId(bv.utmParameters);
     } catch (e) {
       console.error(
         "[BadgeViewsRepository][saveBadgeView] Error - Unable to get utm id for badge view: ",
@@ -147,7 +148,9 @@ export default class MigrationBadgeViewsRepository
         "[BadgeViewsRepository][saveBadgeView] Error - Unable to save badge view: ",
         bv,
         " with utm id: ",
-        utmId
+        utmId,
+        "\nError: ",
+        e
       );
       throw e;
     }

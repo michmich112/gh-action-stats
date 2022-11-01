@@ -3,6 +3,8 @@ import { Client } from "pg";
 import { createClient } from "../../../infrastructure/postgres/PostgresClient";
 import MigrationBadgeViewsRepository from "../../../infrastructure/postgres/BadgeViewsRepository";
 import BadgeView from "../../../domain/BadgeView.type";
+import MigrationActionRepository from "../../../infrastructure/postgres/MigrationActionsRepository";
+import MigrationBadgesRepository from "../../../infrastructure/postgres/BadgesRepository";
 
 describe.only("BadgeViewsRepository tests", () => {
   let client: null | Client = null;
@@ -20,9 +22,13 @@ describe.only("BadgeViewsRepository tests", () => {
       return;
     }
     try {
+      await MigrationActionRepository.New(client);
+      await MigrationBadgesRepository.New(client);
       repo = await MigrationBadgeViewsRepository.New(client); // Create any table if necessary
     } catch (e) {
-      console.warn(`Error creating Badges or Action run repo: ${e}`);
+      console.warn(
+        `Error creating Badges, Action or Badges View run repo: ${e}`
+      );
       repo = null;
       return;
     }
@@ -43,7 +49,7 @@ describe.only("BadgeViewsRepository tests", () => {
 
       // create existing action up to date (repos)
       await client.query(
-        'INSERT INTO "Badges" (action_id, metric, last_generated, location_path, public_uri, value) VALUES ($1, $2, $3, $4, $5, $6);',
+        'INSERT INTO "Badges" (id, action_id, metric, last_generated, location_path, public_uri, value) VALUES (1, $1, $2, $3, $4, $5, $6);',
         [
           1,
           "repos",
@@ -55,7 +61,7 @@ describe.only("BadgeViewsRepository tests", () => {
       );
 
       await client.query(
-        'INSERT INTO "UtmParameters" (id, source, medium, campaign, term, content) VALUES (1, $1,$2,$3,$4,$5);',
+        'INSERT INTO "UtmParameters" (id, source, medium, campaign, term, content) VALUES (1, $1, $2, $3, $4, $5);',
         [
           "known_source",
           "known_medium",
@@ -220,7 +226,7 @@ describe.only("BadgeViewsRepository tests", () => {
         return;
       }
       const bv: BadgeView = {
-        badgeId: 1,
+        badgeId: 388299013,
         timestamp: new Date(),
         utmParameters: {},
       };
@@ -231,7 +237,7 @@ describe.only("BadgeViewsRepository tests", () => {
         return;
       }
 
-      fail("Expected Erro to be thrown when saving badge view");
+      throw new Error("Expected Error to be thrown when saving badge view");
     });
   });
 });
