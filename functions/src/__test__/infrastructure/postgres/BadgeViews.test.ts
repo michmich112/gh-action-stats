@@ -9,6 +9,7 @@ import MigrationBadgesRepository from "../../../infrastructure/postgres/BadgesRe
 describe.only("BadgeViewsRepository tests", () => {
   let client: null | Client = null;
   let repo: null | MigrationBadgeViewsRepository = null;
+  let known_utm_id: string = "1";
 
   // Setup
   beforeAll(async () => {
@@ -60,8 +61,8 @@ describe.only("BadgeViewsRepository tests", () => {
         ]
       );
 
-      await client.query(
-        'INSERT INTO "UtmParameters" (id, source, medium, campaign, term, content) VALUES (1, $1, $2, $3, $4, $5);',
+      const known_utm = await client.query(
+        'INSERT INTO "UtmParameters" (source, medium, campaign, term, content) VALUES ($1, $2, $3, $4, $5) RETURNING id;',
         [
           "known_source",
           "known_medium",
@@ -70,6 +71,8 @@ describe.only("BadgeViewsRepository tests", () => {
           "known_content",
         ]
       );
+      if (known_utm.rowCount < 1) throw new Error("No utm id returned");
+      known_utm_id = known_utm.rows[0].id;
     } catch (e) {
       console.warn(
         `Error populating Actions or Badges or UtmParameters: Some tests might fail; ${e}`
@@ -126,7 +129,7 @@ describe.only("BadgeViewsRepository tests", () => {
         id: current.rows[0].id, // don't need to verify this
         badge_id: bv.badgeId.toString(),
         timestamp: bv.timestamp,
-        utm_param_id: "1",
+        utm_param_id: known_utm_id,
       });
     });
 
