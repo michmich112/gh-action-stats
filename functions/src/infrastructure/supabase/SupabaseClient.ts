@@ -5,7 +5,7 @@ import {
 
 let client: null | SupabaseClient;
 
-export function createClient(): SupabaseClient {
+export function getClient(): SupabaseClient {
   const { SUPABASE_URL, SUPABASE_KEY } = process.env;
   if (SUPABASE_URL === undefined || !SUPABASE_URL) {
     console.error(
