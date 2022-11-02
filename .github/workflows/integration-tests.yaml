@@ -65,8 +65,38 @@ jobs:
       - name: Install Dependencies
         run: |
           npm install
-      - name: Test Functions
+
+      - name: Install Supabase Environment
+        id: supabase
         run: |
+          cd ~
+          git clone --depth 1 https://github.com/supabase/supabase
+          cd supabase/docker
+          cp .env.example .env
+          docker-compose up
+
+          # Get Environment variables and make them accessible to future steps
+          function getPathEnvVar {
+            path="$1"
+            var_name="$2"
+            grep "^${var_name}=" "$path" | set -E "s%^${var_name}=\"?([^\"]+)\"?.*$%\1%"
+          }
+
+          echo "site_url=$((getPathEnvVar .env SITE_URL))" >> $GITHUB_OUTPUT
+          echo "anon_key=$((getPathEnvVar .env ANON_KEY))" >> $GITHUB_OUTPUT
+
+      - name: Test Functions
+        continue-on-error: true
+        run: |
+          echo $SUPABASE_URL
+          echo $SUPABASE_KEY
           npm run test
         env:
           PG_URI: postgresql://postgres:postgres@localhost:5432/postgres
+          SUPABASE_URL: ${steps.supabase.outputs.site_url}
+          SUPABASE_KEY: ${steps.supabase.outputs.anon_key}
+
+      - name: Destroy Supabase Environment
+        run: |
+          cd ~/supabase/docker
+          docker-compose down
