@@ -38,7 +38,7 @@ describe(`${eut} tests`, () => {
         );
       }
     } catch (e) {
-      console.warn("Error initializing test.", e);
+      console.error("Error initializing test.", e);
     }
   });
 
