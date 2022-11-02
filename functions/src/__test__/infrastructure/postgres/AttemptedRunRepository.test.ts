@@ -79,7 +79,7 @@ describe.only("RunErrorRepostiory Test", () => {
       try {
         await repo.create({ reason: "" });
         fail("Expected error to be thrown");
-      } catch (e) {
+      } catch (e: any) {
         expect(e.message).toEqual(
           "Cannot create attempt, must have valid reason."
         );
@@ -107,7 +107,7 @@ describe.only("RunErrorRepostiory Test", () => {
       try {
         await repo.getById(69420);
         fail("Expected error to be thown");
-      } catch (e) {
+      } catch (e: any) {
         expect(e.message).toEqual("AttemptedRun with id 69420 not found.");
       }
     });

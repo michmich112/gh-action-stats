@@ -11,11 +11,5 @@
   },
   "compileOnSave": true,
   "include": ["src"],
-  "exclude": [
-    "node_modules",
-    "./node_modules",
-    "./node_modules/*",
-    "src/__test__",
-    "src/__test__/*"
-  ]
+  "exclude": ["node_modules", "./node_modules", "./node_modules/*"]
 }
