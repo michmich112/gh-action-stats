@@ -74,7 +74,7 @@ jobs:
           cd supabase/docker
           cp .env.example .env
 
-          docker-compose up
+          docker-compose up -d --wait #start services and wait for containers to be healthy
 
           # Get Environment variables and make them accessible to future steps
           function getPathEnvVar {

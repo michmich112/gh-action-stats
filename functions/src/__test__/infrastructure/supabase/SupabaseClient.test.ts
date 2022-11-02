@@ -1,6 +1,6 @@
+import * as dotenv from "dotenv";
 import { getClient } from "../../../infrastructure/supabase/SupabaseClient";
 import { SupabaseClient } from "@supabase/supabase-js";
-import IStorage from "../../../domain/IStorage";
 import BadgeStorage from "../../../infrastructure/supabase/storage/BadgeStorage";
 
 const eut = "SupabaseBadgeStorage"; //element under test
@@ -23,17 +23,23 @@ describe(`${eut} tests`, () => {
   let repo: null | BadgeStorage;
 
   beforeAll(async () => {
-    client = getClient();
-    repo = await BadgeStorage.New(client); // create new client
+    dotenv.config();
+    try {
+      client = getClient();
+      repo = await BadgeStorage.New(client); // create new client
 
-    const { error } = await client.storage.emptyBucket(
-      repo?.bucketName ?? "badges"
-    );
-    if (error) {
-      console.warn(
-        `[${eut}] BeforeAll - error clearing storage bucket. Some tests might fail.`,
-        error
+      const { error } = await client.storage.emptyBucket(
+        repo?.bucketName ?? "badges"
       );
+      if (error) {
+        console.warn(
+          `[${eut}] BeforeAll - error clearing storage bucket. Some tests might fail.`,
+          error
+        );
+      }
+    } catch (e) {
+      console.warn("Error initializing test.", e);
+      return;
     }
   });
 
