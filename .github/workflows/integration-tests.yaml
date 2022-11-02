@@ -52,7 +52,7 @@ jobs:
           --health-retries 5
         ports:
           # Maps tcp port 5432 on service container to the host
-          - 5432:5432
+          - 54321:5432
 
     steps:
       # Downloads a copy of the code in your repository before running CI tests
@@ -73,6 +73,7 @@ jobs:
           git clone --depth 1 https://github.com/supabase/supabase
           cd supabase/docker
           cp .env.example .env
+
           docker-compose up
 
           # Get Environment variables and make them accessible to future steps
@@ -92,7 +93,7 @@ jobs:
           echo $SUPABASE_KEY
           npm run test
         env:
-          PG_URI: postgresql://postgres:postgres@localhost:5432/postgres
+          PG_URI: postgresql://postgres:postgres@localhost:54321/postgres
           SUPABASE_URL: ${steps.supabase.outputs.site_url}
           SUPABASE_KEY: ${steps.supabase.outputs.anon_key}
 

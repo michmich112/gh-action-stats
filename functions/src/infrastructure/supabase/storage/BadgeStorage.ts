@@ -14,7 +14,7 @@ export class BadgeStorage implements IStorage {
     this._public = true;
   }
 
-  public static async New(client: SupabaseClient): BadgeStorage {
+  public static async New(client: SupabaseClient): Promise<BadgeStorage> {
     const s = new BadgeStorage(client);
     await s.configure();
     return s;
