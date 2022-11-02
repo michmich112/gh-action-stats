@@ -80,7 +80,7 @@ jobs:
           function getPathEnvVar {
             path="$1"
             var_name="$2"
-            grep "^${var_name}=" "$path" | set -E "s%^${var_name}=\"?([^\"]+)\"?.*$%\1%"
+            grep "^${var_name}=" "${path}" | set -E "s%^${var_name}=\"?([^\"]+)\"?.*$%\1%"
           }
 
           echo "site_url=$(getPathEnvVar .env SITE_URL)" >> $GITHUB_OUTPUT

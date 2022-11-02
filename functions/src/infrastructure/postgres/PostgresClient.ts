@@ -23,6 +23,13 @@ export async function PostgresConnectedClient(): Promise<Client | null> {
     if (!ConnectedClient) {
       ConnectedClient = createClient();
       await ConnectedClient.connect();
+    } else {
+      try {
+        await ConnectedClient.query("SELECT 1;");
+      } catch {
+        ConnectedClient = createClient();
+        await ConnectedClient.connect();
+      }
     }
     return ConnectedClient;
   } catch (e) {
