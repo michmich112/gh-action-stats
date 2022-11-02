@@ -6,7 +6,7 @@ import BadgeStorage from "../../../infrastructure/supabase/storage/BadgeStorage"
 const eut = "SupabaseBadgeStorage"; //element under test
 
 function skip(client: any, repo: any, soft: boolean = false): boolean {
-  if (!!client || !!repo) {
+  if (!client || !repo) {
     if (soft) {
       console.warn(`[${eut}] - client or repo not initialized. Skipping tests`);
       return false;
@@ -19,8 +19,8 @@ function skip(client: any, repo: any, soft: boolean = false): boolean {
 }
 
 describe(`${eut} tests`, () => {
-  let client: null | SupabaseClient;
-  let repo: null | BadgeStorage;
+  let client: null | SupabaseClient = null;
+  let repo: null | BadgeStorage = null;
 
   beforeAll(async () => {
     dotenv.config();
