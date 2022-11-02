@@ -31,7 +31,7 @@ describe.only("RunErrorRepostiory Test", () => {
       await client.query('DELETE FROM "AttemptedRuns";'); // Drop all values from Actions
       // create placeholder
       const res = await client.query(
-        'INSERT INTO "AttemptedRuns" (reason) VALUES ($1) RETURNS id;',
+        'INSERT INTO "AttemptedRuns" (reason) VALUES ($1) RETURNING id;',
         ["BadIP"]
       );
       if (res.rowCount < 1) {
