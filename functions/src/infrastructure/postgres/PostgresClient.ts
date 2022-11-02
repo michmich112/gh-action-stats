@@ -20,7 +20,7 @@ let ConnectedClient: Client | undefined;
 // do not throw an error
 export async function PostgresConnectedClient(): Promise<Client | null> {
   try {
-    if (!ConnectedClient || ConnectedClient.setMaxListeners) {
+    if (!ConnectedClient) {
       ConnectedClient = createClient();
       await ConnectedClient.connect();
     }

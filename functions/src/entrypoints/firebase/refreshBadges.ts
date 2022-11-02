@@ -18,7 +18,7 @@ async function updateBadges(
       owner: owner.toString(),
       repo: repo.toString(),
     });
-  } catch (e) {
+  } catch (e: any) {
     console.group();
     console.error(
       `[updateBadges] - Error Refreshing Badges Operation for owner ${owner} and repo ${repo}`

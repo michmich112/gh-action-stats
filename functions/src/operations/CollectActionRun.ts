@@ -81,7 +81,7 @@ export async function CollectActionRun(runData: ActionRun): Promise<void> {
           message: `Action Data was sent from a non Github Actions IP: ${ip}.`,
         });
       }
-    } catch (e) {
+    } catch (e: any) {
       // log error
       attempt = new AttemptInfo({
         reason: AttemptReason.UnableToGetIP,

@@ -21,7 +21,7 @@ async function SyncActionRun(
     await client.connect(); // connect clinent
     const actionRunRepository = new ActionRunRepository(client);
     await actionRunRepository.create(actionRun);
-  } catch (e) {
+  } catch (e: any) {
     console.group();
     console.error(
       "[SyncActionRun] - Error connecting & adding an action run to the repository"
