@@ -11,7 +11,7 @@ function skip(client: any, repo: any, soft: boolean = false): boolean {
       console.warn(`[${eut}] - client or repo not initialized. Skipping tests`);
       return false;
     }
-    console.error(
+    throw new Error(
       `[${eut}] - client or repo not initialized. Cancelling tests`
     );
   }
