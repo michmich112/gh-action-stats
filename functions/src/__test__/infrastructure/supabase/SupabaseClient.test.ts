@@ -42,15 +42,15 @@ describe(`${eut} tests`, () => {
     }
   });
 
-  describe("put", () => {
+  test("put", () => {
     skip(client, repo);
   });
 
-  describe("get", () => {
+  test("get", () => {
     skip(client, repo);
   });
 
-  describe("exists", () => {
+  test("exists", () => {
     skip(client, repo);
   });
 });

@@ -87,7 +87,6 @@ jobs:
           echo "anon_key=$(getPathEnvVar .env ANON_KEY)" >> $GITHUB_OUTPUT
 
       - name: Test Functions
-        continue-on-error: true
         run: |
           echo $SUPABASE_URL
           echo $SUPABASE_KEY
