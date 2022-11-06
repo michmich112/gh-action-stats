@@ -96,7 +96,7 @@ describe(`${eut} tests`, () => {
   });
 
   describe("get", () => {
-    describe("It should get an existing document if it exists", async function () {
+    describe("It should get an existing document if it exists", function () {
       test("It should get an existing document with no path", async function () {
         skip(client, repo);
         const path = "test.svg";
