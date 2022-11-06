@@ -211,7 +211,7 @@ describe.only("BadgesRepository tests", () => {
 
         try {
           await repo.getBadge({
-            actionId: { repo: "tata_action", creator: "tata" },
+            actionId: { name: "tata_action", creator: "tata" },
             metric: "runs",
           });
         } catch (e) {
@@ -227,7 +227,7 @@ describe.only("BadgesRepository tests", () => {
         }
 
         const badge = await repo.getBadge({
-          actionId: { repo: "toto_action", creator: "toto" },
+          actionId: { name: "toto_action", creator: "toto" },
           metric: "runs",
         });
         expect(badge).toEqual({

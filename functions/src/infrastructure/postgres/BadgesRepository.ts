@@ -116,7 +116,7 @@ export default class MigrationBadgesRepository implements IPostgresRepostiory {
     actionId,
     metric,
   }: {
-    actionId: number | { repo: string; creator: string };
+    actionId: number | { name: string; creator: string };
     metric: BadgeMetrics;
   }): Promise<Badge> {
     let res;
@@ -132,14 +132,14 @@ export default class MigrationBadgesRepository implements IPostgresRepostiory {
       from "${this.tableName}" b 
       LEFT JOIN (
         SELECT 
-          aa.repo,
+          aa.name,
           aa.creator
         FROM "Actions" aa
-      ) a ON a.repo = $1 AND a.creator = $2 
+      ) a ON a.name = $1 AND a.creator = $2 
       WHERE b.metric = $3;
       `;
       res = await this.client.query(query, [
-        actionId.repo,
+        actionId.name,
         actionId.creator,
         metric,
       ]);
