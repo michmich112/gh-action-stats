@@ -218,7 +218,7 @@ describe(`${eut} tests`, () => {
         const path = "test/test_file.svg";
         await repo!.put(path, svg);
         const uri = await repo!.getPublicUrl(path, -1);
-        await setTimeout(10 * 1000); // wait 10 seconds
+        await setTimeout(3 * 1000); // wait 3 seconds
         const res = await axios.get(uri);
         expect(res.data).toEqual(svg);
       });
@@ -241,12 +241,12 @@ describe(`${eut} tests`, () => {
         skip(client, repo);
         const path = "test/test_file-ttl.svg";
         await repo!.put(path, svg);
-        const uri = await repo!.getPublicUrl(path, 8);
+        const uri = await repo!.getPublicUrl(path, 3);
         const res = await axios.get(uri);
         expect(res.data).toEqual(svg);
 
         //test that the file does not work
-        await setTimeout(8 * 1000); // ad an extra second just in case;
+        await setTimeout(3 * 1000);
 
         try {
           const res2 = await axios.get(uri);
