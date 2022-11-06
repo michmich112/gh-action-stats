@@ -79,10 +79,12 @@ export class BadgeStorage implements IStorage {
   }
 
   async exists(path: string): Promise<boolean> {
-    if (!this.isValidPath(path))
-      throw new Error(
+    if (!this.isValidPath(path)) {
+      console.error(
         `[SupabaseBadgeStorage][exists] Error - Path ${path} does not match expected form.`
       );
+      return false;
+    }
 
     // maybe should use the path module
     const dir_match = path.match(/^[a-zA-Z0-9\-\_\/]*\//g);

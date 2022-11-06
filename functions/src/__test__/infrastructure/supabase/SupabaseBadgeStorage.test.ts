@@ -67,17 +67,31 @@ describe(`${eut} tests`, () => {
       await repo!.put("test_1.svg", svg); // test no path
       await repo!.put("test/test_2.svg", svg); // test in single folder
       await repo!.put("test/put/test_3.svg", svg); // test compound path
-      const { data: post_data } = await client!.storage.from("badges").list();
 
-      if (!pre_data || !post_data) throw new Error("Data Not Returned");
+      const { data: lvl1_data } = await client!.storage.from("badges").list();
+      if (!pre_data || !lvl1_data) throw new Error("Data Not Returned");
+      let fileNames = lvl1_data.map((f) => f.name);
+      // supabase api returns only 1st depth files
+      expect(lvl1_data.length).toEqual(pre_data.length + 2);
+      expect(fileNames.includes("test_1.svg")).toBeTruthy();
+      expect(fileNames.includes("test")).toBeTruthy(); // will include name of the folder
 
-      const fileName = post_data.map((f) => f.name);
-      console.error("checkThisOut", fileName);
+      const { data: lvl2_data } = await client!.storage
+        .from("badges")
+        .list("test");
+      if (!lvl2_data) throw new Error("Level 2 data not returned");
+      fileNames = lvl2_data.map((f) => f.name);
+      expect(lvl2_data.length).toEqual(2);
+      expect(fileNames.includes("test_2.svg")).toBeTruthy();
+      expect(fileNames.includes("put")).toBeTruthy(); // will include name of the folder
 
-      expect(post_data.length).toEqual(pre_data.length + 3);
-      expect(fileName.includes("test_1.svg")).toBeTruthy();
-      expect(fileName.includes("test_2.svg")).toBeTruthy();
-      expect(fileName.includes("test_3.svg")).toBeTruthy();
+      const { data: lvl3_data } = await client!.storage
+        .from("badges")
+        .list("test/put");
+      if (!lvl3_data) throw new Error("Level 3 data not returned");
+      fileNames = lvl3_data.map((f) => f.name);
+      expect(lvl3_data.length).toEqual(1);
+      expect(fileNames.includes("test_3.svg")).toBeTruthy();
     });
 
     test("it should fail if a non proper file path is passed", async function () {
