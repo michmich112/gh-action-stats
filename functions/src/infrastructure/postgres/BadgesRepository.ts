@@ -116,13 +116,34 @@ export default class MigrationBadgesRepository implements IPostgresRepostiory {
     actionId,
     metric,
   }: {
-    actionId: number;
+    actionId: number | { repo: string; creator: string };
     metric: BadgeMetrics;
   }): Promise<Badge> {
-    const query = `
-      SELECT * from "${this.tableName}" WHERE action_id = $1 AND metric = $2;
-    `;
-    const res = await this.client.query(query, [actionId, metric]);
+    let res;
+    if (typeof actionId === "number") {
+      const query = `
+        SELECT * from "${this.tableName}" WHERE action_id = $1 AND metric = $2;
+      `;
+      res = await this.client.query(query, [actionId, metric]);
+    } else {
+      const query = `
+      SELECT 
+        b.* 
+      from "${this.tableName}" b 
+      LEFT JOIN (
+        SELECT 
+          aa.repo,
+          aa.creator,
+        FROM "Actions" aa
+      ) a ON a.repo = $1 AND a.creator = $2 
+      WHERE b.metric = $3;
+      `;
+      res = await this.client.query(query, [
+        actionId.repo,
+        actionId.creator,
+        metric,
+      ]);
+    }
 
     if (res.rowCount < 1) {
       const message = `[BadgesRepository][getBadge] Error - No record found for badge for action_id: ${actionId} and metric: ${metric}`;
