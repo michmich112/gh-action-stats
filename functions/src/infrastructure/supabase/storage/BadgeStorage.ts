@@ -124,6 +124,10 @@ export class BadgeStorage implements IStorage {
       throw new Error(
         `[SupabaseBadgeStorage][getPublicUrl] Error - Path ${path} does not match expected form`
       );
+    if (!(await this.exists(path)))
+      throw new Error(
+        `[SupabaseBadgeStorage][getPublicUrl] Error - File with ${path} does not exist`
+      );
 
     if (!ttl || ttl <= 0) {
       const { data } = this._client.storage
