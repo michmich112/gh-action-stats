@@ -6,6 +6,7 @@ import MigrationAttemptedRunRepository from "../../../infrastructure/postgres/At
 describe.only("RunErrorRepostiory Test", () => {
   let client: null | Client = null;
   let repo: null | MigrationAttemptedRunRepository = null;
+  let known_id: number = 1;
 
   // Setup
   beforeAll(async () => {
@@ -29,10 +30,14 @@ describe.only("RunErrorRepostiory Test", () => {
     try {
       await client.query('DELETE FROM "AttemptedRuns";'); // Drop all values from Actions
       // create placeholder
-      await client.query(
-        'INSERT INTO "AttemptedRuns" (id, reason) VALUES (1, $1);',
+      const res = await client.query(
+        'INSERT INTO "AttemptedRuns" (reason) VALUES ($1) RETURNING id;',
         ["BadIP"]
       );
+      if (res.rowCount < 1) {
+        throw new Error("No id returned from know attempted run");
+      }
+      known_id = parseInt(res.rows[0].id);
     } catch (e) {
       console.warn(
         `Error populating AttemptedRuns: Some tests might fail; ${e}`
@@ -60,7 +65,7 @@ describe.only("RunErrorRepostiory Test", () => {
       }
       const ar = await repo.create({ reason: "Over The Rate Limit" });
       expect(ar).not.toBeNaN();
-      expect(ar).not.toEqual(1);
+      expect(ar).not.toEqual(known_id);
     });
     test("it should return an existing Attepted run if it already exists.", async () => {
       if (client === null || repo === null) {
@@ -69,7 +74,7 @@ describe.only("RunErrorRepostiory Test", () => {
       }
       const ar = await repo.create({ reason: "BadIP" });
       expect(ar).not.toBeNaN();
-      expect(ar).toEqual(1);
+      expect(ar).toEqual(known_id);
     });
     test("it should return an error if the reason is not passed.", async () => {
       if (client === null || repo === null) {
@@ -79,7 +84,7 @@ describe.only("RunErrorRepostiory Test", () => {
       try {
         await repo.create({ reason: "" });
         fail("Expected error to be thrown");
-      } catch (e) {
+      } catch (e: any) {
         expect(e.message).toEqual(
           "Cannot create attempt, must have valid reason."
         );
@@ -93,8 +98,8 @@ describe.only("RunErrorRepostiory Test", () => {
         console.warn("No client connection or repo, skipping test");
         return;
       }
-      const ar = await repo.getById(1);
-      expect(ar.id).toEqual(1);
+      const ar = await repo.getById(known_id);
+      expect(ar.id).toEqual(known_id);
       expect(ar.reason).toEqual("BadIP");
     });
 
@@ -107,7 +112,7 @@ describe.only("RunErrorRepostiory Test", () => {
       try {
         await repo.getById(69420);
         fail("Expected error to be thown");
-      } catch (e) {
+      } catch (e: any) {
         expect(e.message).toEqual("AttemptedRun with id 69420 not found.");
       }
     });

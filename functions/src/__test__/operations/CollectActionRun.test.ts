@@ -132,6 +132,7 @@ describe("CollectActionRun tests", () => {
     };
 
     await CollectActionRun(run);
+    client = (await PostgresConnectedClient()) as Client;
 
     const res = await client.query(GetActionRunQuery);
     expect(res.rowCount).toEqual(1);
@@ -180,6 +181,7 @@ describe("CollectActionRun tests", () => {
     };
 
     await CollectActionRun(run);
+    client = (await PostgresConnectedClient()) as Client;
 
     const res = await client.query(GetActionRunQuery);
     expect(res.rowCount).toEqual(1);
@@ -232,6 +234,7 @@ describe("CollectActionRun tests", () => {
     };
 
     await CollectActionRun(run);
+    client = (await PostgresConnectedClient()) as Client; // required since the  operation will close the connection
 
     const res = await client.query(GetActionRunQuery);
     expect(res.rowCount).toEqual(1);

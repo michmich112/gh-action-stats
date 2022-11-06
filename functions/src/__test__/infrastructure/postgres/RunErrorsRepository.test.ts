@@ -87,7 +87,7 @@ describe.only("RunErrorRepostiory Test", () => {
       try {
         await repo.create({});
         fail("Error should have been thrown when no parameters are present");
-      } catch (e) {
+      } catch (e: any) {
         if (e.message !== "No run error information was present.") {
           fail("Wrong Error returned");
         }
@@ -116,7 +116,7 @@ describe.only("RunErrorRepostiory Test", () => {
       try {
         await repo.getById(69420);
         fail("Error Should have been thrown.");
-      } catch (e) {
+      } catch (e: any) {
         if (e.message !== "No RunError with id 69420 found.") {
           fail("Bad error format");
         }
