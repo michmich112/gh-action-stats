@@ -2,6 +2,8 @@ import * as dotenv from "dotenv";
 import { getClient } from "../../../infrastructure/supabase/SupabaseClient";
 import { SupabaseClient } from "@supabase/supabase-js";
 import BadgeStorage from "../../../infrastructure/supabase/storage/BadgeStorage";
+import axios from "axios";
+import { setTimeout } from "timers/promises";
 
 const eut = "SupabaseBadgeStorage"; //element under test
 
@@ -193,6 +195,79 @@ describe(`${eut} tests`, () => {
       skip(client, repo);
       const exist = await repo!.exists("test/bad_filename");
       expect(exist).toBeFalsy();
+    });
+  });
+
+  describe("getPublicUrl", () => {
+    describe("No TTL", () => {
+      test("It should get the public path for a file that exists", async function () {
+        skip(client, repo);
+        const path = "test/test_file.svg";
+        await repo!.put(path, svg);
+        const uri = await repo!.getPublicUrl(path);
+        const res = await axios.get(uri);
+        expect(res.data).toEqual(svg);
+        // test a second use of the file
+        await setTimeout(3);
+        const res2 = await axios.get(uri);
+        expect(res2.data).toEqual(svg);
+      });
+
+      test("It should get the public path for a file that exists with negative ttl", async function () {
+        skip(client, repo);
+        const path = "test/test_file.svg";
+        await repo!.put(path, svg);
+        const uri = await repo!.getPublicUrl(path, -1);
+        await setTimeout(10); // wait 10 seconds
+        const res = await axios.get(uri);
+        expect(res.data).toEqual(svg);
+      });
+
+      test("It should throw an error if a non existing file path is passed", async function () {
+        skip(client, repo);
+        try {
+          await repo!.getPublicUrl("test/non_existant_file.svg");
+        } catch {
+          return;
+        }
+        throw new Error(
+          "Expected error to be thrown with non existant file path"
+        );
+      });
+    });
+
+    describe("With TTL", () => {
+      test("It should get a public URL that expires after the TTL", async function () {
+        skip(client, repo);
+        const path = "test/test_file-ttl.svg";
+        await repo!.put(path, svg);
+        const uri = await repo!.getPublicUrl(path, 8);
+        const res = await axios.get(uri);
+        expect(res.data).toEqual(svg);
+
+        //test that the file does not work
+        await setTimeout(8);
+
+        try {
+          const res2 = await axios.get(uri);
+          if (res2.data !== svg) return;
+        } catch {
+          return;
+        }
+        throw new Error("Expected to not get a return from url");
+      });
+      test("It should throw an error if a non existing file path is passed", async function () {
+        skip(client, repo);
+        const path = "test/non_existing_file.svg";
+        try {
+          await repo!.getPublicUrl(path, 8);
+        } catch {
+          return;
+        }
+        throw new Error(
+          "Expected an error to be thrown when attempting to get public url for file"
+        );
+      });
     });
   });
 });
