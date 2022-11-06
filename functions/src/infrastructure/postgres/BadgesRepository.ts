@@ -133,7 +133,7 @@ export default class MigrationBadgesRepository implements IPostgresRepostiory {
       LEFT JOIN (
         SELECT 
           aa.repo,
-          aa.creator,
+          aa.creator
         FROM "Actions" aa
       ) a ON a.repo = $1 AND a.creator = $2 
       WHERE b.metric = $3;
