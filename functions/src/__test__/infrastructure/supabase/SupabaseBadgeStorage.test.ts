@@ -70,8 +70,11 @@ describe(`${eut} tests`, () => {
       const { data: post_data } = await client!.storage.from("badges").list();
 
       if (!pre_data || !post_data) throw new Error("Data Not Returned");
-      expect(post_data.length).toEqual(pre_data.length + 3);
+
       const fileName = post_data.map((f) => f.name);
+      console.error("checkThisOut", fileName);
+
+      expect(post_data.length).toEqual(pre_data.length + 3);
       expect(fileName.includes("test_1.svg")).toBeTruthy();
       expect(fileName.includes("test_2.svg")).toBeTruthy();
       expect(fileName.includes("test_3.svg")).toBeTruthy();
