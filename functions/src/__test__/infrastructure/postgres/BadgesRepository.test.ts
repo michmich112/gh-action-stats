@@ -210,10 +210,11 @@ describe.only("BadgesRepository tests", () => {
         }
 
         try {
-          await repo.getBadge({
+          const a = await repo.getBadge({
             actionId: { name: "tata_action", creator: "tata" },
             metric: "runs",
           });
+          console.log("lookHere", a);
         } catch (e) {
           return;
         }

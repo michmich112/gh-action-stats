@@ -132,11 +132,12 @@ export default class MigrationBadgesRepository implements IPostgresRepostiory {
       from "${this.tableName}" b 
       LEFT JOIN (
         SELECT 
+          aa.id,
           aa.name,
           aa.creator
         FROM "Actions" aa
-      ) a ON a.name = $1 AND a.creator = $2 
-      WHERE b.metric = $3;
+      ) a ON a.id = b.action_id
+      WHERE a.name = $1 AND a.creator = $2 AND b.metric = $3;
       `;
       res = await this.client.query(query, [
         actionId.name,
