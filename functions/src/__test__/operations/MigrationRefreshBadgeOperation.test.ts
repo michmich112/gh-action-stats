@@ -118,27 +118,32 @@ describe("RefreshBadgeOperation tests", () => {
       console.warn("Error Wiping Data", e);
     }
 
-    const supabaseClient = getClient();
-    // empty all existing badges
-    await supabaseClient.storage.emptyBucket("badges");
+    try {
+      const supabaseClient = getClient();
+      // empty all existing badges
+      await supabaseClient.storage.emptyBucket("badges");
 
-    jest
-      .spyOn(utils, "isGithubActionsAddress")
-      .mockImplementation(async (ip) => {
-        if (ip === "9.9.9.9") {
-          // mock a communication error
-          throw new Error("Communication Error");
-        }
+      jest
+        .spyOn(utils, "isGithubActionsAddress")
+        .mockImplementation(async (ip) => {
+          if (ip === "9.9.9.9") {
+            // mock a communication error
+            throw new Error("Communication Error");
+          }
 
-        const authorizedIps = ["1.2.3.4", "5.6.7.8", "1:2:3:4:5:6:7:8"];
-        return authorizedIps.includes(ip as string);
-      });
+          const authorizedIps = ["1.2.3.4", "5.6.7.8", "1:2:3:4:5:6:7:8"];
+          return authorizedIps.includes(ip as string);
+        });
 
-    await setup(client!);
+      await setup(client!);
+    } catch (e) {
+      console.error("Setup Failure:", e);
+    }
   });
 
   afterAll(async function () {
     try {
+      client = await PostgresConnectedClient();
       await wipeData(client!);
     } finally {
       await client!.end();
