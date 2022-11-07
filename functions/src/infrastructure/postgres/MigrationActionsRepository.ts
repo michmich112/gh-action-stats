@@ -95,4 +95,18 @@ export default class MigrationActionRepository implements IPostgresRepostiory {
     }
     return res.rows[0];
   }
+
+  public async getByCreatorAndName(
+    creator: string,
+    name: string
+  ): Promise<MigrationDbAction> {
+    const res = await this.client.query(
+      `SELECT * FROM "${this.tableName}" WHERE creator = $1 AND name = $2;`,
+      [creator, name]
+    );
+    if (res.rowCount < 1) {
+      throw new Error(`No actions with creator ${creator} and name ${name}.`);
+    }
+    return res.rows[0];
+  }
 }

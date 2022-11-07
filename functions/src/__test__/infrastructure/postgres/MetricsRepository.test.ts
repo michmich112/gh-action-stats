@@ -7,7 +7,7 @@ import MigrationMetricsRepository from "../../../infrastructure/postgres/Metrics
 import MigrationActionRunsRepository from "../../../infrastructure/postgres/MigrationActionRunsRepository";
 import ActionRun from "../../../domain/ActionRun.type";
 
-describe.only("BadgesRepository tests", () => {
+describe.only("MetricsRepository tests", () => {
   let client: null | Client = null;
   let repo: null | MigrationMetricsRepository = null;
 

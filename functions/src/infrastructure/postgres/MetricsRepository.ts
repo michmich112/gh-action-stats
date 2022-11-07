@@ -10,6 +10,12 @@ CREATE TABLE IF NOT EXISTS "MetricDefinitions" (
 );
 `;
 
+const metricDefinitions: string = `
+INSERT INTO "MetricDefinitions" (metric, query, parameters, return_column) VALUES (
+  'runs', 'SELECT count(*) as runs FROM "Runs" WHERE action_id = $1 AND attempt_id IS NULL;', '{"actionId"}', 'runs'
+) ON CONFLICT DO NOTHING;
+`;
+
 export default class MigrationMetricsRepository implements IPostgresRepostiory {
   tableName: string;
   client: Client;
@@ -27,6 +33,7 @@ export default class MigrationMetricsRepository implements IPostgresRepostiory {
 
   protected async mustExec(): Promise<void> {
     await this.client.query(tableSchema);
+    await this.client.query(metricDefinitions);
   }
 
   public async metricExists(metric: string): Promise<boolean> {

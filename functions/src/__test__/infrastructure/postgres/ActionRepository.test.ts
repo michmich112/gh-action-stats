@@ -110,4 +110,57 @@ describe.only("ActionsRepositoryTests", () => {
       }
     });
   });
+  describe("GetByCreatorAndName", () => {
+    test("it should return all data", async function () {
+      if (client === null || repo === null) {
+        console.warn("No client connection or repo, skipping test");
+        return;
+      }
+      const res = await repo.getByCreatorAndName("toto", "toto_action");
+      expect(res.name).toEqual("toto_action");
+      expect(res.creator).toEqual("toto");
+    });
+
+    test("its should return an error if there is no action with non existant creator and existant name", async function () {
+      if (client === null || repo === null) {
+        console.warn("No client connection or repo, skipping test");
+        return;
+      }
+      try {
+        await repo.getByCreatorAndName("not_there", "toto_action");
+        fail("Expected error to be thrown");
+      } catch (e) {
+        // pass;
+        return;
+      }
+    });
+
+    test("its should return an error if there is no action with existant creator and non existant name", async function () {
+      if (client === null || repo === null) {
+        console.warn("No client connection or repo, skipping test");
+        return;
+      }
+      try {
+        await repo.getByCreatorAndName("toto", "dontExists");
+        fail("Expected error to be thrown");
+      } catch (e) {
+        // pass;
+        return;
+      }
+    });
+
+    test("its should return an error if there is no action with non existant creator and non existant name", async function () {
+      if (client === null || repo === null) {
+        console.warn("No client connection or repo, skipping test");
+        return;
+      }
+      try {
+        await repo.getByCreatorAndName("not_there", "dontExists");
+        fail("Expected error to be thrown");
+      } catch (e) {
+        // pass;
+        return;
+      }
+    });
+  });
 });
