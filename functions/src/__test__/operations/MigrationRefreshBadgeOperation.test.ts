@@ -138,8 +138,11 @@ describe("RefreshBadgeOperation tests", () => {
   });
 
   afterAll(async function () {
-    await wipeData(client!);
-    await client!.end();
+    try {
+      await wipeData(client!);
+    } finally {
+      await client!.end();
+    }
   });
 
   test("it not perfom any update if the badge is already up to date", async function () {
@@ -148,7 +151,7 @@ describe("RefreshBadgeOperation tests", () => {
       throw new Error("No Client Connection");
     }
 
-    const badgeRepo = await MigrationBadgesRepository.New(client);
+    let badgeRepo = await MigrationBadgesRepository.New(client);
     const startBadge = await badgeRepo.getBadge({
       actionId: { creator: "michmich112", name: "action-name" },
       metric: "rpm" as BadgeMetrics,
@@ -162,6 +165,7 @@ describe("RefreshBadgeOperation tests", () => {
 
     client = (await PostgresConnectedClient()) as Client;
 
+    badgeRepo = await MigrationBadgesRepository.New(client);
     const endBadge = await badgeRepo.getBadge({
       actionId: { creator: "michmich112", name: "action-name" },
       metric: "rpm" as BadgeMetrics,
@@ -175,7 +179,7 @@ describe("RefreshBadgeOperation tests", () => {
       throw new Error("No Client Connection");
     }
 
-    const badgeRepo = await MigrationBadgesRepository.New(client);
+    let badgeRepo = await MigrationBadgesRepository.New(client);
     const startBadge = await badgeRepo.getBadge({
       actionId: { creator: "michmich112", name: "action-name" },
       metric: "runs" as BadgeMetrics,
@@ -189,6 +193,7 @@ describe("RefreshBadgeOperation tests", () => {
 
     client = (await PostgresConnectedClient()) as Client;
 
+    badgeRepo = await MigrationBadgesRepository.New(client);
     const endBadge = await badgeRepo.getBadge({
       actionId: { creator: "michmich112", name: "rpm" },
       metric: "runs" as BadgeMetrics,
@@ -217,7 +222,7 @@ describe("RefreshBadgeOperation tests", () => {
       throw new Error("No Client Connection");
     }
 
-    const badgeRepo = await MigrationBadgesRepository.New(client);
+    let badgeRepo = await MigrationBadgesRepository.New(client);
     let err = false;
     try {
       await badgeRepo.getBadge({
@@ -240,6 +245,7 @@ describe("RefreshBadgeOperation tests", () => {
 
     client = (await PostgresConnectedClient()) as Client;
 
+    badgeRepo = await MigrationBadgesRepository.New(client);
     const endBadge = await badgeRepo.getBadge({
       actionId: { creator: "michmich112", name: "rpm" },
       metric: "runs" as BadgeMetrics,
