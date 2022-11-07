@@ -14,14 +14,17 @@ import { RefreshBadgeOperation } from "../../operations/MigrationRefreshBadgeOpe
 const utils = require("../../utils/githubUtils");
 
 async function wipeData(client: Client) {
-  await client.query(`
-                       DELETE FROM "Runs";
-                       DELETE FROM "Actions";
-                       DELETE FROM "RunErrors";
-                       DELETE FROM "AttemptedRuns";
-                       DELETE FROM "PulseRepos";
-                       DELETE FROM "MetricDefinitions";
-                       `);
+  const allWiped = await Promise.allSettled([
+    client.query('DELETE FROM "Runs";'),
+    client.query('DELETE FROM "Actions";'),
+    client.query('DELETE FROM "RunErrors";'),
+    client.query('DELETE FROM "AttemptedRuns";'),
+    client.query('DELETE FROM "PulseRepos";'),
+    client.query('DELETE FROM "MetricDefinitions";'),
+  ]);
+
+  if (allWiped.filter((q) => q.status === "rejected").length > 0)
+    throw new Error("Unable to clear some relations");
 }
 
 async function setup(client: Client) {
@@ -109,7 +112,11 @@ describe("RefreshBadgeOperation tests", () => {
   beforeAll(async function () {
     dotenv.config();
     client = await PostgresConnectedClient();
-    await wipeData(client!);
+    try {
+      await wipeData(client!);
+    } catch (e) {
+      console.warn("Error Wiping Data", e);
+    }
 
     const supabaseClient = getClient();
     // empty all existing badges
