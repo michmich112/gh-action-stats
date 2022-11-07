@@ -141,6 +141,10 @@ describe("RefreshBadgeOperation tests", () => {
     }
   });
 
+  beforeEach(async function () {
+    client = await PostgresConnectedClient();
+  });
+
   afterAll(async function () {
     try {
       client = await PostgresConnectedClient();
