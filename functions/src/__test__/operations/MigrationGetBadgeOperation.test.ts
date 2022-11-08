@@ -140,6 +140,10 @@ describe("GetBadgeOperation test", () => {
     }
   });
 
+  beforeEach(async function () {
+    client = await PostgresConnectedClient();
+  });
+
   test("it should return the URL if the badge exists and is up to date", async function () {
     if (!client) {
       console.warn("No client connection, failing test.");
