@@ -105,6 +105,7 @@ async function setup(client: Client) {
     value: "12",
   };
   await badgeRepo.createBadge(badge2);
+  console.log("SETUP SUCCESS");
 }
 
 describe("RefreshBadgeOperation tests", () => {
