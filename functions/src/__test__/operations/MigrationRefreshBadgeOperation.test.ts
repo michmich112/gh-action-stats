@@ -95,8 +95,8 @@ async function setup(client: Client) {
     publicUri: "public/url/file.svg",
     value: "10",
   };
-
   await badgeRepo.createBadge(badge);
+
   const badge2: Badge = {
     actionId: action.id,
     metric: "runs" as BadgeMetrics,

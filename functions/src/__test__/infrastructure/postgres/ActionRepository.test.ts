@@ -92,6 +92,7 @@ describe.only("ActionsRepositoryTests", () => {
         return;
       }
       const res = await repo.getById(1);
+      expect(res.id).toEqual(1);
       expect(res.name).toEqual("toto_action");
       expect(res.creator).toEqual("toto");
     });
