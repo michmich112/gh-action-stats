@@ -1,6 +1,6 @@
 import { SupabaseClient } from "@supabase/supabase-js";
 import { Client } from "pg";
-import Badge from "../domain/Badge.type";
+import Badge, { BadgeData } from "../domain/Badge.type";
 import BadgeMetrics from "../domain/BadgeMetrics.type";
 import generateBadge from "../domain/methods/badges/generateBadge";
 import getBadgeLabel from "../domain/methods/badges/getBadgeLabel";
@@ -109,7 +109,7 @@ async function RefreshBadgeOperationImplementation(
   await badgeStorageRepo.put(path, badgeSvg);
   const uri = await badgeStorageRepo.getPublicUrl(path);
 
-  const newBadgeDef: Badge = {
+  const newBadgeDef: BadgeData = {
     actionId: action.id,
     metric: metric as BadgeMetrics,
     value: value.toString(),

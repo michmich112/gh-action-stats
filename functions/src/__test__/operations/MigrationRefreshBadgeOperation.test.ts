@@ -2,7 +2,7 @@ import axios from "axios";
 import * as dotenv from "dotenv";
 import { Client } from "pg";
 import ActionRun from "../../domain/ActionRun.type";
-import Badge from "../../domain/Badge.type";
+import { BadgeData } from "../../domain/Badge.type";
 import BadgeMetrics from "../../domain/BadgeMetrics.type";
 import MigrationBadgesRepository from "../../infrastructure/postgres/BadgesRepository";
 import MigrationActionRepository from "../../infrastructure/postgres/MigrationActionsRepository";
@@ -87,7 +87,7 @@ async function setup(client: Client) {
   );
 
   const badgeRepo = await MigrationBadgesRepository.New(client);
-  const badge: Badge = {
+  const badge: BadgeData = {
     actionId: action.id,
     metric: "rpm" as BadgeMetrics,
     lastGenerated: new Date(),
@@ -97,7 +97,7 @@ async function setup(client: Client) {
   };
   await badgeRepo.createBadge(badge);
 
-  const badge2: Badge = {
+  const badge2: BadgeData = {
     actionId: action.id,
     metric: "runs" as BadgeMetrics,
     lastGenerated: new Date(0),

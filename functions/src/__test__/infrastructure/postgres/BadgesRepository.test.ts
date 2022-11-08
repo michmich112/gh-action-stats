@@ -150,7 +150,7 @@ describe.only("BadgesRepository tests", () => {
       });
       const a = await repo.getBadge({ actionId: 1, metric: "repos" });
       expect(b.value).not.toEqual(a.value);
-      expect({ ...b, value: "" }).toEqual({ ...b, value: "" });
+      expect({ ...b, value: "" }).toEqual({ ...a, value: "" });
     });
 
     test("it should not error if no updatable parameters are passed", async function () {
@@ -193,6 +193,7 @@ describe.only("BadgesRepository tests", () => {
 
         const badge = await repo.getBadge({ actionId: 1, metric: "runs" });
         expect(badge).toEqual({
+          id: badge.id,
           actionId: 1,
           metric: "runs",
           lastGenerated: new Date(10),
@@ -232,6 +233,7 @@ describe.only("BadgesRepository tests", () => {
           metric: "runs",
         });
         expect(badge).toEqual({
+          id: badge.id,
           actionId: 1,
           metric: "runs",
           lastGenerated: new Date(10),
@@ -263,7 +265,10 @@ describe.only("BadgesRepository tests", () => {
       await repo.createBadge(badge);
 
       const resBadge = await repo.getBadge({ actionId: 2, metric: "repos" });
-      expect(resBadge).toEqual(badge);
+      expect(resBadge).toEqual({
+        ...badge,
+        id: resBadge.id,
+      });
     });
     test("it should error if the action doesn't exist", async function () {
       if (client === null || repo === null) {

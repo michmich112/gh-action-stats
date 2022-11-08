@@ -1,5 +1,5 @@
 import { Client } from "pg";
-import Badge from "../../domain/Badge.type";
+import Badge, { BadgeData } from "../../domain/Badge.type";
 import BadgeMetrics from "../../domain/BadgeMetrics.type";
 
 import { IPostgresRepostiory } from "../../domain/IRepository";
@@ -157,7 +157,7 @@ export default class MigrationBadgesRepository implements IPostgresRepostiory {
     return BadgeMapper(res.rows[0]);
   }
 
-  public async createBadge(badge: Badge): Promise<void> {
+  public async createBadge(badge: BadgeData): Promise<void> {
     const query = `
       INSERT INTO "${this.tableName}" (
         action_id, 
@@ -206,17 +206,6 @@ export default class MigrationBadgesRepository implements IPostgresRepostiory {
   }
 }
 
-// function dbBadgeMapper(b: object): Badge {
-//   return Object.keys(b).reduce(
-//     (acc, cur) => ({
-//       ...acc,
-//       [cur.replace(/_[a-z]/g, (l) => l.toUpperCase()).replace(/_/g, "")]:
-//         b[cur as keyof typeof b], // change to CamelCase
-//     }),
-//     {}
-//   ) as Badge;
-// }
-
 type DbBadge = {
   id: string;
   action_id: string;
@@ -227,7 +216,7 @@ type DbBadge = {
   value: string;
 };
 
-function BadgeMapper(b: DbBadge): Badge {
+function BadgeDataMapper(b: DbBadge): BadgeData {
   return {
     actionId: parseInt(b.action_id, 10),
     metric: b.metric as BadgeMetrics,
@@ -235,5 +224,12 @@ function BadgeMapper(b: DbBadge): Badge {
     locationPath: b.location_path,
     publicUri: b.public_uri,
     value: b.value,
+  };
+}
+
+function BadgeMapper(b: DbBadge): Badge {
+  return {
+    id: parseInt(b.id),
+    ...BadgeDataMapper(b),
   };
 }

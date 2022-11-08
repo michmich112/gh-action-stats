@@ -2,7 +2,7 @@ import { makeBadge } from "badge-maker";
 import * as dotenv from "dotenv";
 import { Client } from "pg";
 import ActionRun from "../../domain/ActionRun.type";
-import Badge from "../../domain/Badge.type";
+import { BadgeData } from "../../domain/Badge.type";
 import BadgeMetrics from "../../domain/BadgeMetrics.type";
 import MigrationBadgesRepository from "../../infrastructure/postgres/BadgesRepository";
 import MigrationActionRepository from "../../infrastructure/postgres/MigrationActionsRepository";
@@ -13,14 +13,19 @@ import { GetBadgeOperation } from "../../operations/MigrationGetBadgeOperation";
 const utils = require("../../utils/githubUtils");
 
 async function wipeData(client: Client) {
-  await client.query(`
-                       DELETE FROM "Runs";
-                       DELETE FROM "Actions";
-                       DELETE FROM "RunErrors";
-                       DELETE FROM "AttemptedRuns";
-                       DELETE FROM "PulseRepos";
-                       DELETE FROM "MetricDefinitions";
-                       `);
+  try {
+    await client.query('DELETE FROM "Runs";');
+  } catch {
+    console.warn("Error Deleting Runs");
+  }
+  await Promise.allSettled([
+    client.query('DELETE FROM "Actions";'),
+    client.query('DELETE FROM "RunErrors";'),
+    client.query('DELETE FROM "AttemptedRuns";'),
+    client.query('DELETE FROM "PulseRepos";'),
+    client.query('DELETE FROM "MetricDefinitions";'),
+    client.query('DELETE FROM "BadgeViews";'),
+  ]);
 }
 
 async function setup(client: Client) {
@@ -75,7 +80,7 @@ async function setup(client: Client) {
   );
 
   const badgeRepo = await MigrationBadgesRepository.New(client);
-  const badge: Badge = {
+  const badge: BadgeData = {
     actionId: action.id,
     metric: "test_upToDate" as BadgeMetrics,
     lastGenerated: new Date(),
@@ -85,7 +90,7 @@ async function setup(client: Client) {
   };
 
   await badgeRepo.createBadge(badge);
-  const badge2: Badge = {
+  const badge2: BadgeData = {
     actionId: action.id,
     metric: "test_notUpToDate" as BadgeMetrics,
     lastGenerated: new Date(0),
@@ -129,6 +134,8 @@ describe("GetBadgeOperation test", () => {
       console.warn("No client connection, failing test.");
       throw new Error("No Client Connection");
     }
+    const preBadgesLog = (await client.query('SELECT * FROM "BadgeViews"'))
+      .rowCount;
 
     const res = await GetBadgeOperation({
       creator: "michmich112",
@@ -137,10 +144,14 @@ describe("GetBadgeOperation test", () => {
     });
     client = (await PostgresConnectedClient()) as Client;
 
+    const postBadgesLog = (await client.query('SELECT * FROM "BadgeViews"'))
+      .rowCount;
     expect(res).toEqual({
       url: "public/url/file.svg",
       outdated: false,
     });
+
+    expect(postBadgesLog).toEqual(preBadgesLog + 1);
   });
 
   test("it should return the URL and outdated if the badge is not up do date", async function () {
@@ -148,6 +159,8 @@ describe("GetBadgeOperation test", () => {
       console.warn("No client connection, failing test.");
       throw new Error("No Client Connection");
     }
+    const preBadgesLog = (await client.query('SELECT * FROM "BadgeViews"'))
+      .rowCount;
 
     const res = await GetBadgeOperation({
       creator: "michmich112",
@@ -156,10 +169,15 @@ describe("GetBadgeOperation test", () => {
     });
     client = (await PostgresConnectedClient()) as Client;
 
+    const postBadgesLog = (await client.query('SELECT * FROM "BadgeViews"'))
+      .rowCount;
+
     expect(res).toEqual({
       url: "public/url/file_not_up_to_dat.svg",
       outdated: true,
     });
+
+    expect(postBadgesLog).toEqual(preBadgesLog + 1);
   });
 
   test("it should return the raw metric if no badge exists", async function () {
@@ -168,6 +186,9 @@ describe("GetBadgeOperation test", () => {
       throw new Error("No Client Connection");
     }
 
+    const preBadgesLog = (await client.query('SELECT * FROM "BadgeViews"'))
+      .rowCount;
+
     const res = await GetBadgeOperation({
       creator: "michmich112",
       name: "action-name",
@@ -175,10 +196,15 @@ describe("GetBadgeOperation test", () => {
     });
     client = (await PostgresConnectedClient()) as Client;
 
+    const postBadgesLog = (await client.query('SELECT * FROM "BadgeViews"'))
+      .rowCount;
+
     expect(res).toEqual({
       raw: makeBadge({ label: "Runs", color: "green", message: "2" }),
       outdated: true,
     });
+
+    expect(postBadgesLog).toEqual(preBadgesLog + 1);
   });
 
   test("it should return an error if the metric is not defined", async function () {
@@ -187,6 +213,9 @@ describe("GetBadgeOperation test", () => {
       throw new Error("No Client Connection");
     }
 
+    const preBadgesLog = (await client.query('SELECT * FROM "BadgeViews"'))
+      .rowCount;
+
     const res = await GetBadgeOperation({
       creator: "michmich112",
       name: "action-name",
@@ -194,10 +223,13 @@ describe("GetBadgeOperation test", () => {
     });
 
     client = (await PostgresConnectedClient()) as Client;
+    const postBadgesLog = (await client.query('SELECT * FROM "BadgeViews"'))
+      .rowCount;
 
     expect(res).toHaveProperty("err");
     expect(res).not.toHaveProperty("raw");
     expect(res).not.toHaveProperty("url");
     expect(res).not.toHaveProperty("outdated");
+    expect(postBadgesLog).toEqual(preBadgesLog);
   });
 });
