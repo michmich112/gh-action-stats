@@ -17,6 +17,7 @@ async function wipeData(client: Client) {
     await client.query('DELETE FROM "Runs";');
   } catch (e) {
     console.warn("Error Deleting Runs", e);
+    client = (await PostgresConnectedClient()) as Client;
   }
   await Promise.allSettled([
     client.query('DELETE FROM "Actions";'),
