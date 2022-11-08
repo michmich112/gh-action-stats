@@ -118,5 +118,9 @@ async function RefreshBadgeOperationImplementation(
     publicUri: uri,
   };
 
-  await badgeRepo.updateBadge(newBadgeDef);
+  if (badge == null) {
+    await badgeRepo.createBadge(newBadgeDef);
+  } else {
+    await badgeRepo.updateBadge(newBadgeDef);
+  }
 }
