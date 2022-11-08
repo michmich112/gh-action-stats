@@ -207,7 +207,7 @@ describe("RefreshBadgeOperation tests", () => {
 
     badgeRepo = await MigrationBadgesRepository.New(client);
     const endBadge = await badgeRepo.getBadge({
-      actionId: { creator: "michmich112", name: "rpm" },
+      actionId: { creator: "michmich112", name: "action-name" },
       metric: "runs" as BadgeMetrics,
     });
 
@@ -259,7 +259,7 @@ describe("RefreshBadgeOperation tests", () => {
 
     badgeRepo = await MigrationBadgesRepository.New(client);
     const endBadge = await badgeRepo.getBadge({
-      actionId: { creator: "michmich112", name: "rpm" },
+      actionId: { creator: "michmich112", name: "new-action" },
       metric: "runs" as BadgeMetrics,
     });
 

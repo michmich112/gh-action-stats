@@ -147,9 +147,9 @@ export default class MigrationBadgesRepository implements IPostgresRepostiory {
     }
 
     if (res.rowCount < 1) {
-      const message = `[BadgesRepository][getBadge] Error - No record found for badge for action_id: ${actionId} and metric: ${JSON.stringify(
-        metric
-      )}`;
+      const message = `[BadgesRepository][getBadge] Error - No record found for badge for action_id: ${JSON.stringify(
+        actionId
+      )} and metric: ${JSON.stringify(metric)}`;
       console.error(message);
       throw new Error(message);
     }
