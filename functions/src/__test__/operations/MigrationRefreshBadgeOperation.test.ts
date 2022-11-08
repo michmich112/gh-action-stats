@@ -15,6 +15,7 @@ const utils = require("../../utils/githubUtils");
 
 async function wipeData(client: Client) {
   const allWiped = await Promise.allSettled([
+    client.query('DELETE FROM "Badges";'),
     client.query('DELETE FROM "Runs";'),
     client.query('DELETE FROM "Actions";'),
     client.query('DELETE FROM "RunErrors";'),
@@ -105,7 +106,8 @@ async function setup(client: Client) {
     value: "12",
   };
   await badgeRepo.createBadge(badge2);
-  console.log("SETUP SUCCESS");
+  const bbb = await client.query('SELECT * FROM "Badges";');
+  console.log("SETUP SUCCESS:", JSON.stringify(bbb));
 }
 
 describe("RefreshBadgeOperation tests", () => {
