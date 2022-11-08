@@ -15,8 +15,8 @@ const utils = require("../../utils/githubUtils");
 async function wipeData(client: Client) {
   try {
     await client.query('DELETE FROM "Runs";');
-  } catch {
-    console.warn("Error Deleting Runs");
+  } catch (e) {
+    console.warn("Error Deleting Runs", e);
   }
   await Promise.allSettled([
     client.query('DELETE FROM "Actions";'),
@@ -107,26 +107,37 @@ describe("GetBadgeOperation test", () => {
     dotenv.config();
     client = await PostgresConnectedClient();
 
-    await wipeData(client!);
+    try {
+      await wipeData(client!);
 
-    jest
-      .spyOn(utils, "isGithubActionsAddress")
-      .mockImplementation(async (ip) => {
-        if (ip === "9.9.9.9") {
-          // mock a communication error
-          throw new Error("Communication Error");
-        }
+      jest
+        .spyOn(utils, "isGithubActionsAddress")
+        .mockImplementation(async (ip) => {
+          if (ip === "9.9.9.9") {
+            // mock a communication error
+            throw new Error("Communication Error");
+          }
 
-        const authorizedIps = ["1.2.3.4", "5.6.7.8", "1:2:3:4:5:6:7:8"];
-        return authorizedIps.includes(ip as string);
-      });
+          const authorizedIps = ["1.2.3.4", "5.6.7.8", "1:2:3:4:5:6:7:8"];
+          return authorizedIps.includes(ip as string);
+        });
 
-    await setup(client!);
+      await setup(client!);
+    } catch (e) {
+      console.error(
+        `[GetBadgeOperationTests][beforeAll] Error - Error setting up tests`
+      );
+    }
   });
 
   afterAll(async function () {
-    await wipeData(client!);
-    await client!.end();
+    try {
+      await wipeData(client!);
+    } catch (e) {
+      console.error(`[GetBadgeOperationTests] Error - Error wiping data.`, e);
+    } finally {
+      await client!.end();
+    }
   });
 
   test("it should return the URL if the badge exists and is up to date", async function () {
