@@ -44,13 +44,16 @@ LEFT JOIN (
 `;
 
 async function wipeData(client: Client) {
-  await client.query(`
-                       DELETE FROM "Runs";
-                       DELETE FROM "Actions";
-                       DELETE FROM "RunErrors";
-                       DELETE FROM "AttemptedRuns";
-                       DELETE FROM "PulseRepos";
-                       `);
+  const allWiped = await Promise.allSettled([
+    client.query('DELETE FROM "Runs";'),
+    client.query('DELETE FROM "Actions";'),
+    client.query('DELETE FROM "RunErrors";'),
+    client.query('DELETE FROM "AttemptedRuns";'),
+    client.query('DELETE FROM "PulseRepos";'),
+  ]);
+
+  if (allWiped.filter((q) => q.status === "rejected").length > 0)
+    throw new Error("Unable to clear some relations");
 }
 
 const MockComsErrorMessage = "Communication Error";

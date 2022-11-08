@@ -68,12 +68,17 @@ jobs:
           npm install
 
       - name: Install Supabase Environment
-        id: supabase
         run: |
           cd ~
           git clone --depth 1 https://github.com/supabase/supabase
           cd supabase/docker
           cp .env.example .env
+          docker-compose pull
+
+      - name: Start Supabase Environment
+        id: supabase
+        run: |
+          cd ~/supabase/docker
 
           docker compose up -d --wait #start services and wait for containers to be healthy
 

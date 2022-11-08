@@ -150,7 +150,7 @@ describe.only("BadgesRepository tests", () => {
       });
       const a = await repo.getBadge({ actionId: 1, metric: "repos" });
       expect(b.value).not.toEqual(a.value);
-      expect({ ...b, value: "" }).toEqual({ ...b, value: "" });
+      expect({ ...b, value: "" }).toEqual({ ...a, value: "" });
     });
 
     test("it should not error if no updatable parameters are passed", async function () {
@@ -170,34 +170,77 @@ describe.only("BadgesRepository tests", () => {
   });
 
   describe("getBadge", () => {
-    test("it should return an error if there is no badge for the action and metric", async function () {
-      if (client === null || repo === null) {
-        console.warn("No client connection or repo, skipping test");
-        return;
-      }
+    describe("With Number ActionId", () => {
+      test("it should return an error if there is no badge for the action and metric", async function () {
+        if (client === null || repo === null) {
+          console.warn("No client connection or repo, skipping test");
+          return;
+        }
 
-      try {
-        await repo.getBadge({ actionId: 2, metric: "runs" });
-      } catch (e) {
-        return;
-      }
-      fail("Error should have been thrown");
+        try {
+          await repo.getBadge({ actionId: 2, metric: "runs" });
+        } catch (e) {
+          return;
+        }
+        fail("Error should have been thrown");
+      });
+
+      test("it should return the Badge information if it exists", async function () {
+        if (client === null || repo === null) {
+          console.warn("No client connection or repo, skipping test");
+          return;
+        }
+
+        const badge = await repo.getBadge({ actionId: 1, metric: "runs" });
+        expect(badge).toEqual({
+          id: badge.id,
+          actionId: 1,
+          metric: "runs",
+          lastGenerated: new Date(10),
+          locationPath: "toto/toto_action/runs",
+          publicUri: "uri://toto/toto_action/runs",
+          value: "100",
+        });
+      });
     });
+    describe("With Repo & Creator ActionId", () => {
+      test("it should return an error if there is no badge for the action and metric", async function () {
+        if (client === null || repo === null) {
+          console.warn("No client connection or repo, skipping test");
+          return;
+        }
 
-    test("it should return the Badge information if it exists", async function () {
-      if (client === null || repo === null) {
-        console.warn("No client connection or repo, skipping test");
-        return;
-      }
+        try {
+          const a = await repo.getBadge({
+            actionId: { name: "tata_action", creator: "tata" },
+            metric: "runs",
+          });
+          console.log("lookHere", a);
+        } catch (e) {
+          return;
+        }
+        fail("Error should have been thrown");
+      });
 
-      const badge = await repo.getBadge({ actionId: 1, metric: "runs" });
-      expect(badge).toEqual({
-        actionId: 1,
-        metric: "runs",
-        lastGenerated: new Date(10),
-        locationPath: "toto/toto_action/runs",
-        publicUri: "uri://toto/toto_action/runs",
-        value: "100",
+      test("it should return the Badge information if it exists", async function () {
+        if (client === null || repo === null) {
+          console.warn("No client connection or repo, skipping test");
+          return;
+        }
+
+        const badge = await repo.getBadge({
+          actionId: { name: "toto_action", creator: "toto" },
+          metric: "runs",
+        });
+        expect(badge).toEqual({
+          id: badge.id,
+          actionId: 1,
+          metric: "runs",
+          lastGenerated: new Date(10),
+          locationPath: "toto/toto_action/runs",
+          publicUri: "uri://toto/toto_action/runs",
+          value: "100",
+        });
       });
     });
   });
@@ -222,7 +265,10 @@ describe.only("BadgesRepository tests", () => {
       await repo.createBadge(badge);
 
       const resBadge = await repo.getBadge({ actionId: 2, metric: "repos" });
-      expect(resBadge).toEqual(badge);
+      expect(resBadge).toEqual({
+        ...badge,
+        id: resBadge.id,
+      });
     });
     test("it should error if the action doesn't exist", async function () {
       if (client === null || repo === null) {
