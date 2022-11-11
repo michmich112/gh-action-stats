@@ -37,6 +37,8 @@ constructs:
       fifo: true
       environment:
         PG_URI: ${env:PG_URI}
+        SUPABASE_URL: ${env:SUPABASE_URL}
+        SUPABASE_KEY: ${env:SUPABASE_KEY}
 
 functions:
   collect-action-run-receiver:
@@ -61,7 +63,7 @@ functions:
           method: get
           path: /badge/{creator}/{name}/{metric}
     environment:
-      QUEUE_URL_URL: ${construct:refresh-badge-worker.queueUrl}
+      QUEUE_URL: ${construct:refresh-badge-worker.queueUrl}
     memorySize: ${self:custom.memsize.${self:provider.stage}, 1024}
     timeout: ${self:custom.timeout.${self:provider.stage}, 10}
     runtime: nodejs16.x
