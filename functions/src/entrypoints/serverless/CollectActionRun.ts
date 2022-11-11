@@ -1,8 +1,16 @@
-import { SQS } from "aws-sdk";
+import { SQS, APIGateway } from "aws-sdk";
 import { CollectActionRun } from "../../operations/CollectActionRun";
 
+type LambdaResponse = {
+  cookies?: string[];
+  isBase64Encoded?: boolean;
+  statusCode?: number;
+  headers?: { [headerName: string]: string };
+  body?: any;
+};
+
 // Todo: strongly typed
-export async function receiver(event: any) {
+export async function receiver(event: any): Promise<LambdaResponse> {
   const ip = event["requestContext"]["http"]["sourceIp"];
   const body = {
     ...JSON.parse(event.body),
@@ -12,7 +20,9 @@ export async function receiver(event: any) {
 
   if (!process.env.QUEUE_URL) {
     console.error("No QUEUE_URL found. Body:", body);
-    return;
+    return {
+      statusCode: 200,
+    };
   }
 
   const sqs = new SQS();

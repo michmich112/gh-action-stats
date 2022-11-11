@@ -27,6 +27,16 @@ constructs:
       fifo: true
       environment:
         PG_URI: ${env:PG_URI}
+  refresh-badge-worker:
+    type: queue
+    worker:
+      handler: lib/serverless-index.RefreshBadge.worker
+      memorySize: ${self:custom.memsize.${self:provider.stage}, 1024}
+      timeout: ${self:custom.timeout.${self:provider.stage}, 10}
+      runtime: nodejs16.x
+      fifo: true
+      environment:
+        PG_URI: ${env:PG_URI}
 
 functions:
   collect-action-run-receiver:
@@ -40,6 +50,18 @@ functions:
           async: true
     environment:
       QUEUE_URL: ${construct:collect-action-run-worker.queueUrl}
+    memorySize: ${self:custom.memsize.${self:provider.stage}, 1024}
+    timeout: ${self:custom.timeout.${self:provider.stage}, 10}
+    runtime: nodejs16.x
+  get-badges-receiver:
+    handler: lib/serverless-index.GetBadge.receiver
+    description: Receiver to get a requested badge from an HTTP endpoint. Returns a badge or a redirect to the public URL of the badge.
+    events:
+      - httpApi:
+          method: get
+          path: /badge/{creator}/{name}/{metric}
+    environment:
+      QUEUE_URL_URL: ${construct:refresh-badge-worker.queueUrl}
     memorySize: ${self:custom.memsize.${self:provider.stage}, 1024}
     timeout: ${self:custom.timeout.${self:provider.stage}, 10}
     runtime: nodejs16.x

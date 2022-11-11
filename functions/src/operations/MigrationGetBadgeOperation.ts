@@ -11,14 +11,14 @@ import MigrationMetricsRepository from "../infrastructure/postgres/MetricsReposi
 import MigrationActionRepository from "../infrastructure/postgres/MigrationActionsRepository";
 import { PostgresConnectedClient } from "../infrastructure/postgres/PostgresClient";
 
-type GetBadgeOperationParams = {
+export type GetBadgeOperationParams = {
   creator: string;
   name: string;
   metric: BadgeMetrics;
   params?: { [key: string]: string };
 };
 
-type GetBadgeOperationReturn =
+export type GetBadgeOperationReturn =
   | { err: Error }
   | { url: string; outdated: boolean; err?: Error }
   | {
