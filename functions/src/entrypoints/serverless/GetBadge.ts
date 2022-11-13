@@ -73,27 +73,29 @@ export async function receiver(event: any): Promise<LambdaResponse> {
     }
   }
 
-  if(badge.raw) {
+  if (badge.raw) {
     return {
       statusCode: 200,
-      body: badge.raw
+      body: badge.raw,
       headers: {
-        "content-type": "image/svg+xml"
-      }
-    }
-  }else if(badge.url) {
+        "content-type": "image/svg+xml",
+      },
+    };
+  } else if (badge.url) {
     return {
-      statusCode: 302
+      statusCode: 302,
       headers: {
-        "location": badge.url
-      }
-    }
-  }else{
+        location: badge.url,
+      },
+    };
+  } else {
     console.error(
-      `Return from GetBadeOperation cannot be handled.\nParams: ${JSON.stringify(operationParams)}\nReturn:${JSON.stringify(badge)}`
+      `Return from GetBadeOperation cannot be handled.\nParams: ${JSON.stringify(
+        operationParams
+      )}\nReturn:${JSON.stringify(badge)}`
     );
     return {
-      statusCode:404
-    }
+      statusCode: 404,
+    };
   }
 }
