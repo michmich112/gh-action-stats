@@ -1,8 +1,11 @@
-import { SQS } from "aws-sqk";
+import { SQS } from "aws-sdk";
 import {
   GetBadgeOperation,
+  GetBadgeOperationErrorReturn,
   GetBadgeOperationParams,
+  GetBadgeOperationRawReturn,
   GetBadgeOperationReturn,
+  GetBadgeOperationUrlReturn,
 } from "../../operations/MigrationGetBadgeOperation";
 
 type LambdaResponse = {
@@ -39,18 +42,20 @@ export async function receiver(event: any): Promise<LambdaResponse> {
     return { statusCode: 500 };
   }
   // Handle error
-  if (badge.err) {
+  if ((badge as GetBadgeOperationErrorReturn).err) {
     console.error(
       `Error encountered when getting the badge with operation parameters: ${JSON.stringify(
         operationParams
       )}`,
-      badge.err
+      (badge as GetBadgeOperationErrorReturn).err
     );
     return { statusCode: 500 };
   }
 
   // Send update badge request
-  if (badge.outdated) {
+  if (
+    (badge as GetBadgeOperationRawReturn | GetBadgeOperationUrlReturn).outdated
+  ) {
     if (!process.env.QUEUE_URL) {
       console.error(
         "No QUEUE_URL present for refresh badge requests. Unable to refresh badge."
@@ -73,19 +78,19 @@ export async function receiver(event: any): Promise<LambdaResponse> {
     }
   }
 
-  if (badge.raw) {
+  if ((badge as GetBadgeOperationRawReturn).raw) {
     return {
       statusCode: 200,
-      body: badge.raw,
+      body: (badge as GetBadgeOperationRawReturn).raw,
       headers: {
         "content-type": "image/svg+xml",
       },
     };
-  } else if (badge.url) {
+  } else if ((badge as GetBadgeOperationUrlReturn).url) {
     return {
       statusCode: 302,
       headers: {
-        location: badge.url,
+        location: (badge as GetBadgeOperationUrlReturn).url,
       },
     };
   } else {

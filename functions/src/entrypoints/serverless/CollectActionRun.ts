@@ -1,4 +1,4 @@
-import { SQS, APIGateway } from "aws-sdk";
+import { SQS } from "aws-sdk";
 import { CollectActionRun } from "../../operations/CollectActionRun";
 
 type LambdaResponse = {
@@ -10,7 +10,7 @@ type LambdaResponse = {
 };
 
 // Todo: strongly typed
-export async function receiver(event: any): Promise<LambdaResponse> {
+export async function receiver(event: any): Promise<LambdaResponse | void> {
   const ip = event["requestContext"]["http"]["sourceIp"];
   const body = {
     ...JSON.parse(event.body),

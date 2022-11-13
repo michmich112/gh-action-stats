@@ -18,14 +18,13 @@ export type GetBadgeOperationParams = {
   params?: { [key: string]: string };
 };
 
+export type GetBadgeOperationErrorReturn = { err: Error };
+export type GetBadgeOperationUrlReturn = { url: string; outdated: boolean };
+export type GetBadgeOperationRawReturn = { raw: string; outdated: boolean };
 export type GetBadgeOperationReturn =
-  | { err: Error }
-  | { url: string; outdated: boolean; err?: Error }
-  | {
-      raw: string;
-      outdated?: boolean;
-      err?: Error;
-    };
+  | GetBadgeOperationRawReturn
+  | GetBadgeOperationUrlReturn
+  | GetBadgeOperationErrorReturn;
 
 const opName = "GetBadgeOperation";
 
@@ -48,7 +47,7 @@ export async function GetBadgeOperation(
     await client.query("BEGIN;");
 
     res = await GetBadgeOperationImplementation(getBadgeParams, client);
-    if (res.err) {
+    if ((res as GetBadgeOperationErrorReturn).err) {
       // rollback transation if there was an error
       await client.query("ROLLBACK;");
     } else {
