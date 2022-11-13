@@ -64,6 +64,7 @@ functions:
           path: /badge/{creator}/{name}/{metric}
     environment:
       QUEUE_URL: ${construct:refresh-badge-worker.queueUrl}
+      PG_URI: ${env:PG_URI}
     memorySize: ${self:custom.memsize.${self:provider.stage}, 1024}
     timeout: ${self:custom.timeout.${self:provider.stage}, 10}
     runtime: nodejs16.x
