@@ -2,7 +2,7 @@ name: Deploy Dev AWS Functions
 on:
   push:
     paths:
-      - functions/**
+      - functions/src/**
     branches:
       - staging
       - MigrationMain
