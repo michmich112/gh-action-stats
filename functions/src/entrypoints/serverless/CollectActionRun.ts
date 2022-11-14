@@ -13,8 +13,8 @@ type LambdaResponse = {
 export async function receiver(event: any): Promise<LambdaResponse | void> {
   const ip = event["requestContext"]["http"]["sourceIp"];
   const body = {
+    ip, // TODO fix this as per https://github.com/michmich112/gh-action-stats/issues/51
     ...JSON.parse(event.body),
-    ip,
     timestamp: new Date().toISOString(),
   };
 
