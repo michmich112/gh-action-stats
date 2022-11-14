@@ -221,6 +221,24 @@ describe.only("BadgeViewsRepository tests", () => {
         term: null,
         content: null,
       });
+
+      // Validate that only one UTM is created when all utm params are null
+      const bv_two: BadgeView = {
+        badgeId: 1,
+        timestamp: new Date(),
+        utmParameters: {},
+      };
+      await repo.saveBadgeView(bv_two);
+      const current_two = await client.query(
+        'SELECT * FROM "BadgeViews" ORDER BY id DESC;'
+      );
+      const current_utm_two = await client.query(
+        'SELECT * FROM "UtmParameters" ORDER BY id DESC;'
+      );
+      expect(current_utm_two.rowCount).toEqual(current_utm.rowCount);
+      expect(current.rows[0].utm_param_id).toEqual(
+        current_two.rows[0].utm_param_id
+      );
     });
 
     test("it should return an error if the badge with passed id does not exist", async function () {
