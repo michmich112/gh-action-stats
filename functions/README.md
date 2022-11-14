@@ -6,10 +6,11 @@ Backend for the GitHub action stats platform
 
 ### Environment Variables
 
-| Variable | Required | Description |
-| `PG_URI` | `True` | Postgres Connection Uri: `postgresql://<username>:<password>@<host>:<port>/<database>` |
-| `SUPABASE_URL` | `True` | Url to the Supabase instance (c.f. Supabase docs) |
-| `SUPABASE_KEY` | `True` | Anon Private Key for the Supabase instance |
+| Variable       | Required | Description                                                                            |
+| -------------- | -------- | -------------------------------------------------------------------------------------- |
+| `PG_URI`       | `True`   | Postgres Connection Uri: `postgresql://<username>:<password>@<host>:<port>/<database>` |
+| `SUPABASE_URL` | `True`   | Url to the Supabase instance (c.f. Supabase docs)                                      |
+| `SUPABASE_KEY` | `True`   | Anon Private Key for the Supabase instance                                             |
 
 ### Postgres Configurations
 

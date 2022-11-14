@@ -20,7 +20,10 @@ CREATE TABLE IF NOT EXISTS "BadgeViews" (
   "utm_param_id" bigint NOT NULL REFERENCES "UtmParameters" ("id") ON DELETE SET NULL,
   "timestamp" timestamptz
 );
+`;
 
+const tableConstraints: string = `
+CREATE UNIQUE INDEX IF NOT EXISTS utm_unique_null ON "UtmParameters" ((source IS null), (medium IS NULL), (campaign IS NULL), (term IS NULL), (content IS NULL)) WHERE source IS NULL AND medium is NULL AND campaign is NULL AND term is NULL AND content is NULL;
 `;
 
 export default class MigrationBadgeViewsRepository
@@ -52,29 +55,59 @@ export default class MigrationBadgeViewsRepository
    */
   protected async mustExec(): Promise<void> {
     await this.client.query(tableSchema);
+    await this.client.query(tableConstraints);
   }
 
   /**
    * Gets an Id for persisted UTM params. if they do not exist in the DB they are created and persited.
    */
   private async getUtmId(utm: UtmParameters): Promise<number> {
+    function* queryParamIndex() {
+      let index = 1;
+      while (true) {
+        yield index++;
+      }
+    }
+    const paramIndex = queryParamIndex();
+    const nullish = [null, undefined];
     const query = `
       SELECT id FROM "${this.utmTableName}" WHERE 1=1
-        AND source = $1
-        AND medium = $2
-        AND campaign = $3
-        AND term = $4
-        AND content = $5;
+        AND source ${
+          nullish.includes(utm.source as null | undefined)
+            ? "is NULL"
+            : "= $" + paramIndex.next().value!.toString()
+        } 
+        AND medium ${
+          nullish.includes(utm.medium as null | undefined)
+            ? "is NULL"
+            : "= $" + paramIndex.next().value!.toString()
+        }
+        AND campaign ${
+          nullish.includes(utm.campaign as null | undefined)
+            ? "is NULL"
+            : "= $" + paramIndex.next().value!.toString()
+        }
+        AND term ${
+          nullish.includes(utm.term as null | undefined)
+            ? "is NULL"
+            : "= $" + paramIndex.next().value!.toString()
+        }
+        AND content ${
+          nullish.includes(utm.content as null | undefined)
+            ? "is NULL"
+            : "= $" + paramIndex.next().value!.toString()
+        };
     `;
+    console.log("Query", query);
+    console.log("utm", utm);
     let res;
     try {
-      res = await this.client.query(query, [
-        utm.source,
-        utm.medium,
-        utm.campaign,
-        utm.term,
-        utm.content,
-      ]);
+      res = await this.client.query(
+        query,
+        [utm.source, utm.medium, utm.campaign, utm.term, utm.content].filter(
+          (f) => !nullish.includes(f as any)
+        )
+      );
     } catch (e) {
       console.error(
         "[BadgeViewsRepository][getUtmId] Error - Error querying for utm with params:",
