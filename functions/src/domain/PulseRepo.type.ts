@@ -5,4 +5,7 @@ export type PulseRepo = {
   hashed_name: string;
   full_name: string;
   full_hashed_name: string;
+  github_id?: number | null;
+  is_public: boolean;
+  last_polled?: Date | null;
 };
