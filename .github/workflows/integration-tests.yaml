@@ -92,11 +92,20 @@ jobs:
           echo "url=$(getPathEnvVar .env API_EXTERNAL_URL)" >> $GITHUB_OUTPUT
           echo "key=$(getPathEnvVar .env SERVICE_ROLE_KEY)" >> $GITHUB_OUTPUT
 
+          pg_user="$(getPathEnvVar .env POSTGRES_USER)"
+          pg_host="$(getPathEnvVar .env POSTGRES_HOST)"
+          pg_port="$(getPathEnvVar .env POSTGRES_PORT)"
+          pg_db="$(getPathEnvVar .env POSTGRES_DB)"
+          pg_pw="$(getPathEnvVar .env POSTGRES_PASSWORD)"
+
+          echo "pg_uri=postrgesql://$pg_user:$pg_pw@$pg_host:$pg_port/$pg_db" >> $GITHUB_OUTPUT
+
       - name: Test Functions
         run: |
           npm run test
         env:
-          PG_URI: postgresql://postgres:postgres@localhost:54321/postgres
+          # PG_URI: postgresql://postgres:postgres@localhost:54321/postgres
+          PG_URI: ${{ steps.supabase.outputs.pg_uri }}
           SUPABASE_URL: ${{ steps.supabase.outputs.url }}
           SUPABASE_KEY: ${{ steps.supabase.outputs.key }}
 
