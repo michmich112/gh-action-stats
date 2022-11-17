@@ -36,25 +36,7 @@ jobs:
     defaults:
       run:
         working-directory: ./functions
-    # Service containers to run with `runner-job`
-    # services:
-    #   # Label used to access the service container
-    #   postgres:
-    #     # Docker Hub image
-    #     image: postgres
-    #     # Provide the password for postgres
-    #     env:
-    #       POSTGRES_PASSWORD: postgres
-    #     # Set health checks to wait until postgres has started
-    #     options: >-
-    #       --health-cmd pg_isready
-    #       --health-interval 10s
-    #       --health-timeout 5s
-    #       --health-retries 5
-    #     ports:
-    #       # Maps tcp port 5432 on service container to the host
-    #       - 54321:5432
-    #
+
     steps:
       # Downloads a copy of the code in your repository before running CI tests
       - name: Checkout
@@ -105,7 +87,6 @@ jobs:
         run: |
           npm run test
         env:
-          # PG_URI: postgresql://postgres:postgres@localhost:54321/postgres
           PG_URI: ${{ steps.supabase.outputs.pg_uri }}
           SUPABASE_URL: ${{ steps.supabase.outputs.url }}
           SUPABASE_KEY: ${{ steps.supabase.outputs.key }}
