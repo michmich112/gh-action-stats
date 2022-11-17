@@ -9,6 +9,7 @@ export async function worker(event: any) {
         `RefreshBadgeOperation Error.\nParameters: ${message.body}\nError:`,
         e
       );
+      throw e;
     }
   }
 }
