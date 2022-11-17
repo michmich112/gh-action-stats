@@ -101,37 +101,36 @@ async function GetBadgeOperationImplementation(
         metric,
       });
 
-      const ret = { url: badge.publicUri, outdated: !isAccurate };
-      console.log(`[${opName}] END - Success: `, ret);
-      return ret;
-    } else {
-      const metricRepo = await MigrationMetricsRepository.New(client);
-
-      // check if metric exists
-      const metricExists = await metricRepo.metricExists(metric);
-      if (!metricExists) {
-        const ret = { err: new Error(`Metric ${metric} is not defined`) };
-        console.log(`[${opName}] END - Metric ${metric} is not defined.`);
+      if (badge.publicUri) {
+        const ret = { url: badge.publicUri, outdated: !isAccurate };
+        console.log(`[${opName}] END - Success: `, ret);
         return ret;
+      } else {
+        console.error(
+          `[${opName}] - ERROR - Badge defined but with no Public URI. Badge: ${JSON.stringify(
+            badge
+          )}`
+        );
+        console.debug(`[${opName}] - DEBUG recomputing badge`);
+        console.time(`${opName}-computeMetricBadge`);
+        const { badge: rawBadge } = await computeMetricBadge(
+          { creator, name, metric, params },
+          client
+        );
+        console.timeEnd(`${opName}-computeMetricBadge`);
+        return { raw: rawBadge, outdated: true };
       }
-
-      const actionRepo = await MigrationActionRepository.New(client);
-      const action = await actionRepo.getByCreatorAndName(creator, name);
-      const value = await metricRepo.computeMetric(metric, {
-        ...params,
-        actionId: action.id,
-        actionCreator: action.creator,
-        actionName: action.name,
-        actionLastUpdate: action.last_update,
-      });
-
-      const rawBadge = generateBadge({
-        label: getBadgeLabel(metric),
-        value: value.toString(),
-      });
+    } else {
+      console.time(`${opName}-computeMetricBadge`);
+      const {
+        value,
+        badge: rawBadge,
+        actionId,
+      } = await computeMetricBadge({ creator, name, metric, params }, client);
+      console.timeEnd(`${opName}-computeMetricBadge`);
 
       await badgeRepo.createBadge({
-        actionId: action.id,
+        actionId: actionId,
         metric: metric as BadgeMetrics,
         lastGenerated: new Date(0),
         locationPath: getBadgeStoragePath({ creator, name, metric }),
@@ -140,7 +139,7 @@ async function GetBadgeOperationImplementation(
       });
 
       const newBadge = await badgeRepo.getBadge({
-        actionId: action.id,
+        actionId: actionId,
         metric,
       });
 
@@ -185,4 +184,39 @@ async function logBadgeView(bv: BadgeView, client: Client) {
     );
     await client.query(`ROLLBACK TO SAVEPOINT ${savepointId};`);
   }
+}
+
+async function computeMetricBadge(
+  { creator, name, metric, params = {} }: GetBadgeOperationParams,
+  client: Client
+): Promise<{ value: string; badge: string; actionId: number }> {
+  const metricRepo = await MigrationMetricsRepository.New(client);
+
+  // check if metric exists
+  const metricExists = await metricRepo.metricExists(metric);
+  if (!metricExists) {
+    console.log(`[${opName}] END - Metric ${metric} is not defined.`);
+    throw new Error(`Metric ${metric} is not defined`);
+  }
+
+  const actionRepo = await MigrationActionRepository.New(client);
+  const action = await actionRepo.getByCreatorAndName(creator, name);
+  const value = await metricRepo.computeMetric(metric, {
+    ...params,
+    actionId: action.id,
+    actionCreator: action.creator,
+    actionName: action.name,
+    actionLastUpdate: action.last_update,
+  });
+
+  const rawBadge = generateBadge({
+    label: getBadgeLabel(metric),
+    value: value.toString(),
+  });
+
+  return {
+    value: value.toString(),
+    badge: rawBadge,
+    actionId: action.id,
+  };
 }
