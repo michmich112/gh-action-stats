@@ -9,8 +9,9 @@ export type User = {
 export type MigrationUser = {
   id: string;
   githubUsername: string;
-  github_id: string;
-  avatar_url?: string;
+  githubId: number;
+  avatarUrl?: string;
+  lastRefresh: Date;
 };
 
 export default User;
