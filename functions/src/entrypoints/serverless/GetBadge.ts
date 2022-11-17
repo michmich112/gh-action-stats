@@ -39,7 +39,8 @@ export async function receiver(event: any): Promise<LambdaResponse> {
       )}`,
       e
     );
-    return { statusCode: 500 };
+    throw new Error("1180");
+    // return { statusCode: 500 };
   }
   // Handle error
   if ((badge as GetBadgeOperationErrorReturn).err) {
@@ -49,7 +50,8 @@ export async function receiver(event: any): Promise<LambdaResponse> {
       )}`,
       (badge as GetBadgeOperationErrorReturn).err
     );
-    return { statusCode: 500 };
+    throw new Error("1181");
+    // return { statusCode: 500 };
   }
 
   // Send update badge request
@@ -99,8 +101,9 @@ export async function receiver(event: any): Promise<LambdaResponse> {
         operationParams
       )}\nReturn:${JSON.stringify(badge)}`
     );
-    return {
-      statusCode: 404,
-    };
+    throw new Error("Unable to handle request");
+    // return {
+    //   statusCode: 404,
+    // };
   }
 }
