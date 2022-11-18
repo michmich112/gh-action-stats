@@ -86,10 +86,11 @@ describe.only("UserPulseRepoAccessRepository Tests", () => {
           "Users",
           "PulseRepos",
         ]);
-        await client.end();
       } catch (e) {
         console.error(`ERROR Tearing Down: ${e}.`);
       }
+
+      await client.end();
     }
     return;
   });
@@ -152,6 +153,10 @@ describe.only("UserPulseRepoAccessRepository Tests", () => {
       // cleanup
       // await client!.query('DELETE FROM "UserPulseRepoAccesses" WHERE user_id = $1 AND pulse_repo_id = $2;', [knownUserId, knownPulseRepoIdTwo]);
     });
+
+    test.todo(
+      "Its should perform an update if the UserPulseReposAccessRule already exists"
+    );
 
     test("It should throw an error if the user does not exist", async function () {
       skipTest(client, repo, eut);

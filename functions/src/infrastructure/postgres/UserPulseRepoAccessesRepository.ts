@@ -84,7 +84,7 @@ export default class MigrationUsersPulseRepoAccessesRepository
         pulse_repo_id,
         can_access
       ) VALUES ($1,$2,$3) 
-      ON CONFLICT("user_id", "pulse_repo_id") DO UPDATE 
+      ON CONFLICT("user_id", "pulse_repo_id") DO UPDATE SET
         can_acces=$3,
         last_polled=NOW()
       RETURNING *;
