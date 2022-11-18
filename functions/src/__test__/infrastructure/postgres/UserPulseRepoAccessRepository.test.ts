@@ -3,7 +3,9 @@ import * as dotenv from "dotenv";
 import { Client } from "pg";
 import { UserPulseRepoAccess } from "../../../domain/UserPulseRepoAccess.type";
 import { createClient } from "../../../infrastructure/postgres/PostgresClient";
+import MigrationPulseRepoRepository from "../../../infrastructure/postgres/PulseReposRepository";
 import MigrationUsersPulseRepoAccessesRepository from "../../../infrastructure/postgres/UserPulseRepoAccessesRepository";
+import MigrationUsersRepository from "../../../infrastructure/postgres/UsersRepository";
 import {
   createKnownPulseRepo,
   createKnownUser,
@@ -34,6 +36,8 @@ describe.only("UserPulseRepoAccessRepository Tests", () => {
       return;
     }
     try {
+      await MigrationUsersRepository.New(client);
+      await MigrationPulseRepoRepository.New(client);
       repo = await MigrationUsersPulseRepoAccessesRepository.New(client);
     } catch (e) {
       console.warn(
