@@ -152,7 +152,7 @@ export default class MigrationUsersPulseRepoAccessesRepository
     pulseRepoId: number
   ): Promise<boolean> {
     const query = `
-      SELECT EXISTS (SELECT * FROM "${this.tableName}" WERE user_id = $1 and pulse_repo_id = $2);
+      SELECT EXISTS (SELECT * FROM "${this.tableName}" WHERE user_id = $1 AND pulse_repo_id = $2);
     `;
     const res = await this.client.query(query, [userId, pulseRepoId]);
     return res.rows[0].exists;
@@ -168,7 +168,7 @@ export default class MigrationUsersPulseRepoAccessesRepository
     pulseRepoId: number
   ): Promise<UserPulseRepoAccess> {
     const query = `
-      SELECT * FROM "${this.tableName}" WHERE user_id = $1 and pulse_repo_id = $2;
+      SELECT * FROM "${this.tableName}" WHERE user_id = $1 AND pulse_repo_id = $2;
     `;
     const res = await this.client.query(query, [userId, pulseRepoId]);
     if (res.rowCount < 1) {
