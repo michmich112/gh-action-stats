@@ -55,7 +55,7 @@ jobs:
           git clone --depth 1 https://github.com/supabase/supabase
           cd supabase/docker
           cp .env.example .env
-          docker-compose pull
+          docker compose pull -q
 
       - name: Start Supabase Environment
         id: supabase
