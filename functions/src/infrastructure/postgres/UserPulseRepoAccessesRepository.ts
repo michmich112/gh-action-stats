@@ -231,4 +231,20 @@ export default class MigrationUsersPulseRepoAccessesRepository
     if (res.rowCount === 0) return [];
     return res.rows.map((v) => DbToDomainUserPulseRepoAccessKey(v));
   }
+
+  /**
+   * Sets all pulse repo accesses to false for the selected user
+   * @param {string} userId - the id of the user for whom you want to remove the accesses
+   */
+  public async revertAllPulseRepoAccessesForUser(
+    userId: string
+  ): Promise<void> {
+    const query = `
+      UPDATE "${this.tableName}" SET
+        can_access = FALSE,
+        last_polled = NOW()
+      WHERE user_id = $1;
+      `;
+    await this.client.query(query, [userId]);
+  }
 }

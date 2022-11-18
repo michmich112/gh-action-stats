@@ -242,6 +242,20 @@ describe.only("UserPulseRepoAccessRepository Tests", () => {
         prev.lastPolled.getTime()
       );
     });
+    test("It should throw an error if the UserPulseRepoAccessRule does not exist (user and pulse repo exist, no rule)", async function () {
+      skipTest(client, repo, eut);
+      try {
+        await repo!.updateCanAccessPulseRepoAccessRule(
+          knownUserIdTwo!,
+          knownPulseRepoId!,
+          true
+        );
+      } catch {
+        return;
+      }
+      throw new Error("Expected error to be thrown");
+    });
+
     test("It should throw an error if the UserPulseRepoAccessRule does not exist (user doesn't exist)", async function () {
       skipTest(client, repo, eut);
       try {
@@ -292,6 +306,15 @@ describe.only("UserPulseRepoAccessRepository Tests", () => {
         prev.lastPolled.getTime()
       );
     });
+    test("It should throw an error if the UserPulseRepoAccessRule does not exist (user and pulser repo exist, no rule)", async function () {
+      skipTest(client, repo, eut);
+      try {
+        await repo!.updateLastPolledTime(knownUserIdTwo!, knownPulseRepoIdTwo!);
+      } catch {
+        return;
+      }
+      throw new Error("Expected error to be thrown");
+    });
     test("It should throw an error if the UserPulseRepoAccessRule does not exist (user doesn't exist)", async function () {
       skipTest(client, repo, eut);
       try {
@@ -328,6 +351,18 @@ describe.only("UserPulseRepoAccessRepository Tests", () => {
       expect(upra.lastPolled.getTime()).toBeGreaterThan(
         new Date().getTime() - 600000
       );
+    });
+    test("It should throw an error if trying to retrieve a UserPulseRepoAccessRule that does not exist (user and pulse repo exist, no rule)", async function () {
+      skipTest(client, repo, eut);
+      try {
+        await repo!.getUserPulseRepoAccessRule(
+          knownUserIdTwo!,
+          knownPulseRepoIdTwo!
+        );
+      } catch {
+        return;
+      }
+      throw new Error("epected error to be thrown");
     });
     test("It should throw an error if trying to retrieve a UserPulseRepoAccessRule that does not exist (user does not exist)", async function () {
       skipTest(client, repo, eut);
@@ -427,6 +462,42 @@ describe.only("UserPulseRepoAccessRepository Tests", () => {
         randomUUID()
       );
       expect(outdated).toEqual([]);
+    });
+  });
+
+  describe("revertAllPulseRepoAccessesForUser", () => {
+    test("It should set all can_access values to false", async function () {
+      skipTest(client, repo, eut);
+      await repo!.updateCanAccessPulseRepoAccessRule(
+        knownUserId!,
+        knownPulseRepoId!,
+        true
+      );
+      await repo!.updateCanAccessPulseRepoAccessRule(
+        knownUserId!,
+        knownPulseRepoIdTwo!,
+        true
+      );
+      const pre = await repo!.getAllPulseRepoAccessesForUser(knownUserId!);
+
+      await repo!.revertAllPulseRepoAccessesForUser(knownUserId!);
+
+      const post = await repo!.getAllPulseRepoAccessesForUser(knownUserId!);
+      expect(pre.map((p) => p.canAccess)).toEqual([true, true]);
+      expect(post.map((p) => p.canAccess)).toEqual([false, false]);
+      expect(
+        Math.max(...post.map((p) => p.lastPolled.getTime()))
+      ).toBeGreaterThan(Math.max(...pre.map((p) => p.lastPolled.getTime())));
+    });
+    test("It should not throw an error if there are no PuleRepoAccessRules for the user", async function () {
+      skipTest(client, repo, eut);
+      await repo!.revertAllPulseRepoAccessesForUser(knownUserIdTwo!);
+      // no error thrown, we are good
+    });
+    test("It should not throw an error if the user does not exist", async function () {
+      skipTest(client, repo, eut);
+      await repo!.revertAllPulseRepoAccessesForUser(randomUUID());
+      // no error thrown, we are good
     });
   });
 });
