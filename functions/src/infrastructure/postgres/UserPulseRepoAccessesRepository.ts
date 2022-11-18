@@ -122,7 +122,17 @@ export default class MigrationUsersPulseRepoAccessesRepository
         last_polled = NOW()
       WHERE user_id = $2 AND pulse_repo_id = $3;
     `;
-    await this.client.query(query, [canAccess, userId, pulseRepoId]);
+
+    const res = await this.client.query(query, [
+      canAccess,
+      userId,
+      pulseRepoId,
+    ]);
+    if (res.rowCount === 0) {
+      throw new Error(
+        `[${classname}][updateCanAccessPulseRepoAccessRule] - Nothing to update with userId ${userId}, pulseRepoId ${pulseRepoId}`
+      );
+    }
   }
 
   /**
@@ -139,7 +149,12 @@ export default class MigrationUsersPulseRepoAccessesRepository
         last_polled = NOW()
       WHERE user_id = $1 AND pulse_repo_id = $2;
     `;
-    await this.client.query(query, [userId, pulseRepoId]);
+    const res = await this.client.query(query, [userId, pulseRepoId]);
+    if (res.rowCount === 0) {
+      throw new Error(
+        `[${classname}][updateLastPolledTime] - Nothing to update with userId ${userId}, pulseRepoId ${pulseRepoId}`
+      );
+    }
   }
 
   /**
@@ -210,7 +225,7 @@ export default class MigrationUsersPulseRepoAccessesRepository
       FROM "${this.tableName}" t 
       WHERE 1=1
         AND t.user_id = $1 
-        AND EXTRACT(EPOCH FROM (NOW() - t.last_polled) >= $2);
+        AND EXTRACT(EPOCH FROM (NOW() - t.last_polled)) >= $2;
     `;
     const res = await this.client.query(query, [userId, pollFrequency]);
     if (res.rowCount === 0) return [];

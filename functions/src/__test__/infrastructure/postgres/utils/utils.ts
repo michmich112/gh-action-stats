@@ -26,6 +26,21 @@ export function skipTest(
   return true;
 }
 
+export function timedTest(
+  testFn: (...argv: any[]) => void | Promise<void>
+): (...argv: any) => void | Promise<void> {
+  return async (...argv: any) => {
+    console.time("timedTest");
+    try {
+      await testFn(...argv);
+    } catch (e) {
+      throw e;
+    } finally {
+      console.timeEnd("timedTest");
+    }
+  };
+}
+
 /**
  * Wipes all data of selected tables
  * @param {Client} client -  aconnected postgres client
@@ -57,19 +72,22 @@ export async function wipeData(
  * @param {Client} client - a connected postgresql client
  * @return {string} - the user id (uuid)
  */
-export async function createKnownUser(client: any): Promise<string> {
+export async function createKnownUser(
+  client: any,
+  index: number = 0
+): Promise<string> {
   let knownSupabaseUserId: string;
   const existingUsers = await client.query(
-    'SELECT * FROM "auth"."users" LIMIT 10'
+    `SELECT * FROM "auth"."users" LIMIT ${Math.max(index + 1, 10)}`
   );
 
-  if (existingUsers.rowCount === 0) {
+  if (existingUsers.rowCount === 0 || existingUsers.rowCount <= index) {
     // create known supabase user
     knownSupabaseUserId = randomUUID();
 
     const createdUserId = await client.query(
-      'INSERT INTO "auth"."users" (id) VALUES ($1) RETURNING id;',
-      [knownSupabaseUserId]
+      'INSERT INTO "auth"."users" (id, reauthentication_token, email_change_token_current) VALUES ($1, $2, $3) RETURNING id;',
+      [knownSupabaseUserId, randomUUID(), randomUUID()]
     );
     if (createdUserId.rowCount === 0) {
       console.error("Error creating new supabase user");
@@ -78,7 +96,7 @@ export async function createKnownUser(client: any): Promise<string> {
       knownSupabaseUserId = createdUserId.rows[0].id;
     }
   } else {
-    knownSupabaseUserId = existingUsers.rows[0].id;
+    knownSupabaseUserId = existingUsers.rows[index].id;
   }
 
   //create known user
