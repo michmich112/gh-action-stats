@@ -183,48 +183,50 @@ describe.only("UserPulseRepoAccessRepository Tests", () => {
   });
 
   describe("updateCanAccessPulseRepoAccessRule", () => {
-    test(
+    test.todo(
       "It should update the the can access field and the polled time if the UserPulseRepoAccessRule Exists"
     );
-    test(
+    test.todo(
       "It should throw an error if the UserPulseRepoAccessRule does not exist"
     );
   });
 
   describe("updateLastPolledTime", () => {
-    test(
+    test.todo(
       "It should update the last polled time if the UserPulseRepoAccessRule exists"
     );
-    test(
+    test.todo(
       "It should throw an error if the UserPulseRepoAccessRule does not exist"
     );
   });
 
   describe("getUserPulseRepoAccessRule", () => {
-    test("It should retrieve the full UserPulseRepoAccessRule if it exists");
-    test(
+    test.todo(
+      "It should retrieve the full UserPulseRepoAccessRule if it exists"
+    );
+    test.todo(
       "It should throw an error if trying to retrieve a UserPulseRepoAccessRule that does not exist"
     );
   });
 
   describe("getAllPulseRepoAccessRule", () => {
-    test("It should retrieve all UserPulseReposAccessRule for the user");
-    test(
+    test.todo("It should retrieve all UserPulseReposAccessRule for the user");
+    test.todo(
       "It should return an empty array if there are no UserPUlseReposAccessRules for user"
     );
-    test("It should return an empty array if the user does not exist");
+    test.todo("It should return an empty array if the user does not exist");
   });
 
   describe("getAllOutdatedPulseRepoAccessesKeysForUser", () => {
-    test(
+    test.todo(
       "It should retrieve all UserPulseReposAccessRules that are outdated based on the default pollFrequency"
     );
-    test(
+    test.todo(
       "It should retrieve all UserPulseReposAccessRules that are outdated based on a custom pollFrequency"
     );
-    test(
+    test.todo(
       "It should return an empty array if there are no outdate UserPulseReposAccessRules"
     );
-    test("It should return an empty array if the user does not exist");
+    test.todo("It should return an empty array if the user does not exist");
   });
 });
