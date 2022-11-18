@@ -4,6 +4,7 @@ import { Client } from "pg";
 import { MigrationUser } from "../../../domain/User.type";
 import { createClient } from "../../../infrastructure/postgres/PostgresClient";
 import MigrationUsersRepository from "../../../infrastructure/postgres/UsersRepository";
+import { createKnownUser } from "./utils/utils";
 
 const eut = "UsersRepository";
 
@@ -56,34 +57,7 @@ describe.only(`${eut}Tests`, () => {
     // populate db
     try {
       await client.query('DELETE FROM "Users";'); // Drop all values from Users
-
-      const existingUsers = await client.query(
-        'SELECT * FROM "auth"."users" LIMIT 10'
-      );
-
-      if (existingUsers.rowCount === 0) {
-        // create known supabase user
-        knownSupabaseUserId = randomUUID();
-
-        const createdUserId = await client.query(
-          'INSERT INTO "auth"."users" (id) VALUES ($1) RETURNING id;',
-          [knownSupabaseUserId]
-        );
-        if (createdUserId.rowCount === 0) {
-          console.error("Error creating new supabase user");
-          knownSupabaseUserId = "";
-        } else {
-          knownSupabaseUserId = createdUserId.rows[0].id;
-        }
-      } else {
-        knownSupabaseUserId = existingUsers.rows[0].id;
-      }
-
-      //create known user
-      await client.query(
-        'INSERT INTO "Users" (id, github_username, github_id, avatar_url) VALUES ($1, $2, $3, $4)',
-        [knownSupabaseUserId, "known_username", 12345, undefined]
-      );
+      knownSupabaseUserId = await createKnownUser(client);
     } catch (e) {
       console.warn(`Error populating Users: Some tests might fail; ${e}`);
     }
