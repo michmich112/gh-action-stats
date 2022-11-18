@@ -9,7 +9,7 @@ import {
 const tableSchema: string = `
 CREATE TABLE IF NOT EXISTS "UserPulseRepoAccesses" (
   "user_id" UUID NOT NULL REFERENCES "Users"("id") ON UPDATE CASCADE ON DELETE CASCADE,
-  "pulse_repo_id" BIGINT NOT NULL ON UPDATE CASCADE ON DELETE CASCADE,
+  "pulse_repo_id" BIGINT NOT NULL REFERENCES "PulseRepos"("id") ON UPDATE CASCADE ON DELETE CASCADE,
   "can_access" BOOLEAN NOT NULL DEFAULT FALSE,
   "last_polled" TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   PRIMARY KEY("user_id", "pulse_repo_id")
