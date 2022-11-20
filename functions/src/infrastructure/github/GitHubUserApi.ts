@@ -116,7 +116,7 @@ export class GithubApi {
     try {
       const res = await axios.get("https://api.github.com/user", {
         headers: {
-          Authorization: `token ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
 
@@ -164,7 +164,7 @@ export class GithubApi {
     try {
       res = await axios.get("https://api.github.com/user", {
         headers: {
-          Authorization: `token ${this._token}`,
+          Authorization: `Bearer ${this._token}`,
         },
       });
       this.syncRateLimitFromApiResponse(res);
@@ -205,7 +205,7 @@ export class GithubApi {
         `https://api.github.com/repos/${owner}/${repo}`,
         {
           headers: {
-            Authorization: `token ${this._token}`,
+            Authorization: `Bearer ${this._token}`,
           },
         }
       );
