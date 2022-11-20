@@ -49,7 +49,7 @@ describe.only("PulseRepoRepositoryTests", () => {
       knownPulseRepoId = parseInt(
         (
           await client.query(
-            'INSERT INTO "PulseRepos" (owner, name, hashed_name, full_name, full_hashed_name) VALUES ($1, $2, $3, $4, $5) RETURNING id;',
+            'INSERT INTO "PulseRepos" (owner, name, hashed_name, full_name, full_hashed_name) VALUES ($1, $2, $3, $4, $5) ON CONFLICT(owner, name) DO UPDATE SET hashed_name = $3 RETURNING id;',
             [
               "toto",
               "toto_repo",
@@ -63,7 +63,7 @@ describe.only("PulseRepoRepositoryTests", () => {
       knownPulseRepoIdTwo = parseInt(
         (
           await client.query(
-            'INSERT INTO "PulseRepos" (owner, name, hashed_name, full_name, full_hashed_name) VALUES ($1, $2, $3, $4, $5) RETURNING id;',
+            'INSERT INTO "PulseRepos" (owner, name, hashed_name, full_name, full_hashed_name) VALUES ($1, $2, $3, $4, $5) ON CONFLICT(owner, name) DO UPDATE SET hashed_name = $3 RETURNING id;',
             [
               "tata",
               "tata_repo",
