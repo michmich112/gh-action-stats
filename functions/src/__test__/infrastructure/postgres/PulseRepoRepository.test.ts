@@ -4,6 +4,7 @@ import MigrationActionRunsRepository from "../../../infrastructure/postgres/Migr
 import MigrationActionRepository from "../../../infrastructure/postgres/MigrationActionsRepository";
 import { createClient } from "../../../infrastructure/postgres/PostgresClient";
 import MigrationPulseRepoRepository from "../../../infrastructure/postgres/PulseReposRepository";
+import MigrationRunErrorsRepository from "../../../infrastructure/postgres/RunErrorsRepository";
 import {
   createKnownAction,
   defaultActionRun,
@@ -90,6 +91,7 @@ describe.only("PulseRepoRepositoryTests", () => {
         name: "pipi_action",
       });
 
+      await MigrationRunErrorsRepository.New(client);
       const runRepo = await MigrationActionRunsRepository.New(client);
 
       // create 4 runs for 2 pulse repos and 2 Actions
