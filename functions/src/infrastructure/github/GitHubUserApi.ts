@@ -171,6 +171,7 @@ export class GithubApi {
           Accept: "application/vnd.github+json",
           Authorization: `Bearer ${this._token}`,
         },
+        validateStatus: (status) => [200, 301, 401, 403, 404].includes(status),
       });
       this.syncRateLimitFromApiResponse(res);
     } catch (e) {
@@ -213,6 +214,8 @@ export class GithubApi {
             Accept: "application/vnd.github+json",
             Authorization: `Bearer ${this._token}`,
           },
+          validateStatus: (status) =>
+            [200, 301, 401, 403, 404].includes(status),
         }
       );
       if ([401, 403].includes(res.status)) {
