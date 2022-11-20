@@ -42,7 +42,8 @@ describe.only("PulseRepoRepositoryTests", () => {
     }
     // populate db
     try {
-      await wipeData(client, ["Runs", "PulseRepos", "Actions"]);
+      // wipe data softly and sequentially
+      await wipeData(client, ["Runs", "PulseRepos", "Actions"], true, true);
       // await client.query('DELETE FROM "PulseRepos";'); // Drop all values from Actions
       // create placeholder toto action
 

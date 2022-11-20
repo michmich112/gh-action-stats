@@ -46,25 +46,40 @@ export function timedTest(
  * Wipes all data of selected tables
  * @param {Client} client -  aconnected postgres client
  * @param {string[]} tableNames - a in-ordered list of tables
- * @param {boolean}  soft=false - choose whethere an error in this process should soft the process by throwing higher order error
+ * @param {boolean}  soft=false - choose whether an error in this process should soft the process by throwing higher order error
+ * @param {boolean} sequential=flase - choose whether to process all the wipes in parallel or sequentially (one by one, lower performance)
  */
 export async function wipeData(
   client: any,
   tableNames: string[],
-  soft: boolean = false
+  soft: boolean = false,
+  sequential: boolean = false
 ) {
-  const res = await Promise.allSettled(
-    tableNames.map((tn) => client.query(`DELETE FROM "${tn}";`))
-  );
+  if (!sequential) {
+    const res = await Promise.allSettled(
+      tableNames.map((tn) => client.query(`DELETE FROM "${tn}";`))
+    );
 
-  const rejects = res.filter((r) => r.status === "rejected");
-  if (rejects.length > 0) {
-    const message = `[wipeData] - Error Wiping Data, ${JSON.stringify(
-      rejects.map((r) => (r as PromiseRejectedResult).reason)
-    )}`;
+    const rejects = res.filter((r) => r.status === "rejected");
+    if (rejects.length > 0) {
+      const message = `[wipeData] - Error Wiping Data, ${JSON.stringify(
+        rejects.map((r) => (r as PromiseRejectedResult).reason)
+      )}`;
 
-    if (!soft) throw new Error(message);
-    else console.warn(message);
+      if (!soft) throw new Error(message);
+      else console.warn(message);
+    }
+  } else {
+    const errors = [];
+    for (let tn of tableNames) {
+      await client.query(`DELETE FROM "${tn}";`).catch((e: any) => {
+        console.warn(`[WipeData]- error deleting from ${tn}`, e);
+        errors.push(tn);
+      });
+    }
+    if (!soft && errors.length > 0) {
+      throw new Error(`[WipeData] - Error wiping data;`);
+    }
   }
 }
 
