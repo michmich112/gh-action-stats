@@ -1,4 +1,7 @@
+// import { Client } from "pg";
+// import MigrationActionRepository from "../../infrastructure/postgres/MigrationActionsRepository";
 import { PostgresConnectedClient } from "../../infrastructure/postgres/PostgresClient";
+// import MigrationUsersPulseRepoAccessesRepository from "../../infrastructure/postgres/UserPulseRepoAccessesRepository";
 
 type RefreshPulseRepoAccessesOperationParams = {
   userId: string;
@@ -35,10 +38,19 @@ export async function RefreshPulseRepoAccessesOperation(
   }
 }
 
-// async function RefreshPulseRepoAccessesOperationImplementation({
-//   userId,
-//   userGithubToken,
-// }: RefreshPulseRepoAccessesOperationParams): Promise<void> {
+// async function RefreshPulseRepoAccessesOperationImplementation(
+//   client: Client,
+//   { userId, userGithubToken }: RefreshPulseRepoAccessesOperationParams
+// ): Promise<void> {
+//   const actionRepo = await MigrationActionRepository.New(client);
+//   const userPulseRepoAccessRepo =
+//     await MigrationUsersPulseRepoAccessesRepository.New(client);
+//
+//   const ownedActions = await actionRepo.getAllActionsWhereUserIsCreator(userId);
+//
+//   // set all existing accesses to false
+//   await userPulseRepoAccessRepo.revertAllPulseRepoAccessesForUser(userId);
+//
 //   // Get all pulse repositories that need to be validated
 //   // Set all the pulse repo access to false
 //   // run operation on all pulse repositories & update PulseRepoAccesses

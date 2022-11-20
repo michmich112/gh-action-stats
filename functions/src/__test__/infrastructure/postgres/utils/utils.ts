@@ -3,6 +3,7 @@
  */
 
 import { randomUUID } from "crypto";
+import ActionRun from "../../../../domain/ActionRun.type";
 import { UserPulseRepoAccess } from "../../../../domain/UserPulseRepoAccess.type";
 
 /**
@@ -170,4 +171,43 @@ export async function createKnownUserPulseRepoAccessRule(
     }
   }
   return upra;
+}
+
+export const defaultActionRun: ActionRun = {
+  creator: "toto",
+  github_action: "workflow_step_name",
+  github_actor: "actor",
+  github_base_ref: "base/ref",
+  github_head_ref: "head/ref",
+  github_ref: "base/ref",
+  github_repository: "user/repository",
+  github_run_id: "1234353",
+  github_event_name: "push",
+  github_action_repository: "michmich112/versionbumper@main",
+  package_version: "0.1.0",
+  ip: "1.2.3.4",
+  name: "toto_action",
+  runner_os: "Linux",
+  runner_name: "HostedRunner",
+  timestamp: new Date().toISOString(),
+  version: "main_branch",
+  execution_time: [0, 123456789],
+  error: null,
+};
+
+export async function createKnownAction(
+  client: any,
+  action: { creator?: string; name?: string; last_update?: Date } = {}
+) {
+  // create placeholder toto action
+  const res = await client.query(
+    'INSERT INTO "Actions" (creator, name, last_update) VALUES ($1, $2, $3) RETURNING id;',
+    [
+      action.creator ?? "toto",
+      action.name ?? "toto_action",
+      action.last_update ?? new Date(0).toISOString(),
+    ]
+  );
+
+  return parseInt(res.rows[0].id);
 }
