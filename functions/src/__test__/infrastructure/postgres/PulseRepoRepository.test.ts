@@ -1,5 +1,6 @@
 import * as dotenv from "dotenv";
 import { Client } from "pg";
+import MigrationAttemptedRunRepository from "../../../infrastructure/postgres/AttemptedRunRepository";
 import MigrationActionRunsRepository from "../../../infrastructure/postgres/MigrationActionRunsRepository";
 import MigrationActionRepository from "../../../infrastructure/postgres/MigrationActionsRepository";
 import { createClient } from "../../../infrastructure/postgres/PostgresClient";
@@ -43,6 +44,11 @@ describe.only("PulseRepoRepositoryTests", () => {
     }
     // populate db
     try {
+      await MigrationActionRepository.New(client); // initialize ActionRepository And dependencies
+      await MigrationAttemptedRunRepository.New(client); // initialize Action Run Attempt Repo
+      await MigrationRunErrorsRepository.New(client); // initialize Run Error Repository
+      const runRepo = await MigrationActionRunsRepository.New(client); // intialize Action run repository
+
       // wipe data softly and sequentially
       await wipeData(client, ["Runs", "PulseRepos", "Actions"], true, true);
       // await client.query('DELETE FROM "PulseRepos";'); // Drop all values from Actions
@@ -77,7 +83,6 @@ describe.only("PulseRepoRepositoryTests", () => {
         ).rows[0].id
       );
 
-      await MigrationActionRepository.New(client); // initialize ActionRepository And dependencies
       knownActionId = await createKnownAction(client, {
         creator: "toto",
         name: "toto_action",
@@ -90,9 +95,6 @@ describe.only("PulseRepoRepositoryTests", () => {
         creator: "pipi",
         name: "pipi_action",
       });
-
-      await MigrationRunErrorsRepository.New(client);
-      const runRepo = await MigrationActionRunsRepository.New(client);
 
       // create 4 runs for 2 pulse repos and 2 Actions
       await runRepo.create({
