@@ -16,6 +16,8 @@ const eut = "PulseReposRepository";
 describe.only("PulseRepoRepositoryTests", () => {
   let client: null | Client = null;
   let repo: null | MigrationPulseRepoRepository = null;
+  let knownPulseRepoId: null | number = null;
+  let knownPulseRepoIdTwo: null | number = null;
   let knownActionId: null | number = null;
   let knownActionIdTwo: null | number = null;
   let knownActionIdThree: null | number = null;
@@ -43,25 +45,34 @@ describe.only("PulseRepoRepositoryTests", () => {
       await wipeData(client, ["Runs", "PulseRepos", "Actions"]);
       // await client.query('DELETE FROM "PulseRepos";'); // Drop all values from Actions
       // create placeholder toto action
-      await client.query(
-        'INSERT INTO "PulseRepos" (id, owner, name, hashed_name, full_name, full_hashed_name) VALUES (1, $1, $2, $3, $4, $5);',
-        [
-          "toto",
-          "toto_repo",
-          "repo_hashed",
-          "toto/toto_repo",
-          "toto/repo_hashed",
-        ]
+
+      knownPulseRepoId = parseInt(
+        (
+          await client.query(
+            'INSERT INTO "PulseRepos" (owner, name, hashed_name, full_name, full_hashed_name) VALUES ($1, $2, $3, $4, $5) RETURNING id;',
+            [
+              "toto",
+              "toto_repo",
+              "repo_hashed",
+              "toto/toto_repo",
+              "toto/repo_hashed",
+            ]
+          )
+        ).rows[0].id
       );
-      await client.query(
-        'INSERT INTO "PulseRepos" (id, owner, name, hashed_name, full_name, full_hashed_name) VALUES (2, $1, $2, $3, $4, $5);',
-        [
-          "tata",
-          "tata_repo",
-          "repo_hashed",
-          "tata/tata_repo",
-          "tata/repo_hashed",
-        ]
+      knownPulseRepoIdTwo = parseInt(
+        (
+          await client.query(
+            'INSERT INTO "PulseRepos" (owner, name, hashed_name, full_name, full_hashed_name) VALUES ($1, $2, $3, $4, $5) RETURNING id;',
+            [
+              "tata",
+              "tata_repo",
+              "repo_hashed",
+              "tata/tata_repo",
+              "tata/repo_hashed",
+            ]
+          )
+        ).rows[0].id
       );
 
       await MigrationActionRepository.New(client); // initialize ActionRepository And dependencies
@@ -83,22 +94,22 @@ describe.only("PulseRepoRepositoryTests", () => {
       // create 4 runs for 2 pulse repos and 2 Actions
       await runRepo.create({
         actionId: knownActionId,
-        pulseRepoId: 1,
+        pulseRepoId: knownPulseRepoId,
         run: defaultActionRun,
       });
       await runRepo.create({
         actionId: knownActionId,
-        pulseRepoId: 2,
+        pulseRepoId: knownPulseRepoIdTwo,
         run: defaultActionRun,
       });
       await runRepo.create({
         actionId: knownActionId,
-        pulseRepoId: 2,
+        pulseRepoId: knownPulseRepoIdTwo,
         run: defaultActionRun,
       });
       await runRepo.create({
         actionId: knownActionIdTwo,
-        pulseRepoId: 2,
+        pulseRepoId: knownPulseRepoIdTwo,
         run: defaultActionRun,
       });
     } catch (e) {
@@ -127,7 +138,7 @@ describe.only("PulseRepoRepositoryTests", () => {
         return;
       }
       const res = await repo.getFromGithubRepositoryString("toto/toto_repo");
-      expect(res.id).toEqual(1);
+      expect(res.id).toEqual(knownPulseRepoId);
       expect(res.owner).toEqual("toto");
       expect(res.name).toEqual("toto_repo");
       expect(res.hashed_name).toEqual("repo_hashed");
@@ -141,7 +152,8 @@ describe.only("PulseRepoRepositoryTests", () => {
         return;
       }
       const res = await repo.getFromGithubRepositoryString("toto/toto_repo2");
-      expect(res.id).not.toEqual(1);
+      expect(res.id).not.toEqual(knownPulseRepoId);
+      expect(res.id).not.toEqual(knownPulseRepoIdTwo);
       expect(res.owner).toEqual("toto");
       expect(res.name).toEqual("toto_repo2");
       expect(res.hashed_name).not.toEqual("toto_repo2");
@@ -157,7 +169,8 @@ describe.only("PulseRepoRepositoryTests", () => {
       const res = await repo.getFromGithubRepositoryString(
         "toto/toto_repo/the/third"
       );
-      expect(res.id).not.toEqual(1);
+      expect(res.id).not.toEqual(knownPulseRepoId);
+      expect(res.id).not.toEqual(knownPulseRepoIdTwo);
       expect(res.owner).toEqual("toto");
       expect(res.name).toEqual("toto_repo/the/third");
       expect(res.hashed_name).not.toEqual("toto_repo/the/third");
@@ -171,7 +184,7 @@ describe.only("PulseRepoRepositoryTests", () => {
         return;
       }
       const res = await repo.getFromGithubRepositoryString("toto/toto_repo/");
-      expect(res.id).toEqual(1);
+      expect(res.id).toEqual(knownPulseRepoId);
       expect(res.owner).toEqual("toto");
       expect(res.name).toEqual("toto_repo");
       expect(res.hashed_name).toEqual("repo_hashed");
