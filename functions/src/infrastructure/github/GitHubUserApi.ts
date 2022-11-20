@@ -1,5 +1,5 @@
 import UnauthorizedGitHubApiError from "../../domain/errors/UnauthorizedGitHubApiError";
-import axios, { AxiosResponse } from "axios";
+import axios from "axios";
 import {
   getDefaultRateLimit,
   getRateLimitFromResponse,

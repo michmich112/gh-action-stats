@@ -111,4 +111,32 @@ export default class MigrationActionRepository implements IPostgresRepostiory {
     const ret = res.rows[0];
     return { ...ret, id: parseInt(ret.id) };
   }
+
+  public async getAllActionsWhereUserIsCreator(
+    userId: string
+  ): Promise<MigrationDbAction[]> {
+    const query = `
+      SELECT 
+        a.* 
+      FROM "${this.tableName}" a
+      LEFT JOIN (
+        SELECT 
+          uu.id,
+          uu.github_username
+        FROM "Users" uu
+      ) u ON u.id = $1
+      WHERE a.creator = u.github_username;
+    `;
+
+    try {
+      const res = await this.client.query(query, [userId]);
+      return res.rows.map((a) => ({ ...a, id: parseInt(a.id) }));
+    } catch (e) {
+      console.error(
+        `[ActionRepository][getAllActionWhereUserIsCreator] - Error when querying for user with id ${userId}`,
+        e
+      );
+      return [];
+    }
+  }
 }

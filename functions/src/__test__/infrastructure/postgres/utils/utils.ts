@@ -74,7 +74,12 @@ export async function wipeData(
  */
 export async function createKnownUser(
   client: any,
-  index: number = 0
+  index: number = 0,
+  user: {
+    github_username?: string;
+    github_id?: number;
+    avatar_url?: string;
+  } = {}
 ): Promise<string> {
   let knownSupabaseUserId: string;
   const existingUsers = await client.query(
@@ -102,7 +107,12 @@ export async function createKnownUser(
   //create known user
   await client.query(
     `INSERT INTO "Users" (id, github_username, github_id, avatar_url) VALUES ($1, $2, $3, $4) ON CONFLICT ("id") DO NOTHING`,
-    [knownSupabaseUserId, "known_username", 12345, undefined]
+    [
+      knownSupabaseUserId,
+      user.github_username ?? "known_username",
+      user.github_id ?? 12345,
+      user.avatar_url,
+    ]
   );
 
   return knownSupabaseUserId;

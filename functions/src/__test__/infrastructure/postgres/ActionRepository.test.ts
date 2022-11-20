@@ -2,10 +2,17 @@ import * as dotenv from "dotenv";
 import { Client } from "pg";
 import { createClient } from "../../../infrastructure/postgres/PostgresClient";
 import MigrationActionRepository from "../../../infrastructure/postgres/MigrationActionsRepository";
+import { createKnownUser, skipTest } from "./utils/utils";
+import MigrationUsersRepository from "../../../infrastructure/postgres/UsersRepository";
+import { randomUUID } from "crypto";
+
+const eut = "ActionsRepository";
 
 describe.only("ActionsRepositoryTests", () => {
   let client: null | Client = null;
   let repo: null | MigrationActionRepository = null;
+  let knownUserId: null | string = null;
+  let knownUserIdTwo: null | string = null;
 
   // Setup
   beforeAll(async () => {
@@ -27,12 +34,24 @@ describe.only("ActionsRepositoryTests", () => {
     }
     // populate db
     try {
+      await MigrationUsersRepository.New(client);
+
       await client.query('DELETE FROM "Actions";'); // Drop all values from Actions
+      await client.query('DELETE FROM "Users";'); // Drop all values from Actions
+
       // create placeholder toto action
       await client.query(
         'INSERT INTO "Actions" (id, creator, name, last_update) VALUES (1, $1, $2, $3);',
         ["toto", "toto_action", new Date(0).toISOString()]
       );
+
+      knownUserId = await createKnownUser(client, 0, {
+        github_username: "toto",
+      });
+
+      knownUserIdTwo = await createKnownUser(client, 1, {
+        github_username: "titi",
+      });
     } catch (e) {
       console.warn(`Error populating Actions: Some tests might fail; ${e}`);
     }
@@ -43,6 +62,7 @@ describe.only("ActionsRepositoryTests", () => {
     if (client !== null) {
       try {
         await client.query('DELETE FROM "Actions";'); // Drop all values from Actions
+        await client.query('DELETE FROM "Users";'); // Drop all values from Actions
       } catch (e) {
         console.error(`ERROR Tearing Down: ${e}.`);
       }
@@ -162,6 +182,27 @@ describe.only("ActionsRepositoryTests", () => {
         // pass;
         return;
       }
+    });
+  });
+
+  describe("getAllActionsWhereUserIsCreator", () => {
+    test("It should return all the actions where the user is the owner", async function () {
+      skipTest(client, repo, eut);
+      const repos = await repo!.getAllActionsWhereUserIsCreator(knownUserId!);
+      expect(repos.length).toEqual(1);
+      expect(repos[0].name).toEqual("toto_action");
+    });
+    test("it should return an empty array if there are no actions owned by user", async function () {
+      skipTest(client, repo, eut);
+      const repos = await repo!.getAllActionsWhereUserIsCreator(
+        knownUserIdTwo!
+      );
+      expect(repos.length).toEqual(0);
+    });
+    test("it should return an empty array if the user does not exist", async function () {
+      skipTest(client, repo, eut);
+      const repos = await repo!.getAllActionsWhereUserIsCreator(randomUUID());
+      expect(repos.length).toEqual(0);
     });
   });
 });
