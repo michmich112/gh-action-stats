@@ -1,7 +1,10 @@
-// import { Client } from "pg";
-// import MigrationActionRepository from "../../infrastructure/postgres/MigrationActionsRepository";
+import { Client } from "pg";
+import { PulseRepo } from "../../domain/PulseRepo.type";
+import { GithubApi } from "../../infrastructure/github/GitHubUserApi";
+import MigrationActionRepository from "../../infrastructure/postgres/MigrationActionsRepository";
 import { PostgresConnectedClient } from "../../infrastructure/postgres/PostgresClient";
-// import MigrationUsersPulseRepoAccessesRepository from "../../infrastructure/postgres/UserPulseRepoAccessesRepository";
+import MigrationPulseRepoRepository from "../../infrastructure/postgres/PulseReposRepository";
+import MigrationUsersPulseRepoAccessesRepository from "../../infrastructure/postgres/UserPulseRepoAccessesRepository";
 
 type RefreshPulseRepoAccessesOperationParams = {
   userId: string;
@@ -25,6 +28,7 @@ export async function RefreshPulseRepoAccessesOperation(
     // start transaction
     await client.query("BEGIN;");
     // Run Implementation
+    await RefreshPulseRepoAccessesOperationImplementation(client, params);
     // commit transaction
     await client.query("COMMIT;");
     console.log(`[${opName}] END - Success refreshing pulse repo accesses.`);
@@ -38,20 +42,44 @@ export async function RefreshPulseRepoAccessesOperation(
   }
 }
 
-// async function RefreshPulseRepoAccessesOperationImplementation(
-//   client: Client,
-//   { userId, userGithubToken }: RefreshPulseRepoAccessesOperationParams
-// ): Promise<void> {
-//   const actionRepo = await MigrationActionRepository.New(client);
-//   const userPulseRepoAccessRepo =
-//     await MigrationUsersPulseRepoAccessesRepository.New(client);
-//
-//   const ownedActions = await actionRepo.getAllActionsWhereUserIsCreator(userId);
-//
-//   // set all existing accesses to false
-//   await userPulseRepoAccessRepo.revertAllPulseRepoAccessesForUser(userId);
-//
-//   // Get all pulse repositories that need to be validated
-//   // Set all the pulse repo access to false
-//   // run operation on all pulse repositories & update PulseRepoAccesses
-// }
+async function RefreshPulseRepoAccessesOperationImplementation(
+  client: Client,
+  { userId, userGithubToken }: RefreshPulseRepoAccessesOperationParams
+): Promise<void> {
+  const actionRepo = await MigrationActionRepository.New(client);
+  const pulseRepoRepo = await MigrationPulseRepoRepository.New(client);
+  const userPRAccessesRepo =
+    await MigrationUsersPulseRepoAccessesRepository.New(client);
+  const ghApi = await GithubApi.New(userGithubToken);
+  // initialized
+
+  // set all existing accesses to false
+  await userPRAccessesRepo.revertAllPulseRepoAccessesForUser(userId);
+
+  const ownedActions = await actionRepo.getAllActionsWhereUserIsCreator(userId);
+  const pulseRepos = await pulseRepoRepo.getAllPulseReposForActions(
+    ownedActions.map((a) => a.id)
+  );
+
+  async function updateRepo(pr: PulseRepo) {
+    const can_access = await ghApi.isRepoAccessible(pr.owner, pr.name);
+    await userPRAccessesRepo.updateCanAccessPulseRepoAccessRule(
+      userId,
+      pr.id,
+      can_access
+    );
+  }
+
+  const updateResults = await Promise.allSettled(
+    pulseRepos.map((pr) => updateRepo(pr))
+  );
+
+  const failed = updateResults.filter((ur) => ur.status === "rejected");
+  if (failed.length > 0) {
+    const message = `[RefreshPulseRepoAccessesOperationImplementation] - Errors updatingRepo ${JSON.stringify(
+      failed
+    )}`;
+    console.error(message);
+    throw new Error(message);
+  }
+}
