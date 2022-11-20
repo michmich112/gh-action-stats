@@ -7,7 +7,7 @@ import {
 } from "../../utils/githubUtils";
 
 const tableSchema: string = `
-CREATE TABLE IF NOT EXISTS"PulseRepos" (
+CREATE TABLE IF NOT EXISTS "PulseRepos" (
   "id" BIGSERIAL PRIMARY KEY,
   "owner" text NOT NULL,
   "name" text NOT NULL,
@@ -16,6 +16,12 @@ CREATE TABLE IF NOT EXISTS"PulseRepos" (
   "full_hashed_name" text,
   UNIQUE (owner, name)
 );
+`;
+
+const tableUpdates: string = `
+ALTER TABLE "PulseRepos" ADD COLUMN IF NOT EXISTS "github_id" BIGINT;
+ALTER TABLE "PulseRepos" ADD COLUMN IF NOT EXISTS "is_public" BOOLEAN NOT NULL DEFAULT FALSE;
+ALTER TABLE "PulseRepos" ADD COLUMN IF NOT EXISTS "last_polled" TIMESTAMPTZ;
 `;
 
 export default class MigrationPulseRepoRepository
@@ -43,6 +49,7 @@ export default class MigrationPulseRepoRepository
    */
   protected async mustExec(): Promise<void> {
     await this.client.query(tableSchema);
+    await this.client.query(tableUpdates);
   }
 
   /**

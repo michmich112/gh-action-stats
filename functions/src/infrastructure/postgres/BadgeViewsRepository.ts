@@ -98,8 +98,6 @@ export default class MigrationBadgeViewsRepository
             : "= $" + paramIndex.next().value!.toString()
         };
     `;
-    console.log("Query", query);
-    console.log("utm", utm);
     let res;
     try {
       res = await this.client.query(
