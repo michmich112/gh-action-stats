@@ -116,12 +116,16 @@ export class GithubApi {
     try {
       const res = await axios.get("https://api.github.com/user", {
         headers: {
+          Accept: "application/vnd.github+json",
           Authorization: `Bearer ${token}`,
         },
       });
 
       if (res.status !== 200) {
-        console.warn(`[WARN] - Possibly invalid token: ${JSON.stringify(res)}`);
+        console.warn(
+          `[WARN][GithubApi][New] - Invalid token: ${JSON.stringify(res)}`
+        );
+        throw new Error("Invalid User Github Token");
       }
       rateLimit = getRateLimitFromResponse(res);
     } catch (e) {
@@ -164,6 +168,7 @@ export class GithubApi {
     try {
       res = await axios.get("https://api.github.com/user", {
         headers: {
+          Accept: "application/vnd.github+json",
           Authorization: `Bearer ${this._token}`,
         },
       });
@@ -205,11 +210,12 @@ export class GithubApi {
         `https://api.github.com/repos/${owner}/${repo}`,
         {
           headers: {
+            Accept: "application/vnd.github+json",
             Authorization: `Bearer ${this._token}`,
           },
         }
       );
-      if ([403, 404].includes(res.status)) {
+      if ([401, 403].includes(res.status)) {
         if (res.headers["x-ratelimit-remaining"] === 0 && retry) {
           // retry
           await this.handleRateLimit();
@@ -220,6 +226,8 @@ export class GithubApi {
             res
           )}`
         );
+        return false;
+      } else if (res.status === 404) {
         return false;
       } else if ([200, 301].includes(res.status)) {
         return true;
