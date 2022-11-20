@@ -2,12 +2,8 @@ import { Client } from "pg";
 import { PostgresConnectedClient } from "../../infrastructure/postgres/PostgresClient";
 import { CollectActionRun } from "../../operations/CollectActionRun";
 import * as dotenv from "dotenv";
-import {
-  createKnownUser,
-  skipTest,
-} from "../infrastructure/postgres/utils/utils";
+import { createKnownUser } from "../infrastructure/postgres/utils/utils";
 import ActionRun from "../../domain/ActionRun.type";
-import MigrationPulseRepoRepository from "../../infrastructure/postgres/PulseReposRepository";
 import MigrationUsersPulseRepoAccessesRepository from "../../infrastructure/postgres/UserPulseRepoAccessesRepository";
 import { RefreshPulseRepoAccessesOperation } from "../../operations/v1/RefreshPulseRepoAccesses";
 import { randomUUID } from "crypto";
