@@ -63,26 +63,38 @@ async function RefreshPulseRepoAccessesOperationImplementation(
 
   async function updateRepo(pr: PulseRepo) {
     const can_access = await ghApi.isRepoAccessible(pr.owner, pr.name);
-    await userPRAccessesRepo.updateCanAccessPulseRepoAccessRule(
+    const ruleExists = await userPRAccessesRepo.userPulseRepoAccessRuleExists(
       userId,
-      pr.id,
-      can_access
+      pr.id
     );
+    if (ruleExists) {
+      await userPRAccessesRepo.updateCanAccessPulseRepoAccessRule(
+        userId,
+        pr.id,
+        can_access
+      );
+    } else {
+      await userPRAccessesRepo.createPulseRepoAccessRule({
+        userId,
+        pulseRepoId: pr.id,
+        canAccess: can_access,
+      });
+    }
   }
 
-  for (const pr of pulseRepos) {
-    await updateRepo(pr);
-  }
-  // const updateResults = await Promise.allSettled(
-  //   pulseRepos.map((pr) => updateRepo(pr))
-  // );
-  //
-  // const failed = updateResults.filter((ur) => ur.status === "rejected");
-  // if (failed.length > 0) {
-  //   const message = `[RefreshPulseRepoAccessesOperationImplementation] - Errors updatingRepo ${JSON.stringify(
-  //     failed
-  //   )}`;
-  //   console.error(message);
-  //   throw new Error(message);
+  // for (const pr of pulseRepos) {
+  //   await updateRepo(pr);
   // }
+  const updateResults = await Promise.allSettled(
+    pulseRepos.map((pr) => updateRepo(pr))
+  );
+
+  const failed = updateResults.filter((ur) => ur.status === "rejected");
+  if (failed.length > 0) {
+    const message = `[RefreshPulseRepoAccessesOperationImplementation] - Errors updatingRepo ${JSON.stringify(
+      failed
+    )}`;
+    console.error(message);
+    throw new Error(message);
+  }
 }
