@@ -61,6 +61,8 @@ async function RefreshPulseRepoAccessesOperationImplementation(
     ownedActions.map((a) => a.id)
   );
 
+  console.log(`pulse repos ${JSON.stringify(pulseRepos)}`);
+
   async function updateRepo(pr: PulseRepo) {
     const can_access = await ghApi.isRepoAccessible(pr.owner, pr.name);
     await userPRAccessesRepo.updateCanAccessPulseRepoAccessRule(
