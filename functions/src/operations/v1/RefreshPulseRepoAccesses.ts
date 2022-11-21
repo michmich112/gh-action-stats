@@ -15,9 +15,7 @@ const opName = "RefreshPulseRepoAccessesOperation";
 export async function RefreshPulseRepoAccessesOperation(
   params: RefreshPulseRepoAccessesOperationParams
 ): Promise<void> {
-  console.log(
-    `[${opName}] START - New request with params: ${JSON.stringify(params)}`
-  );
+  console.log(`[${opName}] START - New request with userId: ${params.userId}`);
   const client = await PostgresConnectedClient();
   if (!client) {
     console.error("Unable to connect to persistance");
