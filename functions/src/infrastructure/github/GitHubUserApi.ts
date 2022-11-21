@@ -128,13 +128,13 @@ export class GithubApi {
         throw new Error("Invalid User Github Token");
       }
       rateLimit = getRateLimitFromResponse(res);
+      return new GithubApi(token, rateLimit ?? getDefaultRateLimit());
     } catch (e) {
       console.error(
         `[ERROR][GithubApi][New] - Error validating token and getting rate limit`,
         e
       );
-    } finally {
-      return new GithubApi(token, rateLimit ?? getDefaultRateLimit());
+      throw e;
     }
   }
 

@@ -36,6 +36,7 @@ export async function RefreshPulseRepoAccessesOperation(
     // Rollback transaction on error
     console.error(`[${opName}] END - Error encountered, rolling back.`, e);
     await client.query("ROLLBACK;");
+    throw e;
   } finally {
     // ensure we close the client cleanly after the RefreshBadgeOperationImplementation
     await client.end();
@@ -82,9 +83,6 @@ async function RefreshPulseRepoAccessesOperationImplementation(
     }
   }
 
-  // for (const pr of pulseRepos) {
-  //   await updateRepo(pr);
-  // }
   const updateResults = await Promise.allSettled(
     pulseRepos.map((pr) => updateRepo(pr))
   );
