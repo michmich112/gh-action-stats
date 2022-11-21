@@ -61,8 +61,6 @@ async function RefreshPulseRepoAccessesOperationImplementation(
     ownedActions.map((a) => a.id)
   );
 
-  console.log(`pulse repos ${JSON.stringify(pulseRepos)}`);
-
   async function updateRepo(pr: PulseRepo) {
     const can_access = await ghApi.isRepoAccessible(pr.owner, pr.name);
     await userPRAccessesRepo.updateCanAccessPulseRepoAccessRule(
@@ -72,16 +70,19 @@ async function RefreshPulseRepoAccessesOperationImplementation(
     );
   }
 
-  const updateResults = await Promise.allSettled(
-    pulseRepos.map((pr) => updateRepo(pr))
-  );
-
-  const failed = updateResults.filter((ur) => ur.status === "rejected");
-  if (failed.length > 0) {
-    const message = `[RefreshPulseRepoAccessesOperationImplementation] - Errors updatingRepo ${JSON.stringify(
-      failed
-    )}`;
-    console.error(message);
-    throw new Error(message);
+  for (const pr of pulseRepos) {
+    await updateRepo(pr);
   }
+  // const updateResults = await Promise.allSettled(
+  //   pulseRepos.map((pr) => updateRepo(pr))
+  // );
+  //
+  // const failed = updateResults.filter((ur) => ur.status === "rejected");
+  // if (failed.length > 0) {
+  //   const message = `[RefreshPulseRepoAccessesOperationImplementation] - Errors updatingRepo ${JSON.stringify(
+  //     failed
+  //   )}`;
+  //   console.error(message);
+  //   throw new Error(message);
+  // }
 }
