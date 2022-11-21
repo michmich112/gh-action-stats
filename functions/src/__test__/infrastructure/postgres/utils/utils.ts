@@ -3,6 +3,7 @@
  */
 
 import { randomUUID } from "crypto";
+import ActionRun from "../../../../domain/ActionRun.type";
 import { UserPulseRepoAccess } from "../../../../domain/UserPulseRepoAccess.type";
 
 /**
@@ -45,25 +46,40 @@ export function timedTest(
  * Wipes all data of selected tables
  * @param {Client} client -  aconnected postgres client
  * @param {string[]} tableNames - a in-ordered list of tables
- * @param {boolean}  soft=false - choose whethere an error in this process should soft the process by throwing higher order error
+ * @param {boolean}  soft=false - choose whether an error in this process should soft the process by throwing higher order error
+ * @param {boolean} sequential=flase - choose whether to process all the wipes in parallel or sequentially (one by one, lower performance)
  */
 export async function wipeData(
   client: any,
   tableNames: string[],
-  soft: boolean = false
+  soft: boolean = false,
+  sequential: boolean = false
 ) {
-  const res = await Promise.allSettled(
-    tableNames.map((tn) => client.query(`DELETE FROM "${tn}";`))
-  );
+  if (!sequential) {
+    const res = await Promise.allSettled(
+      tableNames.map((tn) => client.query(`DELETE FROM "${tn}";`))
+    );
 
-  const rejects = res.filter((r) => r.status === "rejected");
-  if (rejects.length > 0) {
-    const message = `[wipeData] - Error Wiping Data, ${JSON.stringify(
-      rejects.map((r) => (r as PromiseRejectedResult).reason)
-    )}`;
+    const rejects = res.filter((r) => r.status === "rejected");
+    if (rejects.length > 0) {
+      const message = `[wipeData] - Error Wiping Data, ${JSON.stringify(
+        rejects.map((r) => (r as PromiseRejectedResult).reason)
+      )}`;
 
-    if (!soft) throw new Error(message);
-    else console.warn(message);
+      if (!soft) throw new Error(message);
+      else console.warn(message);
+    }
+  } else {
+    const errors = [];
+    for (let tn of tableNames) {
+      await client.query(`DELETE FROM "${tn}";`).catch((e: any) => {
+        console.warn(`[WipeData]- error deleting from ${tn}`, e);
+        errors.push(tn);
+      });
+    }
+    if (!soft && errors.length > 0) {
+      throw new Error(`[WipeData] - Error wiping data;`);
+    }
   }
 }
 
@@ -74,7 +90,12 @@ export async function wipeData(
  */
 export async function createKnownUser(
   client: any,
-  index: number = 0
+  index: number = 0,
+  user: {
+    github_username?: string;
+    github_id?: number;
+    avatar_url?: string;
+  } = {}
 ): Promise<string> {
   let knownSupabaseUserId: string;
   const existingUsers = await client.query(
@@ -102,7 +123,12 @@ export async function createKnownUser(
   //create known user
   await client.query(
     `INSERT INTO "Users" (id, github_username, github_id, avatar_url) VALUES ($1, $2, $3, $4) ON CONFLICT ("id") DO NOTHING`,
-    [knownSupabaseUserId, "known_username", 12345, undefined]
+    [
+      knownSupabaseUserId,
+      user.github_username ?? "known_username",
+      user.github_id ?? 12345,
+      user.avatar_url,
+    ]
   );
 
   return knownSupabaseUserId;
@@ -160,4 +186,43 @@ export async function createKnownUserPulseRepoAccessRule(
     }
   }
   return upra;
+}
+
+export const defaultActionRun: ActionRun = {
+  creator: "toto",
+  github_action: "workflow_step_name",
+  github_actor: "actor",
+  github_base_ref: "base/ref",
+  github_head_ref: "head/ref",
+  github_ref: "base/ref",
+  github_repository: "user/repository",
+  github_run_id: "1234353",
+  github_event_name: "push",
+  github_action_repository: "michmich112/versionbumper@main",
+  package_version: "0.1.0",
+  ip: "1.2.3.4",
+  name: "toto_action",
+  runner_os: "Linux",
+  runner_name: "HostedRunner",
+  timestamp: new Date().toISOString(),
+  version: "main_branch",
+  execution_time: [0, 123456789],
+  error: null,
+};
+
+export async function createKnownAction(
+  client: any,
+  action: { creator?: string; name?: string; last_update?: Date } = {}
+) {
+  // create placeholder toto action
+  const res = await client.query(
+    'INSERT INTO "Actions" (creator, name, last_update) VALUES ($1, $2, $3) RETURNING id;',
+    [
+      action.creator ?? "toto",
+      action.name ?? "toto_action",
+      action.last_update ?? new Date(0).toISOString(),
+    ]
+  );
+
+  return parseInt(res.rows[0].id);
 }

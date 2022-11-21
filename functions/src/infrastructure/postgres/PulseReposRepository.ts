@@ -94,4 +94,37 @@ export default class MigrationPulseRepoRepository
     }
     return pr;
   }
+
+  /**
+   * Retrieves all the pulse repos for the actions
+   * Note: depending on the number of records it might be memory intensive
+   */
+  public async getAllPulseReposForActions(
+    actionIds: number[]
+  ): Promise<PulseRepo[]> {
+    if (actionIds.length === 0) return [];
+    const query = `
+      SELECT pr.*
+      FROM "${this.tableName}" pr
+      WHERE pr.id IN (
+        SELECT 
+          DISTINCT r.pulse_repo_id
+        FROM "Runs" r
+        WHERE r.action_id IN (${actionIds.join(",")})
+      );
+    `;
+
+    try {
+      const res = await this.client.query(query, []);
+      return res.rows.map((pr) => ({ ...pr, id: Number(pr.id) }));
+    } catch (e) {
+      console.error(
+        `[PulseReposRepository][getAllPulseReposForActions] - Error fetching pulse repos for actions with ids: ${JSON.stringify(
+          actionIds
+        )}.`,
+        e
+      );
+      return [];
+    }
+  }
 }

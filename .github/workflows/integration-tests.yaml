@@ -90,6 +90,7 @@ jobs:
           PG_URI: ${{ steps.supabase.outputs.pg_uri }}
           SUPABASE_URL: ${{ steps.supabase.outputs.url }}
           SUPABASE_KEY: ${{ steps.supabase.outputs.key }}
+          TEST_GITHUB_TOKEN: ${{ secrets.TEST_GITHUB_TOKEN }}
 
       - name: Destroy Supabase Environment
         run: |
