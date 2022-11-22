@@ -1,9 +1,9 @@
 import * as functions from "firebase-functions";
-import ActionRun from "../domain/ActionRun.type";
-import NewActionRunOperation from "../operations/newActionRun";
+import ActionRun from "../../domain/ActionRun.type";
+import NewActionRunOperation from "../../operations/newActionRun";
 
-export const newActionRun = functions.https
-  .onRequest(async (req: functions.Request, res: functions.Response) => {
+export const newActionRun = functions.https.onRequest(
+  async (req: functions.Request, res: functions.Response) => {
     const { method, body, ip } = req;
     if (method !== "POST") {
       res.status(405);
@@ -19,5 +19,5 @@ export const newActionRun = functions.https
     // eslint-disable-next-line new-cap
     await NewActionRunOperation(data);
     res.end();
-  });
-
+  }
+);

@@ -3,10 +3,14 @@ import { newActionRun } from "..";
 
 jest.mock("../config/firebase.config");
 jest.mock("../utils/githubUtils");
+jest.mock("@google-cloud/pubsub");
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { firestore } = require("../config/firebase.config");
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { isGithubActionsAddress } = require("../utils/githubUtils");
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const { PubSub } = require("@google-cloud/pubsub");
+
 describe("newActionRun tests", () => {
   isGithubActionsAddress.mockImplementation(async (ip: string) => {
     const authorizedIps = ["1.2.3.4", "1:2:3:4:5:6:7:8"];
@@ -28,8 +32,12 @@ describe("newActionRun tests", () => {
       return {
         add: addMock,
         doc: jest.fn(() => ({
-          set: () => {/* pass */ },
-          get: () => {/* pass */ },
+          set: () => {
+            /* pass */
+          },
+          get: () => {
+            /* pass */
+          },
         })),
       };
     });
@@ -58,20 +66,44 @@ describe("newActionRun tests", () => {
         returnedStatus = status;
       }),
       // eslint-disable-next-line @typescript-eslint/no-empty-function
-      end: jest.fn(() => { }),
+      end: jest.fn(() => {}),
     };
+
+    let topicName;
+    let pubMessage;
+    const pubSubMock = jest.fn(() => {
+      return {
+        topic(name: string) {
+          topicName = name;
+          return {
+            async publishMessage(message: any) {
+              pubMessage = message;
+            },
+          };
+        },
+      };
+    });
+    PubSub.mockImplementation(pubSubMock);
+
     await newActionRun(req as Request, res as Response);
 
     expect(returnedStatus).toBe(200);
     expect(addMock.mock.calls.length).toBe(1);
     expect(collectionNames).toContain("runs");
     expect(collectionNames).toContain("actions");
-    expect(addedData.timestamp).toMatch(/[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3}Z/gm);
+    expect(addedData.timestamp).toMatch(
+      /[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3}Z/gm
+    );
     const timestamp = addedData.timestamp;
     expect(addedData).toEqual({
       ip: "1.2.3.4",
       ...req.body,
       timestamp,
+    });
+    expect(pubSubMock.mock.calls.length).toBe(1);
+    expect(topicName).toEqual("action-runs");
+    expect(pubMessage).toEqual({
+      json: { actionRun: { ip: "1.2.3.4", ...req.body, timestamp } },
     });
   });
 
@@ -90,8 +122,12 @@ describe("newActionRun tests", () => {
       return {
         add: addMock,
         doc: jest.fn(() => ({
-          set: () => {/* pass */ },
-          get: () => {/* pass */ },
+          set: () => {
+            /* pass */
+          },
+          get: () => {
+            /* pass */
+          },
         })),
       };
     });
@@ -120,20 +156,45 @@ describe("newActionRun tests", () => {
         returnedStatus = status;
       }),
       // eslint-disable-next-line @typescript-eslint/no-empty-function
-      end: jest.fn(() => { }),
+      end: jest.fn(() => {}),
     };
+
+    let topicName;
+    let pubMessage;
+    const pubSubMock = jest.fn(() => {
+      return {
+        topic(name: string) {
+          topicName = name;
+          return {
+            async publishMessage(message: any) {
+              pubMessage = message;
+            },
+          };
+        },
+      };
+    });
+    PubSub.mockImplementation(pubSubMock);
+
     await newActionRun(req as Request, res as Response);
 
     expect(returnedStatus).toBe(200);
     expect(addMock.mock.calls.length).toBe(1);
     expect(collectionNames).toContain("runs");
     expect(collectionNames).toContain("actions");
-    expect(addedData.timestamp).toMatch(/[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3}Z/gm);
+    expect(addedData.timestamp).toMatch(
+      /[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3}Z/gm
+    );
     const timestamp = addedData.timestamp;
     expect(addedData).toEqual({
       ip: "1.2.3.4",
       ...req.body,
       timestamp,
+    });
+
+    expect(pubSubMock.mock.calls.length).toBe(1);
+    expect(topicName).toEqual("action-runs");
+    expect(pubMessage).toEqual({
+      json: { actionRun: { ip: "1.2.3.4", ...req.body, timestamp } },
     });
   });
 
@@ -152,8 +213,12 @@ describe("newActionRun tests", () => {
       return {
         add: addMock,
         doc: jest.fn(() => ({
-          set: () => {/* pass */ },
-          get: () => {/* pass */ },
+          set: () => {
+            /* pass */
+          },
+          get: () => {
+            /* pass */
+          },
         })),
       };
     });
@@ -182,7 +247,7 @@ describe("newActionRun tests", () => {
         returnedStatus = status;
       }),
       // eslint-disable-next-line @typescript-eslint/no-empty-function
-      end: jest.fn(() => { }),
+      end: jest.fn(() => {}),
     };
     await newActionRun(req as Request, res as Response);
 
@@ -190,7 +255,9 @@ describe("newActionRun tests", () => {
     expect(addMock.mock.calls.length).toBe(1);
     expect(collectionNames).toContain("attempted-runs");
     expect(collectionNames).toContain("actions");
-    expect(addedData.run.timestamp).toMatch(/[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3}Z/gm);
+    expect(addedData.run.timestamp).toMatch(
+      /[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3}Z/gm
+    );
     const timestamp = addedData.run.timestamp;
     expect(addedData).toEqual({
       run: {
@@ -239,7 +306,7 @@ describe("newActionRun tests", () => {
         returnedStatus = status;
       }),
       // eslint-disable-next-line @typescript-eslint/no-empty-function
-      end: jest.fn(() => { }),
+      end: jest.fn(() => {}),
     };
     await newActionRun(req as Request, res as Response);
 
@@ -247,4 +314,3 @@ describe("newActionRun tests", () => {
     expect(addMock.mock.calls.length).toBe(0);
   });
 });
-

@@ -1,0 +1,98 @@
+name: Test Application
+on:
+  push:
+    paths:
+      - src/**
+      - functions/**
+      - .github/**
+  pull_request:
+    paths:
+      - src/**
+      - functions/**
+  workflow_dispatch:
+  workflow_call:
+
+jobs:
+  test-client:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Node
+        uses: actions/setup-node@v1
+        with:
+          node-version: "16"
+      - name: Install Client Dependencies
+        run: |
+          npm install
+      - name: Test Client
+        run: |
+          npm run test
+
+  test-functions:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./functions
+
+    steps:
+      # Downloads a copy of the code in your repository before running CI tests
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - name: Install Dependencies
+        run: |
+          npm install
+
+      - name: Install Supabase Environment
+        run: |
+          cd ~
+          git clone --depth 1 https://github.com/supabase/supabase
+          cd supabase/docker
+          cp .env.example .env
+          docker compose pull -q
+
+      - name: Start Supabase Environment
+        id: supabase
+        run: |
+          cd ~/supabase/docker
+
+          docker compose up -d --wait #start services and wait for containers to be healthy
+
+          # Get Environment variables and make them accessible to future steps
+          function getPathEnvVar {
+            path="$1"
+            var_name="$2"
+            grep "^${var_name}=" "${path}" | sed -E "s%^${var_name}=\"?([^\"]+)\"?.*$%\1%"
+          }
+
+          echo "url=$(getPathEnvVar .env API_EXTERNAL_URL)" >> $GITHUB_OUTPUT
+          echo "key=$(getPathEnvVar .env SERVICE_ROLE_KEY)" >> $GITHUB_OUTPUT
+
+          pg_user="$(getPathEnvVar .env POSTGRES_USER)"
+          #pg_host="$(getPathEnvVar .env POSTGRES_HOST)"
+          pg_host="localhost"
+          pg_port="$(getPathEnvVar .env POSTGRES_PORT)"
+          pg_db="$(getPathEnvVar .env POSTGRES_DB)"
+          pg_pw="$(getPathEnvVar .env POSTGRES_PASSWORD)"
+
+          echo "pg_uri=postrgesql://$pg_user:$pg_pw@$pg_host:$pg_port/$pg_db" >> $GITHUB_OUTPUT
+
+      - name: Test Functions
+        run: |
+          npm run test
+        env:
+          PG_URI: ${{ steps.supabase.outputs.pg_uri }}
+          SUPABASE_URL: ${{ steps.supabase.outputs.url }}
+          SUPABASE_KEY: ${{ steps.supabase.outputs.key }}
+          TEST_GITHUB_TOKEN: ${{ secrets.TEST_GITHUB_TOKEN }}
+
+      - name: Destroy Supabase Environment
+        run: |
+          cd ~/supabase/docker
+          docker-compose down

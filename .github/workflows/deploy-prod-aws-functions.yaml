@@ -1,0 +1,48 @@
+name: Deploy Prod AWS Functions
+on:
+  push:
+    paths:
+      - functions/src/**
+    branches:
+      - main
+      # - MigrationMain
+  workflow_dispatch:
+
+jobs:
+  test-functions:
+    uses: "./.github/workflows/integration-tests.yaml"
+
+  deploy:
+    runs-on: ubuntu-latest
+    environment: Production
+    needs: ["test-functions"]
+
+    defaults:
+      run:
+        working-directory: ./functions
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - name: Install Dependencies
+        run: |
+          npm install
+          npm install -g serverless
+          serverless plugin install -n serverless-lift
+      - name: Build project
+        run: |
+          npm run build
+      - name: Deploy Prod
+        run: |
+          serverless deploy --stage prod
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID_PROD }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY_PROD }}
+          PG_URI: ${{ secrets.PG_URI_PROD }}
+          SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY}}

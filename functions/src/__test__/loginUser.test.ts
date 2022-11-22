@@ -1,4 +1,4 @@
-import { loginUserEntrypoint } from "../entrypoints/loginUser";
+import { loginUserEntrypoint } from "../entrypoints/firebase/loginUser";
 import { CallableContext } from "firebase-functions/v1/https";
 
 jest.mock("axios");
@@ -28,7 +28,8 @@ describe("loginUser", () => {
   axios.get.mockImplementation(async (url: any, params: any) => {
     if (url === "https://api.github.com/user") {
       if (params?.headers?.Authorization === "token token123") {
-        return { // TODO: update this with actual values
+        return {
+          // TODO: update this with actual values
           status: 200,
           data: {
             login: "testUser123",
@@ -39,14 +40,18 @@ describe("loginUser", () => {
             url: "https://api.github.com/users/octocat",
             html_url: "https://github.com/octocat",
             followers_url: "https://api.github.com/users/octocat/followers",
-            following_url: "https://api.github.com/users/octocat/following{/other_user}",
+            following_url:
+              "https://api.github.com/users/octocat/following{/other_user}",
             gists_url: "https://api.github.com/users/octocat/gists{/gist_id}",
-            starred_url: "https://api.github.com/users/octocat/starred{/owner}{/repo}",
-            subscriptions_url: "https://api.github.com/users/octocat/subscriptions",
+            starred_url:
+              "https://api.github.com/users/octocat/starred{/owner}{/repo}",
+            subscriptions_url:
+              "https://api.github.com/users/octocat/subscriptions",
             organizations_url: "https://api.github.com/users/octocat/orgs",
             repos_url: "https://api.github.com/users/octocat/repos",
             events_url: "https://api.github.com/users/octocat/events{/privacy}",
-            received_events_url: "https://api.github.com/users/octocat/received_events",
+            received_events_url:
+              "https://api.github.com/users/octocat/received_events",
             type: "User",
             site_admin: false,
             name: "monalisa octocat",
@@ -76,14 +81,16 @@ describe("loginUser", () => {
       return {
         doc: (id: string) => {
           return {
-            get: async () => (
-              Object.keys(usersDb).includes(id) ? {
-                exists: true,
-                data: () => (usersDb[id]),
-              } : {
-                exist: false,
-                data: () => undefined,
-              }),
+            get: async () =>
+              Object.keys(usersDb).includes(id)
+                ? {
+                    exists: true,
+                    data: () => usersDb[id],
+                  }
+                : {
+                    exist: false,
+                    data: () => undefined,
+                  },
             set: (data: any, options: any) => {
               setValue = data;
               if (options?.merge) {
@@ -99,10 +106,11 @@ describe("loginUser", () => {
     return {};
   });
 
-
   test("it should return the username if the user already exists", async () => {
     try {
-      const user = await loginUserEntrypoint({ GithubToken: "token1234" }, { auth: { uid: "123" } } as CallableContext);
+      const user = await loginUserEntrypoint({ GithubToken: "token1234" }, {
+        auth: { uid: "123" },
+      } as CallableContext);
       expect(user.username).toBe("UserCheck1");
       expect(user.name).toBe("checked user");
       expect(user.avatar_url).toBe("http://avatarurl.com/usercheck1");
@@ -114,7 +122,9 @@ describe("loginUser", () => {
 
   test("it should create a new db entry if the user does not already exist", async () => {
     try {
-      const user = await loginUserEntrypoint({ GithubToken: "token123" }, { auth: { uid: "67866" } } as CallableContext);
+      const user = await loginUserEntrypoint({ GithubToken: "token123" }, {
+        auth: { uid: "67866" },
+      } as CallableContext);
       const expected = {
         username: "testUser123",
         email: "testUser@gmail.com",
@@ -139,7 +149,9 @@ describe("loginUser", () => {
 
   test("it should be unable to login if the github token is not correct", async () => {
     try {
-      const user = await loginUserEntrypoint({ GithubToken: "NotValidToken" }, { auth: { uid: "1234" } } as CallableContext);
+      const user = await loginUserEntrypoint({ GithubToken: "NotValidToken" }, {
+        auth: { uid: "1234" },
+      } as CallableContext);
       expect(user).toEqual({
         code: 401,
         message: "Unauthorized",
@@ -152,7 +164,10 @@ describe("loginUser", () => {
 
   test("it should throw a 400 if the github token is missing from the call", async () => {
     try {
-      const user = await loginUserEntrypoint({} as { GithubToken: string }, { auth: { uid: "1234" } } as CallableContext);
+      const user = await loginUserEntrypoint(
+        {} as { GithubToken: string },
+        { auth: { uid: "1234" } } as CallableContext
+      );
       expect(user).toEqual({
         code: 400,
         message: "Bad Request: GithubToken is required",
@@ -165,7 +180,10 @@ describe("loginUser", () => {
 
   test("it should throw a 401 if the call comes from an unauthorize source", async () => {
     try {
-      const user = await loginUserEntrypoint({ GithubToken: "anyToken" }, {} as CallableContext);
+      const user = await loginUserEntrypoint(
+        { GithubToken: "anyToken" },
+        {} as CallableContext
+      );
       expect(user).toEqual({
         code: 401,
         message: "Unauthorized",
@@ -176,4 +194,3 @@ describe("loginUser", () => {
     }
   });
 });
-

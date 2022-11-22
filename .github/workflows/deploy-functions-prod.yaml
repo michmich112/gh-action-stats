@@ -15,13 +15,13 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v1
         with:
-          node-version: '14'
+          node-version: "14"
       - name: test functions
         working-directory: ./functions
-        run: | 
+        run: |
           npm install
           npm run test
-  
+
   deploy-functions:
     runs-on: ubuntu-latest
     needs: test-functions
@@ -30,7 +30,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v1
         with:
-          node-version: '14'
+          node-version: "14"
       - name: Deploy
         working-directory: ./functions
         run: |
@@ -45,4 +45,3 @@ jobs:
           firebase deploy --project gh-action-stats --only functions --token $FIREBASE_TOKEN
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
-          
