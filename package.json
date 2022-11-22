@@ -13,7 +13,10 @@
     "dev": "rollup -c -w",
     "start": "sirv public --no-clear",
     "check": "svelte-check --tsconfig ./tsconfig.json",
-    "test": "TZ=America/Los_Angeles jest"
+    "test": "TZ=America/Los_Angeles jest",
+    "format": "prettier --write ./src/**/*.{js,svelte,html,ts}",
+    "lint": "eslint src  --ext .js,.svelte,.html,.ts",
+    "lint:fix": "eslint --fix src --ext .js,.svelte"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^17.0.0",
@@ -23,7 +26,13 @@
     "@types/firebase": "^3.2.1",
     "@types/jest": "^27.0.3",
     "@types/node": "^16.11.9",
+    "@typescript-eslint/eslint-plugin": "^5.44.0",
+    "@typescript-eslint/parser": "^5.44.0",
+    "eslint": "^8.28.0",
+    "eslint-plugin-svelte3": "^4.0.0",
     "jest": "^27.3.1",
+    "prettier": "^2.7.1",
+    "prettier-plugin-svelte": "^2.8.1",
     "rollup": "^2.3.4",
     "rollup-plugin-css-only": "^3.1.0",
     "rollup-plugin-livereload": "^2.0.0",
